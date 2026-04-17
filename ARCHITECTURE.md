@@ -1,55 +1,85 @@
-# SpectaSyncAI: Tiered Machine Intelligence Architecture (v3.1.3)
+# SpectaSyncAI: Agentic Signal Mesh Architecture (v1.0.0)
 
-![SpectaSyncAI Architecture](file:///d:/Siva/Books/CAREER/HACKATHON/Gen_AI_APAC_2026/SpectaSyncAI/Architecture_Diagram.png)
+SpectaSyncAI leverages a decentralized, tiered intelligence model to coordinate crowd safety across multi-modal sensor inputs. The system transitions from raw telemetry to autonomous agentic reasoning using Google’s most advanced Gemini models.
 
-## 1. Direct Signal Mastery (Tier 0–4)
-SpectaSyncAI operates through five decoupled layers of intelligence, ensuring low-latency detection and high-confidence intervention.
+## 🟢 High-Level System Architecture
 
-### Tier 0: Multi-Modal Ingestion (The Senses)
-*   **Vision (VEO/Flash):** Real-time spatial density analysis and precursor detection (e.g., 'stop-and-go' waves).
-*   **Acoustic (Lyria):** Panic signature detection and "Information Cascade" monitoring (rumor noise).
-*   **Thermal (Imagen):** Stagnation point identification in high-density corridors.
+```mermaid
+graph TB
+    subgraph "Perception Layer (Multi-Modal Sensors)"
+        CCTV["CCTV (Vision Agent)"]
+        Audio["Ambient Mic (Acoustic Agent)"]
+        Thermal["Thermal Scanners (Imagen Agent)"]
+    end
 
-### Tier 1: Real-Time Edge Processing
-*   FastAPI endpoints process telemetry from the ingestion layer at sub-200ms latency.
-*   Stateless validation of sensor health and data integrity.
+    subgraph "Ingestion & Signal Refining"
+        API["FastAPI Backend (Cloud Run)"]
+        VEO["Vertex AI VEO (Spatial Density)"]
+        Lyria["Vertex AI Lyria (Distress Transients)"]
+    end
 
-### Tier 2: The Agentic Mesh (The Brain)
-*   **11-Agent Hub:** Specialized agents (Perimeter, VIP, Rumor, Failsafe) powered by **Gemini 2.5 Pro**.
-*   **Orchestration:** CoreOrchestrator manages cross-agent communication via the Google ADK.
-*   **Agentic RAG:** IncidentRAGAgent retrieves analogous historical failures (12-incident corpus) via **AlloyDB + pgvector**.
+    subgraph "Agentic Mesh (The Brain)"
+        Orch["Core Orchestrator (Gemini 2.5 Pro)"]
+        RAG["Incident RAG Agent (AlloyDB + pgvector)"]
+        VIP["VIP Sync Agent"]
+        Safety["Safety Guardrail Agent"]
+        Queue["Queue Prediction Agent"]
+    end
 
-### Tier 3: Actionable HMI (The Interface)
-*   **Global I18n:** Command hub support for 12+ languages (Hindi, Telugu, Tamil, Japanese, etc.).
-*   **Tactical View:** Real-time digital twin visualization of venue density.
+    subgraph "Actionable Intelligence (MCP)"
+        MCP["FastMCP Toolbox (SSE Server)"]
+        Staff["Staff Pager (Push)"]
+        Signage["Digital Signage (I18n)"]
+        PA["PA System (Lyria TTS)"]
+    end
 
-### Tier 4: Governance & HITL (The Shield)
-*   **Guardrails:** Automated safety checks for all AI-generated interventions.
-*   **HITL:** Human-In-The-Loop mandatory gate for life-critical protocols (Evacuation, Egress-Reverse).
+    CCTV --> VEO
+    Audio --> Lyria
+    VEO & Lyria --> API
+    API --> Orch
+    Orch <--> RAG
+    Orch --> VIP & Safety & Queue
+    Safety --> MCP
+    MCP --> Staff & Signage & PA
+```
 
-## 2. Security & Safety Guardrails (@10_security_governance)
-*   **PII Scrubbing:** Automated anonymization of face/voice metadata before ingestion.
-*   **Prompt Injection Filters:** Rigorous system-instruction hardening to prevent agent hijacking.
-*   **Hardened IAM:** Least-privilege access for Cloud Run service identities.
-*   **Zero-Secret Policy:** All credentials managed via Google Secret Manager (local .env excluded via .gitignore).
+---
 
-## 3. Cost Efficiency & Token Management (@19_cost_efficiency_architect)
-*   **Vertex AI Context Caching:** 90% cost reduction for long-running agent threads (11-agent mesh).
-*   **Model Selection:** Gemini 1.5/2.5 Flash for high-throughput ingestion; 2.5 Pro only for complex orchestration.
-*   **AlloyDB Optimization:** Connection pooling and indexed vector searches minimize compute overhead.
+## 🏗️ The Technology Stack
 
-## 4. Code Quality & Test Strategy (@14_quality_assurance_engineer)
-*   **Test Coverage (45% -> 85% Target):** While overall coverage is 45%, **Core Intelligence (100%)** and **Safety Routers (92%)** are fully covered. Non-critical UI components are prioritized lower for development speed.
-*   **Standardization:** Adheres to `@07_modern_polyglot_standards` (Type hints, Pydantic v2 validation).
-*   **Auditability:** Standard output logs all agent decisions for post-event forensic replay.
+| Layer | Technology | Role |
+| :--- | :--- | :--- |
+| **LLM / Foundation** | Gemini 2.5 Pro & Flash | Core Reasoning & Multimodal Ingestion |
+| **Agentic Framework** | Google ADK & LangGraph | Multi-agent coordination and state management |
+| **Vector Database** | AlloyDB Omni + pgvector | High-performance RAG over legacy incident corpora |
+| **API Backend** | FastAPI (Python 3.12) | Real-time signal routing and life-lifeline management |
+| **Agentic Toolbox** | FastMCP (SSE) | Standardization of bot-to-hardware communication |
+| **Forensic Storage** | Google Cloud Storage (GCS) | Centralized hosting for high-fidelity media assets |
+| **Frontend UI** | React 18 + Vite + Tailwind | Real-time digital twin and tactical dashboard |
+| **Infrastructure** | Google Cloud Run (Serverless) | Auto-scaling deployment with Dockerized services |
 
-### Data Flow & Signal Mesh
-1. **Perception:** CCTV + Sensors -> Vision Agent -> Spatial Matrix -> PostgreSQL.
-2. **Reasoning:** CoreOrchestrator + IncidentRAGAgent (Forensic Analysis) -> Intervention Strategy.
-3. **Execution:** MCP Dispatch -> Digital Signage / Staff Pagers / PA System.
-4. **Feedback:** Multi-lingual Sentiment Analysis -> Real-time Experience Loop.
+---
 
-### Deployment Hardening
-- **Infrastructure:** Dockerized FastAPI & FastMCP on Google Cloud Run.
-- **Security:** Prompt-Shield v2 for injection filtering + PII Scrubbing at Ingestion.
-- **Availability:** BLE 5.0 Offline Mesh Fallback (Failsafe Agent).
+## 🧠 Core Intelligence Cycles
+
+### 1. Forensic RAG Loop
+When a density surge is detected, the **IncidentRAGAgent** performs a vector search in **AlloyDB** to find analogous historical events. It retrieves specific "lessons learned" and injects them into the **Core Orchestrator's** context to generate a high-confidence intervention plan.
+
+### 2. Multi-Modal Fusion
+*   **Vision (Gemini VEO):** Identifies "stagnation points" and flow reversals.
+*   **Acoustics (Gemini Lyria):** Detects distress transients (screams, panic signatures) before they appear on video.
+*   **Action:** The mesh fuses these signals to verify a crisis before escalating to the **Failsafe Agent**.
+
+### 3. Localization & Inclusivity (I18n)
+All interventions are processed through our **Command I18n Engine**, delivering mission-critical instructions in **12+ languages** (Hindi, Telugu, Tamil, Japanese, etc.) dynamically based on the detected demographic density.
+
+---
+
+## 🛡️ Security & Governance
+*   **PII Masking**: In-flight anonymization of facial and vocal metadata.
+*   **Vertex AI Context Caching**: 90% cost reduction for high-frequency agentic turns.
+*   **Hardened IAM**: Zero-trust service identity for cross-layer communication.
+*   **HITL (Human-in-the-Loop)**: Mandatory bridge for life-critical evacuations.
+
+---
+*Document generated for PromptWars 2026 Hackathon Submission - SpectaSyncAI Team.*
