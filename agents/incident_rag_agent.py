@@ -320,7 +320,11 @@ async def run_incident_rag_query(
                 {"incident_id": i["incident_id"], "similarity_score": i["similarity_score"]}
                 for i in similar["similar_incidents"]
             ],
-            "combined_risk_level": "CRITICAL" if capacity_ratio > 2.0 else "HIGH" if capacity_ratio > 1.5 else "MODERATE",
+            "combined_risk_level": (
+                "CRITICAL" if capacity_ratio > 2.0
+                else "HIGH" if capacity_ratio > 1.5
+                else "MODERATE"
+            ),
             "priority_interventions": [
                 s["action"] for s in strategies["unified_interventions"][:5]
             ],

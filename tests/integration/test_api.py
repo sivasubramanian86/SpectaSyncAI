@@ -154,13 +154,15 @@ def test_telemetry_failures():
     with patch(p_orch, side_effect=Exception("Orch Error")):
         payload = {"location_id": "L1", "density_override": 0.5}
         response = client.post("/v1/telemetry", json=payload)
-        assert response.status_code == 500
+        assert response.status_code == 200
+        assert response.json()["action_taken"][0]["status"] == "PENDING"
 
     p_vision = "api.routers.telemetry.run_vision_analysis"
     with patch(p_vision, side_effect=Exception("Vision Error")):
         payload = {"location_id": "L1", "image_b64": "YmFzZTY0"}
         response = client.post("/v1/telemetry", json=payload)
-        assert response.status_code == 500
+        assert response.status_code == 200
+        assert response.json()["density_report"]["is_fallback"] is True
 
 
 def test_predictions_failure():
@@ -168,7 +170,8 @@ def test_predictions_failure():
     with patch(p_surge, side_effect=Exception("Pred Error")):
         payload = {"location_id": "L1", "current_density": 0.5}
         response = client.post("/v1/predictions/surge", json=payload)
-        assert response.status_code == 500
+        assert response.status_code == 200
+        assert response.json()["is_fallback"] is True
 
 
 def test_queues_invalid():
@@ -176,11 +179,13 @@ def test_queues_invalid():
     p_queue = "api.routers.queues.run_queue_analysis"
     with patch(p_queue, side_effect=Exception("Queue Error")):
         response = client.get("/v1/queues")
-        assert response.status_code == 500
+        assert response.status_code == 200
+        assert response.json()[0]["is_fallback"] is True
 
     with patch(p_queue, side_effect=Exception("Individual Queue Error")):
         response = client.get("/v1/queues/ZONE_A")
-        assert response.status_code == 500
+        assert response.status_code == 200
+        assert response.json()["is_fallback"] is True
 
     with patch(p_queue, new_callable=AsyncMock) as mock_run:
         mock_run.return_value = []

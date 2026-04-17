@@ -198,7 +198,10 @@ class AlloyDBMemory:
         Tracks cached_tokens for context caching ROI measurement.
         """
         if _USE_MOCK:
-            logger.debug(f"[Memory] MOCK LOG — {agent_name} | tokens={input_tokens}+{output_tokens} cached={cached_tokens}")
+            logger.debug(
+                f"[Memory] MOCK LOG — {agent_name} | "
+                f"tokens={input_tokens}+{output_tokens} cached={cached_tokens}"
+            )
             return
 
         try:

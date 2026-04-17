@@ -83,7 +83,10 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
                 "Activate staggered entry protocols",
                 "Verify backup power for real-time vision nodes"
             ],
-            "strategic_recommendation": f"Proceed with event {data.event_name} under Enhanced Safety Protocol V2.1. Monitor density closely.",
+            "strategic_recommendation": (
+                f"Proceed with event {data.event_name} under Enhanced Safety "
+                "Protocol V2.1. Monitor density closely."
+            ),
             "is_fallback": True,
             "error_detail": str(e)
         }

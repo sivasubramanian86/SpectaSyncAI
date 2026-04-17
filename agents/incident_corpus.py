@@ -66,7 +66,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=41,
         injuries=100,
         failure_modes=["TEMPORAL_DISRUPT", "INFRA_FAILURE", "EXOGENOUS_SURGE"],
-        primary_trigger="Political leader convoy arrived ~7 hours late; simultaneous crowd surge toward stage; power cut eliminated all PA and LED guidance.",
+        primary_trigger=(
+            "Political leader convoy arrived ~7 hours late; simultaneous crowd surge toward stage; "
+            "power cut eliminated all PA and LED guidance."
+        ),
         key_precursor_signals=[
             "Venue capacity exceeded 4x at T-6 hours (cell tower anomaly)",
             "Convoy GPS showed departure 6.5 hours behind schedule at T-5 hours",
@@ -715,10 +718,13 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         venue_capacity=10_000_000,
         deaths=30,
         injuries=60,
-        failure_modes=["GHAT_CRUSH", "EXOGENOUS_SURGE", "BRIDGE_BOTTLENECK", "TEMPORAL_DISRUPT"],
+        failure_modes=[
+            "GHAT_CRUSH", "EXOGENOUS_SURGE", "BRIDGE_BOTTLENECK", "TEMPORAL_DISRUPT"
+        ],
         primary_trigger=(
             "Peak amavasya bathing date at pilgrimage festival drew estimated 30 million pilgrims; catch-all "
-            "crowd surge at bathing ghats and approach bridges; pre-dawn bathing timing created convergence in darkness."
+            "crowd surge at bathing ghats and approach bridges; pre-dawn "
+            "bathing timing created convergence in darkness."
         ),
         key_precursor_signals=[
             "Religious calendar amavasya date predictable years in advance",

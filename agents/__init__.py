@@ -1,6 +1,6 @@
 """
 SpectaSyncAI: Agents Package
-Exports the full ADK Agent Mesh — 11 agents across 2 tiers.
+Exports the full ADK Agent Mesh — 12 agents across 2 tiers.
 
 Tier 1 — Operational Agents (real-time venue monitoring):
   VisionAgent, CoreOrchestrator, PredictionAgent, QueueAgent, SafetyAgent, ExperienceAgent

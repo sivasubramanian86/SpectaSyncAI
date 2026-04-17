@@ -39,7 +39,7 @@ export function Header({ lastUpdated, isLive, activeTab, onTabChange }: HeaderPr
 
         <div className="flex items-center gap-4">
           <div className="hidden lg:flex items-center gap-2 text-[10px] text-slate-400 glass px-3 py-1.5 uppercase font-bold tracking-wider">
-            <span className="text-blue-400 flex items-center gap-1"><Users size={12} /> 11-Agent Mesh</span>
+            <span className="text-blue-400 flex items-center gap-1"><Users size={12} /> 12-Agent Mesh</span>
             <span className="w-px h-3 bg-white/20" />
             <span className="text-emerald-400">Vertex AI</span>
             <span className="w-px h-3 bg-white/20" />

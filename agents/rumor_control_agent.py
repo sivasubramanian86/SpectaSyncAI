@@ -165,25 +165,41 @@ def broadcast_counter_narrative(
     """
     COUNTER_MESSAGES = {
         "UNAUTHORIZED_ENTRY": {
-            "en": "OFFICIAL NOTICE: Entry is by valid ticket only. All gates are operating normally. Please join the designated queues.",
-            "ta": "அதிகாரப்பூர்வ அறிவிப்பு: செல்லாத டிக்கெட் இல்லாமல் நுழைவு இல்லை. அனைத்து வாயில்களும் இயல்பாக செயல்படுகின்றன.",
+            "en": (
+                "OFFICIAL NOTICE: Entry is by valid ticket only. All gates are "
+                "operating normally. Please join the designated queues."
+            ),
+            "ta": (
+                "அதிகாரப்பூர்வ அறிவிப்பு: செல்லாத டிக்கெட் இல்லாமல் நுழைவு இல்லை. "
+                "அனைத்து வாயில்களும் இயல்பாக செயல்படுகின்றன."
+            ),
             "kn": "ಅಧಿಕೃತ ಸೂಚನೆ: ಟಿಕೆಟ್ ಇಲ್ಲದೆ ಪ್ರವೇಶವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಗದಿತ ಸರತಿಗೆ ಸೇರಿ.",
             "hi": "आधिकारिक सूचना: प्रवेश केवल वैध टिकट से। सभी द्वार सामान्य रूप से कार्यरत हैं।",
         },
         "STRUCTURAL_PANIC": {
-            "en": "ALL CLEAR: Structural integrity of all venue infrastructure is confirmed. Please remain calm and follow staff directions.",
+            "en": (
+                "ALL CLEAR: Structural integrity of all venue infrastructure is "
+                "confirmed. Please remain calm and follow staff directions."
+            ),
             "ta": "அனைத்தும் பாதுகாப்பானது: அனைத்து வசதிகள் பாதுகாப்பாக உள்ளன. அமைதியாக இருங்கள்.",
             "kn": "ಸಂಪೂರ್ಣ ಸ್ಪಷ್ಟ: ಎಲ್ಲಾ ರಚನೆಗಳು ಸುರಕ್ಷಿತ. ದಯವಿಟ್ಟು ಸಿಬ್ಬಂದಿಯನ್ನು ಅನುಸರಿಸಿ.",
             "hi": "संरचना सुरक्षित: सभी इन्फ्रास्ट्रक्चर सुरक्षित हैं। शांत रहें।",
         },
         "PANIC_CONTAGION": {
-            "en": "PLEASE STAND STILL. There is no emergency. Venue is operating normally. Follow the green arrows for safe movement.",
+            "en": (
+                "PLEASE STAND STILL. There is no emergency. Venue is operating "
+                "normally. Follow the green arrows for safe movement."
+            ),
             "ta": "நிறுத்துங்கள். அவசரகாலம் இல்லை. பச்சை அம்புகளை பின்பற்றுங்கள்.",
             "kn": "ದಯವಿಟ್ಟು ನಿಲ್ಲಿ. ಯಾವುದೇ ತುರ್ತುಸ್ಥಿತಿ ಇಲ್ಲ.",
             "hi": "कृपया रुकें। कोई आपात स्थिति नहीं है।",
         },
         "EMERGENCY_MISINFORMATION": {
-            "en": "OFFICIAL SAFETY UPDATE: Venue security confirms no emergency situation. Stay where you are. Follow green exit signs only on staff instruction.",
+            "en": (
+                "OFFICIAL SAFETY UPDATE: Venue security confirms no emergency "
+                "situation. Stay where you are. Follow green exit signs only on "
+                "staff instruction."
+            ),
             "ta": "அதிகாரப்பூர்வ பாதுகாப்பு: அவசரகாலம் இல்லை என்று உறுதி.",
             "kn": "ಅಧಿಕೃತ ಸುರಕ್ಷತೆ: ತುರ್ತುಸ್ಥಿತಿ ಇಲ್ಲ.",
             "hi": "आधिकारिक सुरक्षा: कोई आपात स्थिति नहीं।",

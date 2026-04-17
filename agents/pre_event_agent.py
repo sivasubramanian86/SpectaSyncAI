@@ -105,13 +105,19 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
             "risk_level": "CRITICAL",
             "expected_crowd_peak": "142,000 (Local Forecast)",
             "weather_impact": "Extreme Heat (38°C) detected. High risk of dehydration-induced panic.",
-            "pro_con_summary": "STRENGTH: Full staff deployment. WEAKNESS: Potential transit strike synergy with gate congestion.",
+            "pro_con_summary": (
+                "STRENGTH: Full staff deployment. "
+                "WEAKNESS: Potential transit strike synergy with gate congestion."
+            ),
             "precautionary_measures": [
                 "Stagger entry by 20-minute windows.",
                 "Deploy mobile hydration teams to Gate North.",
                 "Sync with VIPSyncAgent for high-profile arrival routing."
             ],
-            "strategic_recommendation": "FORCE-START: Activate all auxiliary gates and disable automated turnstiles for faster egress.",
+            "strategic_recommendation": (
+                "FORCE-START: Activate all auxiliary gates and disable "
+                "automated turnstiles for faster egress."
+            ),
             "is_fallback": True,
             "status": "Offline Processing (Mock Enabled)"
         }

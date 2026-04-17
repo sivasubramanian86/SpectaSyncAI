@@ -1,6 +1,6 @@
 SpectaSyncAI is an enterprise-grade, agentic prevention system designed to preempt large-scale crowd disasters before they manifest. By orchestrating a high-fidelity mesh of **12 autonomous agents**, the system intercepts precursor signals of crowd crush events—ranging from exogenous transit surges to information cascades—using a forensically grounded RAG (Retrieval-Augmented Generation) engine.
 
-Ground-truthed against an anonymized corpus of **12 global crowd incidents (2010–2025)**, SpectaSyncAI transforms reactive security into proactive prevention. It leverages **Gemini 2.5 Pro/Flash** for spatial reasoning and **AlloyDB with pgvector** for real-time historical analogy synthesis, enabling a 45–90 minute intervention window that could have saved 3,000+ lives in the last decade.
+Ground-truthed against an anonymized corpus of **18 global crowd incidents (2003–2025)**, SpectaSyncAI transforms reactive security into proactive prevention. It leverages **Gemini 2.5 Pro/Flash** for spatial reasoning and **AlloyDB with pgvector** for real-time historical analogy synthesis, enabling a 45–90 minute intervention window that could have saved 3,500+ lives in the last decade.
 
 [![CI/CD](https://github.com/sivasubramanian86/SpectaSyncAI/actions/workflows/ci.yml/badge.svg)](https://github.com/sivasubramanian86/SpectaSyncAI/actions)
 [![Frontend Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen.svg)](https://github.com/sivasubramanian86/SpectaSyncAI/actions)
@@ -32,7 +32,13 @@ Every incident in the corpus below had **detectable precursor signals 45–90 mi
 | INC-2017-IND-01 | 2017 | IN | Transit/civic | 22 | INFRA_FAILURE + EGRESS_FAILURE |
 | INC-2019-AGO-01 | 2019 | AO | Concert | 17 | EXOGENOUS_SURGE + TICKETING_CHAOS |
 | INC-2023-MAR-01 | 2023 | MA | Sports | 8 | EGRESS_FAILURE + PANIC_TRIGGER |
-| **Total** | | | | **3,298** | |
+| INC-2003-IND-01 | 2003 | IN | Religious | 39 | TEMPLE_SURGE + GHAT_CRUSH |
+| INC-2008-IND-01 | 2008 | IN | Religious | 162 | TEMPLE_SURGE + PANIC_TRIGGER |
+| INC-2013-IND-02 | 2013 | IN | Religious | 36 | BRIDGE_BOTTLENECK + STAIRWAY_COLLAPSE |
+| INC-2022-IND-01 | 2022 | IN | Religious | 12 | NARROW_CORRIDOR + EGRESS_FAILURE |
+| INC-2024-IND-01 | 2024 | IN | Religious | 6 | TICKETING_CHAOS + EXOGENOUS_SURGE |
+| INC-2025-IND-03 | 2025 | IN | Religious | 30 | GHAT_CRUSH + BRIDGE_BOTTLENECK |
+| **Total** | | | | **3,578** | |
 
 > All identifiers follow the schema `INC-{YEAR}-{ISO3166-1α2}-{SEQ}`. No personal names, venue brands, political entities, or celebrity identifiers appear anywhere in this codebase.
 

@@ -156,16 +156,16 @@ export function MultiModalHub() {
                       <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                       <span className="text-[10px] font-black text-blue-300 uppercase tracking-widest">ADK Live Mesh Trace</span>
                     </div>
-                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-blue-500/30 border border-blue-400/30 text-blue-200">11 AGENTS</span>
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-blue-500/30 border border-blue-400/30 text-blue-200">12 AGENTS</span>
                   </div>
                   <div className="space-y-2 text-left">
                     <p className="text-[9px] text-blue-100/90 leading-tight font-mono whitespace-pre-line">
                       {activeMedia.type === 'video' 
-                        ? '> VisionAgent: Detecting high-frequency flow reversal patterns...\n> CoreOrchestrator: Synced 8/11 Mesh Nodes.' 
+                        ? '> VisionAgent: Detecting high-frequency flow reversal patterns...\n> CoreOrchestrator: Synced 9/12 Mesh Nodes.' 
                         : '> LyriaAgent: Isolating non-ambient acoustic distress signatures...\n> IncidentRAG: Analysing INC-2025-IND-02.'}
                     </p>
                     <div className="flex gap-1 items-center">
-                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(v => (
+                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(v => (
                           <div key={v} className="w-1.5 h-1.5 rounded-full bg-blue-400/40 animate-pulse" style={{ animationDelay: `${v * 0.1}s` }} />
                        ))}
                     </div>

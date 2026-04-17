@@ -129,11 +129,31 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
         return {
             "attendee_zone": attendee_zone,
             "recommendations": [
-                {"priority": 1, "category": "TIMING", "message": "Halftime in 18 mins — visit food stands NOW to avoid queues.", "timing": "Immediately"},
-                {"priority": 2, "category": "FOOD", "message": "Food Stand C has only 2-min wait vs 18-min at Stand A.", "timing": "Next 10 mins"},
-                {"priority": 3, "category": "RESTROOM", "message": "South Restroom is 80% less crowded than North.", "timing": "Before halftime"},
-                {"priority": 4, "category": "ENTRY_EXIT", "message": "Gate East has 3-min wait vs 15-min at Gate North.", "timing": "Any time"},
-                {"priority": 5, "category": "TIMING", "message": "Leave venue Gate East at FT+5 mins to avoid post-match surge.", "timing": "Full time"},
+                {
+                    "priority": 1, "category": "TIMING",
+                    "message": "Halftime in 18 mins — visit food stands NOW to avoid queues.",
+                    "timing": "Immediately"
+                },
+                {
+                    "priority": 2, "category": "FOOD",
+                    "message": "Food Stand C has only 2-min wait vs 18-min at Stand A.",
+                    "timing": "Next 10 mins"
+                },
+                {
+                    "priority": 3, "category": "RESTROOM",
+                    "message": "South Restroom is 80% less crowded than North.",
+                    "timing": "Before halftime"
+                },
+                {
+                    "priority": 4, "category": "ENTRY_EXIT",
+                    "message": "Gate East has 3-min wait vs 15-min at Gate North.",
+                    "timing": "Any time"
+                },
+                {
+                    "priority": 5, "category": "TIMING",
+                    "message": "Leave venue Gate East at FT+5 mins to avoid post-match surge.",
+                    "timing": "Full time"
+                },
             ],
             "best_time_to_move": "Now (before halftime surge in 18 mins)",
             "avoid_zones": ["GATE_NORTH", "FOOD_STAND_A"],

@@ -48,4 +48,13 @@ async def get_zone_queue(zone_id: str) -> dict:
         return zone_data[0]
     except Exception as e:
         logger.error(f"Zone Queue Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        from agents.queue_agent import calculate_wait_time
+        wait = calculate_wait_time(40, 10)
+        return {
+            "zone_id": zone_id,
+            "queue_length": 40,
+            "estimated_wait_mins": wait["estimated_wait_mins"],
+            "priority": wait["priority"],
+            "recommendation": wait["recommendation"],
+            "is_fallback": True
+        }
