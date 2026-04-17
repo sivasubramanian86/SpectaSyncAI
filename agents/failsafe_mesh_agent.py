@@ -27,6 +27,7 @@ Graceful Degradation Tiers:
   T3 (Degraded):   BLE mesh + offline cached routing
   T4 (Blackout):   Physical signage + staff formation only
 """
+import os
 import json
 import logging
 from datetime import datetime, timezone
@@ -219,7 +220,7 @@ def build_failsafe_mesh_agent() -> LlmAgent:
         if "INFRA_FAILURE" in r.failure_modes or r.infra_failure_involved
     ]
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="failsafe_mesh_agent",
         description=(
             "Monitors venue infrastructure health. On failure: activates BLE mesh "

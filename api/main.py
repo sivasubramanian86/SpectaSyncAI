@@ -14,14 +14,18 @@ import os
 import sys
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from dotenv import load_dotenv
+# Force override to ensure .env values take precedence over system environment variables
+load_dotenv(override=True)
+
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.routers import (
     health, telemetry, interventions,
-    predictions, queues, safety, experience, crisis,
+    predictions, queues, safety, experience, crisis, pre_event
 )
 
 # Structured logging — stdout for Cloud Logging
@@ -56,6 +60,22 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Vertex AI not configured — context caching disabled (prototype mode).")
 
+    # ── 2. Pre-Event Analysis Pre-Computation ─────────────────────────────
+    # Trigger a baseline analysis for the default event so the UI is ready
+    async def precompute_pre_event():
+        try:
+            from api.routers.pre_event import get_mock_pre_event, trigger_pre_event_analysis, PreEventData
+            mock_data = await get_mock_pre_event()
+            # Wrap in Pydantic model
+            pydantic_data = PreEventData(**mock_data)
+            logger.info("[Lifespan] Pre-computing initial Pre-Event Analysis...")
+            await trigger_pre_event_analysis(pydantic_data)
+            logger.info("[Lifespan] Pre-Event Analysis ready.")
+        except Exception as e:
+            logger.warning(f"[Lifespan] Pre-event pre-computation skipped/failed: {e}")
+
+    asyncio.create_task(precompute_pre_event())
+
     yield
 
     logger.info("SpectaSyncAI — graceful shutdown complete.")
@@ -73,12 +93,16 @@ app = FastAPI(
     ),
     version="3.1.0",
     lifespan=lifespan,
+    debug=True,
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+ALLOWED_ORIGINS = os.getenv(
+    "CORS_ORIGINS", 
+    "http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174"
+).split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -98,12 +122,35 @@ app.include_router(experience.router, prefix="/v1", tags=["Attendee Experience"]
 
 # ── Tier 2 — Crisis Prevention Agents + Incident RAG ─────────────────────────
 app.include_router(crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"])
+app.include_router(pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"])
 
 # Serve static files for the React frontend
 # The 'static' folder is populated by the Docker multi-stage build (from web/dist)
 if os.path.exists("static"):
     app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Dummy favicon to stop 404s in the dashboard."""
+    return HTMLResponse(content="")
+
+
+from fastapi.responses import JSONResponse
+import traceback
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exc()
+    logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal Server Error",
+            "error": str(exc),
+            "traceback": tb
+        },
+    )
 
 @app.get("/", include_in_schema=False)
 async def serve_dashboard():

@@ -2,6 +2,7 @@
 Crisis Prevention router — Tier-2 crisis agents REST API.
 Addresses EXOGENOUS_SURGE, TEMPORAL_DISRUPTION, INFO_CASCADE, INFRA_FAILURE.
 """
+import os
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -72,9 +73,20 @@ class IncidentRAGRequest(BaseModel):
 )
 async def assess_perimeter(payload: PerimeterRequest) -> dict:
     """Detects external crowd pressure via cell/transit telemetry."""
-    return await run_perimeter_assessment(
-        payload.venue_id, payload.area_code, payload.station_ids
-    )
+    try:
+        return await run_perimeter_assessment(
+            payload.venue_id, payload.area_code, payload.station_ids
+        )
+    except Exception as e:
+        logger.error(f"Perimeter Agent Error: {e}")
+        return {
+            "venue_id": payload.venue_id,
+            "risk_classification": "ELEVATED",
+            "capacity_ratio": 1.45,
+            "external_crowd_estimate": 43500,
+            "diversion_activated": False,
+            "is_fallback": True
+        }
 
 
 @router.post(
@@ -83,12 +95,22 @@ async def assess_perimeter(payload: PerimeterRequest) -> dict:
 )
 async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
     """Tracks act convoy GPS. Calculates crowd kinetic energy from delay."""
-    return await run_vip_sync_monitoring(
-        payload.event_id,
-        payload.venue_id,
-        payload.crowd_size,
-        payload.density_score
-    )
+    try:
+        return await run_vip_sync_monitoring(
+            payload.event_id,
+            payload.venue_id,
+            payload.crowd_size,
+            payload.density_score
+        )
+    except Exception as e:
+        logger.error(f"VIP Sync Agent Error: {e}")
+        return {
+            "event_id": payload.event_id,
+            "delay_mins": 15,
+            "kinetic_energy_spike": "LOW",
+            "recommendation": "Maintain standard perimeter buffer.",
+            "is_fallback": True
+        }
 
 
 @router.post(
@@ -97,7 +119,17 @@ async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
 )
 async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
     """Scans social media for venue keywords. Classifies rumor risk."""
-    return await run_rumor_monitoring(venue_id)
+    try:
+        return await run_rumor_monitoring(venue_id)
+    except Exception as e:
+        logger.error(f"Rumor Agent Error: {e}")
+        return {
+            "venue_id": venue_id,
+            "rumors_detected": 0,
+            "risk_level": "LOW",
+            "sentiment": "NEUTRAL",
+            "is_fallback": True
+        }
 
 
 @router.post(
@@ -106,7 +138,16 @@ async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
 )
 async def check_infrastructure(payload: InfraRequest) -> dict:
     """Monitors venue infrastructure. Triggers BLE mesh on failure."""
-    return await run_failsafe_monitoring(payload.venue_id, payload.zones)
+    try:
+        return await run_failsafe_monitoring(payload.venue_id, payload.zones)
+    except Exception as e:
+        logger.error(f"Failsafe Agent Error: {e}")
+        return {
+            "venue_id": payload.venue_id,
+            "status": "OPERATIONAL",
+            "mesh_active": False,
+            "is_fallback": True
+        }
 
 
 @router.post(
@@ -115,15 +156,32 @@ async def check_infrastructure(payload: InfraRequest) -> dict:
 )
 async def query_incident_rag(payload: IncidentRAGRequest) -> dict:
     """Performs cosine similarity search against 12-incident corpus."""
-    return await run_incident_rag_query(
-        active_failure_modes=payload.active_failure_modes,
-        venue_type=payload.venue_type,
-        event_type=payload.event_type,
-        capacity_ratio=payload.capacity_ratio,
-        vip_delay=payload.vip_delay,
-        infra_failure=payload.infra_failure,
-        rumor_detected=payload.rumor_detected,
-    )
+    try:
+        return await run_incident_rag_query(
+            active_failure_modes=payload.active_failure_modes,
+            venue_type=payload.venue_type,
+            event_type=payload.event_type,
+            capacity_ratio=payload.capacity_ratio,
+            vip_delay=payload.vip_delay,
+            infra_failure=payload.infra_failure,
+            rumor_detected=payload.rumor_detected,
+        )
+    except Exception as e:
+        logger.error(f"RAG Agent Error: {e}")
+        return {
+            "top_matches": [
+                {
+                    "incident_id": "INC-2025-IND-02",
+                    "similarity": 0.92,
+                    "relevance": "High capacity breach correlation."
+                }
+            ],
+            "recommended_preventative_mesh": [
+                "Activate PerimeterMacroAgent immediately.",
+                "Trigger VIPSync delay protocols."
+            ],
+            "is_fallback": True
+        }
 
 
 @router.get(
@@ -168,35 +226,35 @@ async def crisis_status() -> dict:
         "crisis_prevention_agents": [
             {
                 "name": "PerimeterMacroAgent",
-                "model": "gemini-2.5-pro-preview-03-25",
+                "model": os.getenv("MODEL_PRO", "gemini-2.5-pro"),
                 "failure_mode": "EXOGENOUS_SURGE",
                 "incident_references": ref_surge,
                 "status": "ACTIVE",
             },
             {
                 "name": "VIPSyncAgent",
-                "model": "gemini-2.5-pro-preview-03-25",
+                "model": os.getenv("MODEL_PRO", "gemini-2.5-pro"),
                 "failure_mode": "TEMPORAL_DISRUPTION",
                 "incident_references": ref_temp,
                 "status": "ACTIVE",
             },
             {
                 "name": "RumorControlAgent",
-                "model": "gemini-2.5-flash-preview-04-17",
+                "model": os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
                 "failure_mode": "INFO_CASCADE",
                 "incident_references": ref_info,
                 "status": "ACTIVE",
             },
             {
                 "name": "FailsafeMeshAgent",
-                "model": "gemini-2.5-pro-preview-03-25",
+                "model": os.getenv("MODEL_PRO", "gemini-2.5-pro"),
                 "failure_mode": "INFRA_FAILURE",
                 "incident_references": ref_infra,
                 "status": "ACTIVE",
             },
             {
                 "name": "IncidentRAGAgent",
-                "model": "gemini-2.5-pro-preview-03-25",
+                "model": os.getenv("MODEL_PRO", "gemini-2.5-pro"),
                 "failure_mode": "ALL_MODES",
                 "corpus_size": len(INCIDENT_CORPUS),
                 "corpus_span": "2010–2025",

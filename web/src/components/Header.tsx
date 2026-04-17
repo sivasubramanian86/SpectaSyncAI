@@ -1,6 +1,6 @@
-import { Activity, ShieldAlert, Database, Command, Users, Settings, HelpCircle, Info } from 'lucide-react';
+import { Activity, ShieldAlert, Database, Command, Users, Settings, HelpCircle, Info, Compass } from 'lucide-react';
 
-export type TabId = 'dashboard' | 'vision' | 'demographics' | 'crisis' | 'intelligence' | 'about' | 'faq' | 'system';
+export type TabId = 'dashboard' | 'vision' | 'demographics' | 'crisis' | 'intelligence' | 'pre-event' | 'about' | 'faq' | 'system';
 
 interface HeaderProps {
   lastUpdated: Date;
@@ -16,6 +16,7 @@ export function Header({ lastUpdated, isLive, activeTab, onTabChange }: HeaderPr
     { id: 'demographics', label: 'Demographic Intel', icon: <Users size={16} /> },
     { id: 'crisis', label: 'Crisis Mesh', icon: <ShieldAlert size={16} /> },
     { id: 'intelligence', label: 'Incident RAG', icon: <Database size={16} /> },
+    { id: 'pre-event', label: 'Strategic Audit', icon: <Compass size={16} /> },
     { id: 'about', label: 'About', icon: <Info size={16} /> },
     { id: 'faq', label: 'FAQ', icon: <HelpCircle size={16} /> },
     { id: 'system', label: 'Settings', icon: <Settings size={16} /> },

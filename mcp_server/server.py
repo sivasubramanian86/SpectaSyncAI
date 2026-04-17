@@ -9,6 +9,11 @@ import os
 import sys
 from mcp.server.fastmcp import FastMCP
 from mcp.server.sse import TransportSecuritySettings
+from dotenv import load_dotenv
+
+# Force override to ensure .env values take precedence over system environment variables
+load_dotenv(override=True)
+
 
 # Structured logging — JSON-compatible for Cloud Logging
 logging.basicConfig(

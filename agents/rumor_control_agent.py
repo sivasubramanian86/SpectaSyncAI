@@ -21,6 +21,7 @@ Responsibility:
   Classifies risk using Gemini Flash NLP. Broadcasts multi-channel, multilingual
   counter-narratives within 12 seconds of viral threshold detection.
 """
+import os
 import json
 import logging
 import re
@@ -206,14 +207,17 @@ def broadcast_counter_narrative(
     }
 
 
-def build_rumor_control_agent() -> LlmAgent:
+from .context_cache import get_cached_model_flash
+
+def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
     """Constructs the Rumor Control Agent using Gemini Flash for speed."""
     corpus_incidents = [
         r.incident_id for r in INCIDENT_CORPUS
         if "INFO_CASCADE" in r.failure_modes or r.rumor_involved
     ]
+    # Caching disabled for agents with tools to avoid Vertex AI 400 error
     return LlmAgent(
-        model="gemini-2.5-flash-preview-04-17",
+        model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
         name="rumor_control_agent",
         description=(
             "Real-time social media NLP monitoring for dangerous crowd rumors. "
@@ -232,13 +236,19 @@ def build_rumor_control_agent() -> LlmAgent:
             "   response_time_ms, analogous_incident_ids.\n"
             "Do NOT reference any persons, brands, venues, or political entities by name."
         ),
-        tools=[scan_social_media_for_rumors, classify_rumor_risk, broadcast_counter_narrative],
+        tools=[scan_social_media_for_rumors, classify_rumor_risk, broadcast_counter_narrative]
     )
 
 
 async def run_rumor_monitoring(venue_id: str) -> dict:
     """Runs the Rumor Control Agent for a venue."""
-    agent = build_rumor_control_agent()
+    try:
+        cache_name = await get_cached_model_flash("rumor_control")
+        agent = build_rumor_control_agent(cache_name=cache_name)
+    except Exception as exc:
+        logger.warning(f"[RumorControlAgent] Falling back to uncached agent: {exc}")
+        agent = build_rumor_control_agent()
+        
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
     session = await session_service.create_session(

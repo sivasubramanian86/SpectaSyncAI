@@ -5,6 +5,7 @@ Responsibility: Real-time wait time estimation across all venue service points
 (entry gates, food concessions, restrooms, merchandise stands).
 Surfaces per-zone wait times for the Command Center dashboard.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -97,7 +98,7 @@ def build_queue_agent() -> LlmAgent:
         LlmAgent: Configured queue monitoring agent.
     """
     return LlmAgent(
-        model="gemini-2.5-flash-preview-04-17",
+        model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
         name="queue_agent",
         description=(
             "Monitors all venue service points in real-time, estimates wait times "

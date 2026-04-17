@@ -5,6 +5,7 @@ Responsibility: Generates real-time personalized recommendations for attendees
 to improve their event experience — optimal timing suggestions, food, seating,
 and transport routing based on live venue state.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -61,7 +62,7 @@ def build_experience_agent() -> LlmAgent:
         LlmAgent: Configured attendee experience agent.
     """
     return LlmAgent(
-        model="gemini-2.5-flash-preview-04-17",
+        model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
         name="experience_agent",
         description=(
             "Generates real-time personalized recommendations for venue attendees "
@@ -94,10 +95,9 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
         dict: Personalized recommendations with timing advice.
     """
     agent = build_experience_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_experience")
 
-    session = await session_service.create_session(
+    session = await runner.session_service.create_session(
         app_name="spectasync_experience", user_id="system"
     )
 

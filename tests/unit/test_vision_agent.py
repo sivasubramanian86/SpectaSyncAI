@@ -2,6 +2,7 @@
 SpectaSyncAI: Unit Tests for Vision Agent
 Tests use mock runner to avoid actual Vertex AI calls in CI.
 """
+import os
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from agents.vision_agent import build_vision_agent, run_vision_analysis

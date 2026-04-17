@@ -82,7 +82,7 @@ export function MultiModalHub() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-white uppercase tracking-wider">{t.title}</h2>
-            <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.0 Flash Multi-Modal</p>
+            <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.5 Flash Multi-Modal</p>
           </div>
         </div>
 

@@ -208,7 +208,7 @@ export default function App(): React.ReactElement {
                          {[
                            { s: 'Retrieving context from AlloyDB', t: '2ms' },
                            { s: 'Running Semantic Overlap', t: '5ms' },
-                           { s: 'Generating Response (Gemini 2.0)', t: '240ms' },
+                           { s: 'Generating Response (Gemini 2.5 Pro)', t: '240ms' },
                            { s: 'Mesh Verification', t: '1ms' },
                          ].map((s, i) => (
                             <div key={i} className="flex justify-between text-xs border-l-2 border-blue-500/30 pl-3 py-1">
@@ -224,6 +224,12 @@ export default function App(): React.ReactElement {
               <div className="space-y-6">
                 <AgentFeed events={dashState.agentFeed} />
               </div>
+            </div>
+          )}
+
+          {activeTab === 'pre-event' && (
+            <div className="max-w-6xl mx-auto animate-fade-in">
+              <SystemPanel view="pre-event" />
             </div>
           )}
 

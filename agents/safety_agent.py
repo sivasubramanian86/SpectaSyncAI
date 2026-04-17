@@ -6,6 +6,7 @@ automated evacuation protocols and emergency service coordination.
 Implements responsible AI — all critical decisions require human confirmation
 in production. Prototype uses structured decision output only.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -93,7 +94,7 @@ def build_safety_agent() -> LlmAgent:
         LlmAgent: Configured safety monitoring agent.
     """
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="safety_agent",
         description=(
             "Detects dangerous crowd conditions, classifies safety risk levels, "

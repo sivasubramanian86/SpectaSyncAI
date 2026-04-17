@@ -18,6 +18,7 @@ Responsibility:
   metro/bus ridership anomalies, traffic density APIs — to detect dangerous
   crowd accumulation BEFORE it reaches the perimeter.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -200,7 +201,7 @@ def build_perimeter_macro_agent() -> LlmAgent:
     """Constructs the Perimeter Macro Agent for external crowd monitoring."""
     corpus_incidents = [r.incident_id for r in INCIDENT_CORPUS if "EXOGENOUS_SURGE" in r.failure_modes]
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="perimeter_macro_agent",
         description=(
             "Monitors external crowd accumulation via cell-tower network load and "

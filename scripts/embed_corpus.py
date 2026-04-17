@@ -26,7 +26,8 @@ from pathlib import Path
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dotenv import load_dotenv
-load_dotenv()
+# Force override to ensure .env values take precedence over system environment variables
+load_dotenv(override=True)
 
 logging.basicConfig(
     level=logging.INFO,

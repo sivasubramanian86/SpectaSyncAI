@@ -19,11 +19,12 @@ graph TB
     end
 
     subgraph "Agentic Mesh (The Brain)"
-        Orch["Core Orchestrator (Gemini 2.0 Pro)"]
+        Orch["Core Orchestrator (Gemini 2.5 Pro)"]
         RAG["Incident RAG Agent (AlloyDB + pgvector)"]
         VIP["VIP Sync Agent"]
         Safety["Safety Guardrail Agent"]
         Queue["Queue Prediction Agent"]
+        Prep["Pre-Event Strategic Analyst (Agent 12)"]
     end
 
     subgraph "Actionable Intelligence (MCP)"
@@ -35,8 +36,8 @@ graph TB
 
     CCTV --> VEO
     Audio --> Lyria
-    VEO & Lyria --> API
-    API --> Orch
+    VEO & Lyria & API --> Prep
+    Prep --> Orch
     Orch <--> RAG
     Orch --> VIP & Safety & Queue
     Safety --> MCP
@@ -49,7 +50,7 @@ graph TB
 
 | Layer | Technology | Role |
 | :--- | :--- | :--- |
-| **LLM / Foundation** | Gemini 2.0 Pro & Flash | Core Reasoning & Multimodal Ingestion |
+| **LLM / Foundation** | Gemini 2.5 Pro & Flash | Core Reasoning & Multimodal Ingestion |
 | **Agentic Framework** | Google ADK & LangGraph | Multi-agent coordination and state management |
 | **Vector Database** | AlloyDB Omni + pgvector | High-performance RAG over legacy incident corpora |
 | **API Backend** | FastAPI (Python 3.12) | Real-time signal routing and life-lifeline management |
@@ -62,7 +63,10 @@ graph TB
 
 ## 🧠 Core Intelligence Cycles
 
-### 1. Forensic RAG Loop
+### 1. Strategic Audit Cycle (Agent 12)
+Before the event starts, the **PreEventAnalystAgent** synthesizes reservations, weather, and transit schedules. It identifies "Deadly Combos" (e.g., Heat Wave + Max Capacity) and triggers **Pre-Gate Authorization** tools via MCP, ensuring auxiliary exits are unlocked and signage is pre-positioned.
+
+### 2. Forensic RAG Loop
 When a density surge is detected, the **IncidentRAGAgent** performs a vector search in **AlloyDB** to find analogous historical events. It retrieves specific "lessons learned" and injects them into the **Core Orchestrator's** context to generate a high-confidence intervention plan.
 
 ### 2. Multi-Modal Fusion

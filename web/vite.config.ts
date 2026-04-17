@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/v1': { target: 'http://localhost:8000', changeOrigin: true },
+      '/v1': { target: 'http://localhost:5174', changeOrigin: true },
     },
   },
   test: {
@@ -18,7 +18,6 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      all: true,
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['node_modules/', 'src/test/setup.ts', 'src/**/*.d.ts', 'src/main.tsx', 'src/types/**/*', 'tests-e2e/**'],
     },

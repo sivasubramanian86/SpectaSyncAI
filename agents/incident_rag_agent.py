@@ -17,6 +17,7 @@ RAG Architecture:
 Production: Uses AlloyDB pgvector for embedding search.
 Prototype:  Uses in-memory cosine similarity on float feature vectors.
 """
+import os
 import json
 import logging
 import math
@@ -228,7 +229,7 @@ def build_incident_rag_agent() -> LlmAgent:
     )
 
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="incident_rag_agent",
         description=(
             "Performs RAG-based similarity search against a global crowd crush incident "
@@ -269,10 +270,9 @@ async def run_incident_rag_query(
         dict: Similar incidents, aggregated interventions, and prevention strategy.
     """
     agent = build_incident_rag_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_rag")
 
-    session = await session_service.create_session(
+    session = await runner.session_service.create_session(
         app_name="spectasync_rag", user_id="system"
     )
 

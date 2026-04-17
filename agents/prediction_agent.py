@@ -5,6 +5,7 @@ Responsibility: AI-driven surge forecasting 15–30 minutes ahead using
 historical AlloyDB patterns + current telemetry trend analysis.
 Provides confidence scores and specific actionable recommendations.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -91,7 +92,7 @@ def build_prediction_agent() -> LlmAgent:
         LlmAgent: Configured prediction agent.
     """
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="prediction_agent",
         description=(
             "Analyzes crowd density trends and historical surge patterns to "

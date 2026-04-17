@@ -1,7 +1,4 @@
-# SpectaSyncAI
-## The Predictive Crowd Intelligence Mesh
-
-SpectaSyncAI is an enterprise-grade, agentic prevention system designed to preempt large-scale crowd disasters before they manifest. By orchestrating a high-fidelity mesh of **11 autonomous agents**, the system intercepts precursor signals of crowd crush events—ranging from exogenous transit surges to information cascades—using a forensically grounded RAG (Retrieval-Augmented Generation) engine.
+SpectaSyncAI is an enterprise-grade, agentic prevention system designed to preempt large-scale crowd disasters before they manifest. By orchestrating a high-fidelity mesh of **12 autonomous agents**, the system intercepts precursor signals of crowd crush events—ranging from exogenous transit surges to information cascades—using a forensically grounded RAG (Retrieval-Augmented Generation) engine.
 
 Ground-truthed against an anonymized corpus of **12 global crowd incidents (2010–2025)**, SpectaSyncAI transforms reactive security into proactive prevention. It leverages **Gemini 2.5 Pro/Flash** for spatial reasoning and **AlloyDB with pgvector** for real-time historical analogy synthesis, enabling a 45–90 minute intervention window that could have saved 3,000+ lives in the last decade.
 
@@ -60,7 +57,7 @@ SpectaSyncAI models crowd crush events across 10 structurally distinct failure c
 
 ---
 
-## 🧠 The 11-Agent ADK Mesh
+## 🧠 The 12-Agent ADK Mesh
 
 ### Tier 1 — Operational Agents (real-time venue monitoring)
 
@@ -77,11 +74,12 @@ SpectaSyncAI models crowd crush events across 10 structurally distinct failure c
 
 | Agent | Model | Failure Mode | Corpus References |
 |:------|:------|:------------|:------------------|
-| **PerimeterMacroAgent** | Gemini 2.0 Pro | `EXOGENOUS_SURGE` | INC-2025-IND-02, INC-2022-KOR-01, INC-2010-DEU-01 |
-| **VIPSyncAgent** | Gemini 2.0 Pro | `TEMPORAL_DISRUPT` | INC-2025-IND-01, INC-2021-USA-01, INC-2015-SAU-01 |
-| **RumorControlAgent** | Gemini 2.0 Flash | `INFO_CASCADE` | INC-2025-IND-02, INC-2013-IND-01, INC-2021-USA-01 |
-| **FailsafeMeshAgent** | Gemini 2.0 Pro | `INFRA_FAILURE` | INC-2025-IND-01, INC-2017-IND-01, INC-2010-KHM-01 |
-| **IncidentRAGAgent** | Gemini 2.0 Pro | All modes | Full 12-incident corpus |
+| **PerimeterMacroAgent** | Gemini 2.5 Pro | `EXOGENOUS_SURGE` | INC-2025-IND-02, INC-2022-KOR-01, INC-2010-DEU-01 |
+| **VIPSyncAgent** | Gemini 2.5 Pro | `TEMPORAL_DISRUPT` | INC-2025-IND-01, INC-2021-USA-01, INC-2015-SAU-01 |
+| **RumorControlAgent** | Gemini 2.5 Flash | `INFO_CASCADE` | INC-2025-IND-02, INC-2013-IND-01, INC-2021-USA-01 |
+| **FailsafeMeshAgent** | Gemini 2.5 Pro | `INFRA_FAILURE` | INC-2025-IND-01, INC-2017-IND-01, INC-2010-KHM-01 |
+| **PreEventAnalystAgent** | Gemini 2.5 Pro | `PRE_EVENT_RISK` | Full strategic lookahead (90 min window) |
+| **IncidentRAGAgent** | Gemini 2.5 Pro | All modes | Full 12-incident corpus |
 
 ---
 
@@ -110,7 +108,7 @@ The `IncidentRAGAgent` implements semantic similarity search across the global i
                       │
         aggregate_intervention_strategies()
                       │
-              Gemini 2.0 Pro synthesis
+              Gemini 2.5 Pro synthesis
                       │
        [priority_interventions + prevention_confidence_pct]
 ```
@@ -141,7 +139,7 @@ PerimeterMacroAgent                     VisionAgent (Flash)
 VIPSyncAgent          ──────────── CoreOrchestrator (Pro) ─── MCPToolbox (7 tools)
 RumorControlAgent                       PredictionAgent (Pro)   └── FastMCP :8001
 FailsafeMeshAgent                       QueueAgent (Flash)
-       │                                SafetyAgent (Pro)
+PreEventAnalystAgent                    SafetyAgent (Pro)
        │                                ExperienceAgent (Flash)
        │                                         │
   IncidentRAGAgent ◄── AlloyDB pgvector ────────┘
@@ -152,7 +150,8 @@ React Command Center (Vite + Tailwind CSS)
 ├── AI Surge Forecast (recharts)
 ├── Queue Wait Time Board
 ├── Agent Activity Feed (SSE stream)
-└── Crisis Prevention Dashboard (11 agents, RAG corpus panel)
+├── Strategic Audit Dashboard (Agent 12 synthesis)
+└── Crisis Prevention Dashboard (12 agents, RAG corpus panel)
 ```
 
 ---
@@ -208,6 +207,7 @@ SpectaSyncAI/
 │   ├── queue_agent.py             # Tier 1: wait time model
 │   ├── safety_agent.py            # Tier 1: emergency classification
 │   ├── experience_agent.py        # Tier 1: attendee recommendations
+│   ├── pre_event_agent.py         # Agent 12: Strategic PrepMaster
 │   └── memory.py                  # AlloyDB + pgvector
 ├── api/
 │   └── routers/                   # 8 versioned REST endpoints
@@ -222,6 +222,6 @@ SpectaSyncAI/
 ---
 
 *Submitted for PromptWars Virtual Event 2026.*
-*Built with Google Vertex AI, Gemini 2.0, AlloyDB, and Cloud Run.*
+*Built with Google Vertex AI, Gemini 2.5, AlloyDB, and Cloud Run.*
 
 > **Governance note:** This project contains no personal names, celebrity identifiers, political entity names, or proprietary venue names in any source file, configuration, or documentation. All incident data is referenced exclusively by the INC-YYYY-ISO2-NN anonymized corpus identifier.

@@ -18,7 +18,8 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-_USE_MOCK = not bool(os.getenv("DATABASE_URL"))
+_USE_ALLOYDB = os.getenv("USE_ALLOYDB", "true").lower() == "true"
+_USE_MOCK = not (bool(os.getenv("DATABASE_URL")) and _USE_ALLOYDB)
 _POOL: Optional[object] = None          # asyncpg.Pool singleton
 EMBEDDING_MODEL = "text-embedding-004"  # 768 dimensions, Vertex AI
 

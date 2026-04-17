@@ -101,7 +101,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=11,
         injuries=56,
         failure_modes=["EXOGENOUS_SURGE", "INFO_CASCADE", "TICKETING_CHAOS"],
-        primary_trigger="A last-minute announcement of complimentary public admission to a sports victory celebration caused 250,000 fans to converge simultaneously on a 40,000-capacity venue.",
+        primary_trigger=(
+            "A last-minute announcement of complimentary public admission to a sports victory celebration "
+            "caused 250,000 fans to converge simultaneously on a 40,000-capacity venue."
+        ),
         key_precursor_signals=[
             "Cellular network load at adjacent transit stations: 4.2x baseline at T-90 mins",
             "Transit ridership at surrounding metro stations: 3.8x baseline at T-60 mins",
@@ -136,7 +139,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=159,
         injuries=197,
         failure_modes=["NARROW_CORRIDOR", "EXOGENOUS_SURGE", "TEMPORAL_DISRUPT"],
-        primary_trigger="Organizer-less public gathering in a narrow sloped alleyway during a public holiday. Crowd density reached >9 persons/m² — the threshold for pressure-wave crush.",
+        primary_trigger=(
+            "Organizer-less public gathering in a narrow sloped alleyway during a public holiday. "
+            "Crowd density reached >9 persons/m² — the threshold for pressure-wave crush."
+        ),
         key_precursor_signals=[
             "Crowd density in target alleyway measured >6/m² at T-45 mins",
             "Nearby street network at 100% pedestrian saturation at T-30 mins",
@@ -172,7 +178,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=131,
         injuries=583,
         failure_modes=["PANIC_TRIGGER", "EGRESS_FAILURE", "EXOGENOUS_SURGE"],
-        primary_trigger="Security forces deployed tear gas inside a stadium following post-match crowd disorder; spectators rushed for exits simultaneously. Exit gates were locked, creating fatal accumulation pressure.",
+        primary_trigger=(
+            "Security forces deployed tear gas inside a stadium following post-match crowd disorder; "
+            "spectators rushed for exits simultaneously. Exit gates were locked, creating fatal accumulation pressure."
+        ),
         key_precursor_signals=[
             "Post-match crowd disorder (pitch invasion) detected at T+0",
             "Tear gas deployed at T+5 triggering non-directional panic surge",
@@ -208,7 +217,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=10,
         injuries=300,
         failure_modes=["EXOGENOUS_SURGE", "TEMPORAL_DISRUPT", "INFO_CASCADE"],
-        primary_trigger="Crowd pressed forward toward stage during a music performance; emergency signals ignored; event continued 37 minutes after stage-front crush reached life-threatening density.",
+        primary_trigger=(
+            "Crowd pressed forward toward stage during a music performance; emergency signals ignored; "
+            "event continued 37 minutes after stage-front crush reached life-threatening density."
+        ),
         key_precursor_signals=[
             "Stage-front density reached critical levels at T-40 mins",
             "Multiple attendee collapse calls to medical staff at T-30 mins",
@@ -243,7 +255,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=2_411,
         injuries=934,
         failure_modes=["EXOGENOUS_SURGE", "NARROW_CORRIDOR", "TEMPORAL_DISRUPT"],
-        primary_trigger="Two massive converging crowds met at a narrow street junction during a religious ritual; no real-time routing was available; flow control systems were insufficient for the volume.",
+        primary_trigger=(
+            "Two massive converging crowds met at a narrow street junction during a religious ritual; "
+            "no real-time routing was available; flow control systems were insufficient for the volume."
+        ),
         key_precursor_signals=[
             "Dual-stream crowd convergence predicted by pilgrimage schedule at T-90 mins",
             "Pedestrian density at junction: >8 persons/m² at T-30 mins",
@@ -278,7 +293,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=21,
         injuries=510,
         failure_modes=["NARROW_CORRIDOR", "EGRESS_FAILURE", "EXOGENOUS_SURGE"],
-        primary_trigger="A single access tunnel served both ingress and egress for a music festival venue; simultaneous bidirectional flow in a 60-meter tunnel created a fatal pressure wave.",
+        primary_trigger=(
+            "A single access tunnel served both ingress and egress for a music festival venue; "
+            "simultaneous bidirectional flow in a 60-meter tunnel created a fatal pressure wave."
+        ),
         key_precursor_signals=[
             "Single tunnel usage at 100% capacity for 90 continuous minutes",
             "Bidirectional flow at T-20 mins — counterflow detected in sensor data",
@@ -313,7 +331,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=347,
         injuries=755,
         failure_modes=["BRIDGE_BOTTLENECK", "PANIC_TRIGGER", "INFRA_FAILURE"],
-        primary_trigger="A crowded suspension bridge became the only return route from a festival island; an electrical bridge light failure triggered panic; oscillation and crowd pressure caused mass crush.",
+        primary_trigger=(
+            "A crowded suspension bridge became the only return route from a festival island; "
+            "an electrical bridge light failure triggered panic; oscillation and crowd pressure caused mass crush."
+        ),
         key_precursor_signals=[
             "Bridge throughput at 300% design load for 45 minutes before incident",
             "Structural vibration sensor anomaly at T-10 mins",
@@ -348,7 +369,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=115,
         injuries=1500,
         failure_modes=["TEMPLE_SURGE", "INFO_CASCADE", "BRIDGE_BOTTLENECK"],
-        primary_trigger="A false rumor of a bridge collapse triggered mass panic at a religious pilgrimage site; two opposing crowd waves collided at a bridge junction, resulting in a brutal counter-crush.",
+        primary_trigger=(
+            "A false rumor of a bridge collapse triggered mass panic at a religious pilgrimage site; "
+            "two opposing crowd waves collided at a bridge junction, resulting in a brutal counter-crush."
+        ),
         key_precursor_signals=[
             "Rumor of structural failure spreading via word-of-mouth at T-5 mins",
             "Bidirectional crowd flow on bridge detected at T-3 mins",
@@ -383,7 +407,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=22,
         injuries=30,
         failure_modes=["INFRA_FAILURE", "EXOGENOUS_SURGE", "EGRESS_FAILURE"],
-        primary_trigger="A railway station footbridge experienced crush during a storm-induced crowd surge; slippery conditions combined with stairway bottleneck and limited emergency lighting.",
+        primary_trigger=(
+            "A railway station footbridge experienced crush during a storm-induced crowd surge; "
+            "slippery conditions combined with stairway bottleneck and limited emergency lighting."
+        ),
         key_precursor_signals=[
             "Weather alert (heavy rain) causing rapid crowd concentration at station at T-20 mins",
             "Exit stairways overwhelmed at T-10 mins — lateral crush building",
@@ -417,7 +444,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=17,
         injuries=120,
         failure_modes=["EXOGENOUS_SURGE", "EGRESS_FAILURE", "TICKETING_CHAOS"],
-        primary_trigger="Over-capacity concert with counterfeit ticketing resulted in mass gate rush; venue operators could not differentiate valid tickets causing gates to be overwhelmed simultaneously.",
+        primary_trigger=(
+            "Over-capacity concert with counterfeit ticketing resulted in mass gate rush; "
+            "venue operators could not differentiate valid tickets causing gates to be overwhelmed simultaneously."
+        ),
         key_precursor_signals=[
             "Queue density at gates 3x normal at T-60 mins before event",
             "Counterfeit ticket detection rate >35% triggered manual verification delays",
@@ -452,7 +482,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=8,
         injuries=60,
         failure_modes=["EGRESS_FAILURE", "TICKETING_CHAOS", "PANIC_TRIGGER"],
-        primary_trigger="Simultaneous exit rush after a football match; inadequate exit gate count for post-match egress pattern; a vehicle backfiring near exit was misinterpreted as gunshot, triggering counter-panic surge.",
+        primary_trigger=(
+            "Simultaneous exit rush after a football match; inadequate exit gate count for post-match egress pattern; "
+            "a vehicle backfiring near exit was misinterpreted as gunshot, triggering counter-panic surge."
+        ),
         key_precursor_signals=[
             "Post-match egress pattern identified as highest risk at T-0",
             "Exit gate capacity calculated at 22 minutes for full evacuation (too long)",
@@ -488,7 +521,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=39,
         injuries=150,
         failure_modes=["TEMPLE_SURGE", "GHAT_CRUSH", "EXOGENOUS_SURGE"],
-        primary_trigger="An annual temple fair drew 5x the expected attendance to narrow riverside ghats; multiple bathing platforms collapsed under crowd weight; no ingress metering was in place.",
+        primary_trigger=(
+            "An annual temple fair drew 5x the expected attendance to narrow riverside ghats; "
+            "multiple bathing platforms collapsed under crowd weight; no ingress metering was in place."
+        ),
         key_precursor_signals=[
             "Attendance 5x historical average detectable via regional transport records at T-3 hrs",
             "Ghat structural load exceeded design rating by T-30 mins",
@@ -524,7 +560,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=162,
         injuries=115,
         failure_modes=["TEMPLE_SURGE", "PANIC_TRIGGER", "STAIRWAY_COLLAPSE", "INFO_CASCADE"],
-        primary_trigger="A false rumor of a landslide near the approach stairs triggered a bidirectional panic surge; pilgrims fleeing downhill collided with pilgrims ascending; narrow mountain stairway had no emergency width for counter-flow.",
+        primary_trigger=(
+            "A false rumor of a landslide near the approach stairs triggered a bidirectional panic surge; "
+            "pilgrims fleeing downhill collided with pilgrims ascending; narrow mountain stairway had no counter-flow."
+        ),
         key_precursor_signals=[
             "Density on approach stairs exceeded 7 persons/m² for 20 continuous minutes before incident",
             "Rumor of landslide spreading by word-of-mouth at T-3 mins",
@@ -560,7 +599,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=36,
         injuries=39,
         failure_modes=["BRIDGE_BOTTLENECK", "STAIRWAY_COLLAPSE", "EXOGENOUS_SURGE"],
-        primary_trigger="Pilgrims surging toward trains on a railway footbridge after a sacred bathing ritual; the footbridge collapsed under overload; post-amavasya egress peak created simultaneous rush at all exit points.",
+        primary_trigger=(
+            "Pilgrims surging toward trains on a railway footbridge after a sacred bathing ritual; the footbridge "
+            "collapsed under overload; post-amavasya egress peak created simultaneous rush at all exit points."
+        ),
         key_precursor_signals=[
             "Amavasya (new moon) date predictably generates maximum single-day attendance",
             "Footbridge load estimated at 3x design rating for 15 continuous minutes",
@@ -596,7 +638,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=12,
         injuries=13,
         failure_modes=["NARROW_CORRIDOR", "STAIRWAY_COLLAPSE", "EGRESS_FAILURE"],
-        primary_trigger="New Year's combined with an auspicious religious date drew 3x expected pilgrims to a mountain shrine; narrow descending stairway became fatal choke point when ascending and descending crowds met in darkness.",
+        primary_trigger=(
+            "New Year's combined with an auspicious religious date drew 3x expected pilgrims to a mountain shrine; "
+            "narrow descending stairway became fatal choke point when ascending and descending crowds met in darkness."
+        ),
         key_precursor_signals=[
             "New Year + religious calendar convergence predicted 3x average attendance",
             "Stairway lit only by handheld torches — no fixed emergency lighting",
@@ -632,7 +677,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=6,
         injuries=40,
         failure_modes=["TICKETING_CHAOS", "EXOGENOUS_SURGE", "TEMPLE_SURGE"],
-        primary_trigger="A pilgrimage queue management system distributing tokens for temple entry failed; incorrect information about token availability spread causing a simultaneous rush by waiting pilgrims; crowd overwhelmed the queue zone.",
+        primary_trigger=(
+            "A pilgrimage queue management system distributing tokens for temple entry failed; incorrect information "
+            "about token availability spread causing a simultaneous rush by waiting pilgrims."
+        ),
         key_precursor_signals=[
             "Token distribution queue density: 4x system capacity at T-45 mins",
             "Misinformation about token availability spreading in queue at T-20 mins",
@@ -668,7 +716,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=30,
         injuries=60,
         failure_modes=["GHAT_CRUSH", "EXOGENOUS_SURGE", "BRIDGE_BOTTLENECK", "TEMPORAL_DISRUPT"],
-        primary_trigger="Peak amavasya bathing date at a decennial pilgrimage festival drew an estimated 30 million pilgrims; crowd surge at bathing ghats and approach bridges exceeded all safety thresholds; pre-dawn bathing timing created simultaneous convergence in darkness.",
+        primary_trigger=(
+            "Peak amavasya bathing date at pilgrimage festival drew estimated 30 million pilgrims; catch-all "
+            "crowd surge at bathing ghats and approach bridges; pre-dawn bathing timing created convergence in darkness."
+        ),
         key_precursor_signals=[
             "Religious calendar amavasya date predictable years in advance",
             "Cell tower load in surrounding districts: 8x baseline at T-2 hrs",

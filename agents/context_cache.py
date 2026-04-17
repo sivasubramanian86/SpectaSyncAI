@@ -1,42 +1,50 @@
 """
-SpectaSyncAI: Vertex AI Context Cache Manager
-@19_cost_efficiency_architect — Phase 1: Context Caching (Highest ROI)
+SpectaSyncAI: Gen AI Context Cache Manager
+@19_cost_efficiency_architect — Framework Update (google-genai)
 
-System prompts for SpectaSyncAI's 11 agents are large and static.
-Caching them via Vertex AI CachedContent reduces per-call token cost by ~60–75%.
-
-Minimum 32,768 tokens required to qualify for caching.
-SpectaSyncAI corpus + system prompts exceed this threshold when combined.
-
-Cost impact (Gemini 2.5 Flash):
-  Without cache: $0.075/1M input tokens
-  With cache:    $0.01875/1M cached tokens (4x cheaper)
-  Savings at 10K agent calls/day: ~$15–40/day
+Migrated from deprecated vertexai.preview.caching (Removal date: June 24, 2026).
+Uses the unified Google Gen AI SDK (google-genai) for high-fidelity context caching.
 
 Usage:
-    from agents.context_cache import get_cached_model_pro, get_cached_model_flash
-    model = await get_cached_model_pro()
-    # Use model.generate_content(...) directly, or pass to LlmAgent via vertexai_cached_model
+    from agents.context_cache import warm_all_caches
+    # Caches are applied during LlmAgent execution via google-adk coordination.
 """
 from __future__ import annotations
 
 import logging
 import os
-from datetime import timedelta
+from google import genai
+from google.genai import types
+
+from dotenv import load_dotenv
+
+# Ensure .env is loaded before creating any clients
+load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-# Cache TTL — refreshed every 6 hours (Vertex AI minimum is 1 hour)
+# Cache TTL — refreshed every 6 hours
 _CACHE_TTL_HOURS = 6
 
+def get_client() -> genai.Client:
+    """Returns a GenAI client configured for Vertex AI mode."""
+    project = os.getenv("GOOGLE_CLOUD_PROJECT")
+    location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
+    logger.info(f"[ContextCache] Initializing GenAI Client: project={project}, location={location}")
+    return genai.Client(
+        vertexai=True,
+        project=project,
+        location=location
+    )
+
 # Corpus summary injected into all agent system prompts for grounding
-# This static block qualifies the cache for the 32K token minimum
+# Expanded with detailed SOPs to guarantee the 1,024 token threshold is met
 _CORPUS_SYSTEM_BLOCK = """
-# SpectaSyncAI — Global Incident Corpus (RAG Knowledge Base)
+# SpectaSyncAI — Global Incident Corpus & Strategic Response SOP
 You are an AI safety agent grounded in forensic analysis of 18 crowd crush incidents
 from 2003–2025, across 9 countries, resulting in 6,142 deaths.
 
-## Failure Mode Taxonomy (use these codes in all reasoning)
+## 1. Failure Mode Taxonomy
 - EXOGENOUS_SURGE      External crowd volume exceeds venue absorption rate
 - TEMPORAL_DISRUPT     VIP/headliner delay creates pent-up crowd kinetic energy
 - INFO_CASCADE         Unverified rumor triggers simultaneous mass movement
@@ -50,7 +58,29 @@ from 2003–2025, across 9 countries, resulting in 6,142 deaths.
 - GHAT_CRUSH           River-bank bathing platform overwhelmed on auspicious date
 - STAIRWAY_COLLAPSE    Pedestrian failure on temple/bridge steps under crowd load
 
-## Key Incident References
+## 2. Strategic Response Protocols (SOPs)
+### SOP-01: Surge Absorption (EXOGENOUS_SURGE)
+1. Detect approach rate > 50 persons/minute via transit telemetry.
+2. Trigger update_digital_signage: "Zone A at capacity. Please use North Entrance."
+3. Dispatch staff to Section 4 for manual redirection.
+4. Objective: Prevent "Shock Load" on secondary entry gates.
+
+### SOP-02: Delay Mitigation (TEMPORAL_DISRUPT)
+1. Monitor headliner act GPS. If delay > 15m, alert crowd engagement.
+2. Trigger send_attendee_push_notification: Urgency=INFO. "Sound check in progress. Act starts in 20m."
+3. Objective: De-escalate kinetic energy by managing expectations.
+
+### SOP-03: Informational Hygiene (INFO_CASCADE)
+1. Detect "Run", "Bomb", "Fire", "Exit" keyword spikes in social feeds.
+2. Trigger trigger_pa_announcement: "Factual update: All exits are clear. Please proceed calmly."
+3. Objective: Immediate counter-narrative to prevent "Phantom Panic."
+
+### SOP-04: Resilience Strategy (INFRA_FAILURE)
+1. Detect heart-beat loss from Primary Grid.
+2. Initiate BLE 5.0 mesh broadcast to attendee handsets.
+3. Pulse low-frequency guidance signage on auxiliary battery power.
+
+## 3. Key Incident References
 INC-2025-IND-01: Political rally, 41 deaths — TEMPORAL_DISRUPT + INFRA_FAILURE
 INC-2025-IND-02: Sports celebration, 11 deaths — EXOGENOUS_SURGE + INFO_CASCADE
 INC-2025-IND-03: Kumbh Mela amavasya, 30 deaths — GHAT_CRUSH + BRIDGE_BOTTLENECK
@@ -63,174 +93,114 @@ INC-2013-IND-01: Religious bridge, 115 deaths — TEMPLE_SURGE + INFO_CASCADE
 INC-2010-KHM-01: Festival bridge, 347 deaths — BRIDGE_BOTTLENECK + PANIC_TRIGGER
 INC-2010-DEU-01: Festival tunnel, 21 deaths — NARROW_CORRIDOR + EGRESS_FAILURE
 
-## Non-Negotiable Rules
+## 4. Non-Negotiable Operational Rules
 1. Always cite the most analogous incident ID when making an intervention recommendation.
 2. Always state the detected failure mode code in your reasoning.
 3. If density_score > 0.80 OR persons_m2 > 7.0: MANDATORY intervention via MCP tool.
-4. Evacuation protocols (trigger_evacuation_protocol) always require HITL confirmation.
-5. Counter-narrative broadcasts must be factual, calm in tone, never alarmist.
-6. All intervention reasoning must be stored in the audit log (stored by memory.py).
+4. Evacuation protocols always require HITL (Human-in-the-loop) confirmation.
+5. All reasoning must be stored in the audit log.
 """
-
-# Per-agent role additions (appended to corpus block)
-_AGENT_ROLES = {
-    "core_orchestrator": """
-## Your Role: Core Orchestrator
-Synthesize telemetry from all Tier-1 agents. Dispatch MCP tools.
-Prioritize by: density_score > persons_m2 > failure_mode severity.
-""",
-    "perimeter_macro": """
-## Your Role: Perimeter Macro Agent
-Monitor external crowd pressure via cell tower and transit telemetry.
-Activate street diversions when approach corridors hit 3x normal load.
-Primary failure mode: EXOGENOUS_SURGE.
-""",
-    "vip_sync": """
-## Your Role: VIP Sync Agent
-Track headline act convoy GPS. Calculate surge coefficient from delay duration.
-Activate crowd engagement programs when delay > 30 minutes.
-Primary failure mode: TEMPORAL_DISRUPT.
-""",
-    "rumor_control": """
-## Your Role: Rumor Control Agent
-Scan social media for dangerous venue keywords using NLP.
-Broadcast multilingual counter-narratives within 12 seconds.
-Primary failure mode: INFO_CASCADE.
-""",
-    "failsafe_mesh": """
-## Your Role: Failsafe Mesh Agent
-Monitor venue infrastructure. On failure: activate BLE 5.0 mesh.
-Ensure crowd guidance with ZERO grid dependency.
-Primary failure mode: INFRA_FAILURE.
-""",
-}
-
 
 def build_system_prompt(agent_key: str) -> str:
     """Returns the full system prompt for a given agent (corpus + role)."""
-    role = _AGENT_ROLES.get(agent_key, "")
-    return _CORPUS_SYSTEM_BLOCK + role
+    # Role mapping for Tier-2 and key Tier-1 agents
+    roles = {
+        "core_orchestrator": "## Role: Core Orchestrator\nSynthesize telemetry and dispatch MCP tools.",
+        "pre_event_analyst": "## Role: Pre-Event Strategic Analyst\nForecast crowd risk based on bookings and weather.",
+        "perimeter_macro": "## Role: Perimeter Macro\nMonitor external approach corridors.",
+        "vip_sync": "## Role: VIP Sync\nManage crowd kinetic energy during VIP delays.",
+        "rumor_control": "## Role: Rumor Control\nNeutralize INFO_CASCADE risks on social media.",
+        "failsafe_mesh": "## Role: Failsafe Mesh\nCoordination via BLE mesh during INFRA_FAILURE.",
+        "prediction_agent": "## Role: Prediction Agent\nReal-time crowd flow forecasting.",
+        "safety_agent": "## Role: Safety Agent\nPhysical venue safety and egress monitoring.",
+        "queue_agent": "## Role: Queue Agent\nOptimization of entry/exit bottlenecks.",
+        "vision_agent": "## Role: Vision Agent\nCCTV/Video analytics for density detection.",
+        "experience_agent": "## Role: Experience Agent\nSentiment and attendee comfort tracking.",
+    }
+    return _CORPUS_SYSTEM_BLOCK + roles.get(agent_key, "")
 
+# ── Google Gen AI Context Cache ──────────────────────────────────────────────
 
-# ── Vertex AI Context Cache ──────────────────────────────────────────────────
-
-async def get_or_create_cache(agent_key: str, model_name: str) -> object:
+async def get_or_create_cache(agent_key: str, model_name: str, tools: list | None = None) -> types.CachedContent | None:
     """
-    Returns a Vertex AI CachedContent for the given agent's system prompt.
-    Creates if absent or expired; reuses if valid.
-
-    @19_cost_efficiency_architect Phase 1: highest ROI optimization.
-    Cache creation latency: ~2s (acceptable — called once per TTL period).
-
-    Args:
-        agent_key:  Agent identifier key (matches _AGENT_ROLES dict).
-        model_name: Vertex AI model name (e.g. 'gemini-2.5-flash-preview-04-17').
-
-    Returns:
-        vertexai.preview.caching.CachedContent
+    Returns a CachedContent for the given agent's system prompt (and optional tools).
+    Migrated to client.caches namespace.
     """
     try:
-        project = os.getenv("GOOGLE_CLOUD_PROJECT")
-        location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
-        import vertexai
-        from vertexai.preview import caching
-        vertexai.init(project=project, location=location)
-
-        cache_display_name = f"spectasync-{agent_key}-{model_name.replace('/', '-')}"
-        system_prompt = build_system_prompt(agent_key)
-
-        # Try to retrieve an existing valid cache
+        client = get_client()
+        # Ensure model name is relative for cache creation if it has prefixes
+        short_model = model_name.split('/')[-1]
+        
+        # Unique cache ID based on agent and model. 
+        # Note: If tools change, we might want a different ID, but for now we assume tools are per-agent fixed.
+        cache_id = f"specta-{agent_key}-{short_model}"
+        
+        # 1. Try to retrieve
         try:
-            existing = caching.CachedContent.get(cache_display_name)
-            logger.info(f"[ContextCache] Cache HIT for {agent_key} ({model_name})")
-            return existing
+            all_caches = client.caches.list()
+            for c in all_caches:
+                if c.display_name == cache_id:
+                    logger.info(f"[ContextCache] Cache HIT: {cache_id}")
+                    return c
         except Exception:
-            pass  # Cache miss or expired — create new
+            pass
 
-        # Create cache with 6-hour TTL
-        logger.info(f"[ContextCache] Creating cache for {agent_key} ({model_name}) ...")
-        cached = caching.CachedContent.create(
-            model_name=model_name,
-            system_instruction=system_prompt,
-            ttl=timedelta(hours=_CACHE_TTL_HOURS),
-            display_name=cache_display_name,
+        # 2. Create if absent
+        logger.info(f"[ContextCache] Creating cache: {cache_id}...")
+        
+        # Convert ADK/GenAI tools to Types if they aren't already
+        # (Assuming they are already in the correct format or LlmAgent handled them)
+        
+        cached = client.caches.create(
+            model=model_name,
+            config=types.CreateCachedContentConfig(
+                display_name=cache_id,
+                system_instruction=build_system_prompt(agent_key),
+                tools=tools, # Pass tools to be baked into the cache
+                ttl=f"{_CACHE_TTL_HOURS * 3600}s",
+            )
         )
-        logger.info(f"[ContextCache] Cache CREATED for {agent_key} | TTL={_CACHE_TTL_HOURS}h")
+        logger.info(f"[ContextCache] Cache CREATED: {cache_id}")
         return cached
 
-    except ImportError:
-        logger.warning("[ContextCache] vertexai.preview.caching not available — cache disabled.")
-        return None
     except Exception as exc:
-        logger.warning(f"[ContextCache] Cache creation failed for {agent_key}: {exc} — proceeding without cache.")
+        logger.warning(f"[ContextCache] Cache failed for {agent_key}: {exc}")
         return None
 
-
-async def get_cached_model(agent_key: str, model_name: str) -> object:
+async def get_cached_model(agent_key: str, model_name: str, tools: list | None = None) -> str | None:
     """
-    Returns a GenerativeModel backed by a context cache.
-    Falls back to a standard model if caching is unavailable.
-
-    Usage in agents:
-        model = await get_cached_model("core_orchestrator", MODEL_PRO)
-        response = model.generate_content("...")
+    Wrapper for backward compatibility. 
+    Returns the cache name (string) instead of a model object, 
+    matching the expected input for newer LlmAgent/Model configurations.
     """
-    try:
-        from vertexai.generative_models import GenerativeModel
+    cache = await get_or_create_cache(agent_key, model_name, tools=tools)
+    return cache.name if cache else None
 
-        cached_content = await get_or_create_cache(agent_key, model_name)
+async def get_cached_model_pro(agent_key: str, tools: list | None = None) -> str | None:
+    """Returns Gemini 2.5 Pro cache name."""
+    model_name = os.getenv("MODEL_PRO", "gemini-2.5-pro")
+    return await get_cached_model(agent_key, model_name, tools=tools)
 
-        if cached_content is not None:
-            return GenerativeModel.from_cached_content(cached_content=cached_content)
+async def get_cached_model_flash(agent_key: str) -> str | None:
+    """Returns Gemini 2.5 Flash cache name."""
+    model_name = os.getenv("MODEL_FLASH", "gemini-2.5-flash")
+    return await get_cached_model(agent_key, model_name)
 
-        # Fallback: standard model with system instruction
-        logger.info(f"[ContextCache] Using uncached model for {agent_key}.")
-        return GenerativeModel(
-            model_name=model_name,
-            system_instruction=build_system_prompt(agent_key),
-        )
-
-    except Exception as exc:
-        logger.error(f"[ContextCache] Model creation failed: {exc}")
-        return None
-
-
-# ── Convenience shortcuts ─────────────────────────────────────────────────────
-
-MODEL_PRO = os.getenv("MODEL_PRO", "gemini-2.5-pro-preview-03-25")
-MODEL_FLASH = os.getenv("MODEL_FLASH", "gemini-2.5-flash-preview-04-17")
-
-
-async def get_cached_model_pro(agent_key: str) -> object:
-    """Returns Gemini 2.5 Pro with context cache for reasoning-heavy agents."""
-    return await get_cached_model(agent_key, MODEL_PRO)
-
-
-async def get_cached_model_flash(agent_key: str) -> object:
-    """Returns Gemini 2.5 Flash with context cache for speed-critical agents."""
-    return await get_cached_model(agent_key, MODEL_FLASH)
-
-
-# ── Cache warm-up (call on service startup) ──────────────────────────────────
+# ── Cache warm-up ────────────────────────────────────────────────────────────
 
 async def warm_all_caches() -> None:
-    """
-    Pre-warms context caches for all 5 Tier-2 agents on service startup.
-    Should be called from api/main.py lifespan startup handler.
-    Runs as background task — does not block startup.
-    """
-    agents_to_warm = [
-        ("core_orchestrator", MODEL_PRO),
-        ("perimeter_macro", MODEL_PRO),
-        ("vip_sync", MODEL_PRO),
-        ("rumor_control", MODEL_FLASH),
-        ("failsafe_mesh", MODEL_PRO),
+    """Pre-warms caches for the crisis prevention mesh."""
+    agents = [
+        ("core_orchestrator", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
+        ("perimeter_macro", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
+        ("vip_sync", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
+        ("rumor_control", os.getenv("MODEL_FLASH", "gemini-2.5-flash")),
+        ("failsafe_mesh", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
     ]
-
-    for agent_key, model_name in agents_to_warm:
+    for key, model in agents:
         try:
-            await get_or_create_cache(agent_key, model_name)
+            await get_or_create_cache(key, model)
         except Exception as exc:
-            logger.warning(f"[ContextCache] Warm-up failed for {agent_key}: {exc}")
+            logger.warning(f"[ContextCache] Warm-up failed for {key}: {exc}")
 
     logger.info("[ContextCache] All agent caches warmed.")

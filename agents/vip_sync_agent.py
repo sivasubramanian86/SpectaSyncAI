@@ -19,6 +19,7 @@ Responsibility:
   vector. If delay > 30 minutes: activates crowd engagement programs.
   Recalculates arrival surge vector and pre-positions staff accordingly.
 """
+import os
 import json
 import logging
 from datetime import datetime, timedelta
@@ -201,7 +202,7 @@ def build_vip_sync_agent() -> LlmAgent:
         r.incident_id for r in INCIDENT_CORPUS if "TEMPORAL_DISRUPT" in r.failure_modes
     ]
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="vip_sync_agent",
         description=(
             "Tracks headline act convoy GPS against schedule. Quantifies crowd kinetic "

@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8001/sse")
 
 
-async def build_orchestrator_agent() -> LlmAgent:
+from .context_cache import get_cached_model_pro
+
+async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
     """
     Constructs the Core Orchestrator ADK Agent using Gemini 2.5 Pro.
     Connects to the FastMCP server via MCPToolset (SSE transport).
@@ -35,8 +37,10 @@ async def build_orchestrator_agent() -> LlmAgent:
     mcp_tools = await mcp_toolset.load_tools()
     logger.info(f"[Orchestrator] Loaded {len(mcp_tools)} tools from MCP server.")
 
+    # Caching disabled for agents with tools to avoid Vertex AI 400 error
+    # until tool baking in cache is fully verified.
     return LlmAgent(
-        model="gemini-2.5-pro-preview-03-25",
+        model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="core_orchestrator",
         description=(
             "Core decision-making agent for SpectaSyncAI. "
@@ -52,7 +56,7 @@ async def build_orchestrator_agent() -> LlmAgent:
             "call an appropriate MCP tool (update_digital_signage or dispatch_staff). "
             "Always justify your decision and state the specific location and action taken."
         ),
-        tools=mcp_tools,
+        tools=mcp_tools
     )
 
 
@@ -73,7 +77,8 @@ async def run_orchestration_cycle(density_report: dict) -> dict:
     history = await memory.get_historical_context(density_report.get("location_id", "UNKNOWN"))
 
     # 2. Build the LlmAgent with live MCP tools
-    agent = await build_orchestrator_agent()
+    cache_name = await get_cached_model_pro("core_orchestrator")
+    agent = await build_orchestrator_agent(cache_name=cache_name)
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
 

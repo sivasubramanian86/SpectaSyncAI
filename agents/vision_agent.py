@@ -3,6 +3,7 @@ SpectaSyncAI: Vision Agent
 Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
 """
+import os
 import json
 import logging
 from google.adk.agents import LlmAgent
@@ -43,7 +44,7 @@ def build_vision_agent() -> LlmAgent:
         LlmAgent: The configured ADK Vision Agent instance.
     """
     return LlmAgent(
-        model="gemini-2.5-flash-preview-04-17",
+        model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
         name="vision_agent",
         description="Analyzes CCTV frames from venue zones to produce crowd density scores.",
         instruction=(

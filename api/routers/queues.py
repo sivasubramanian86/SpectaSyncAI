@@ -18,7 +18,20 @@ async def get_all_queues() -> list[dict]:
         return data
     except Exception as e:
         logger.error(f"Queue Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        from agents.queue_agent import VENUE_ZONES, calculate_wait_time
+        # Return base model as fallback
+        results = []
+        for zone_id in list(VENUE_ZONES.keys()):
+            wait = calculate_wait_time(40, 10) # Safe mid-range fallback
+            results.append({
+                "zone_id": zone_id,
+                "queue_length": 40,
+                "estimated_wait_mins": wait["estimated_wait_mins"],
+                "priority": wait["priority"],
+                "recommendation": wait["recommendation"],
+                "is_fallback": True
+            })
+        return results
 
 
 @router.get(
