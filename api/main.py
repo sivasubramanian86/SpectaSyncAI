@@ -12,12 +12,10 @@ import asyncio
 import logging
 import os
 import sys
+import traceback
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-# Force override to ensure .env values take precedence over system environment variables
-load_dotenv(override=True)
-
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,7 +26,8 @@ from api.routers import (
     predictions, queues, safety, experience, crisis, pre_event
 )
 
-import traceback
+# Force override to ensure .env values take precedence
+load_dotenv(override=True)
 
 # Structured logging — stdout for Cloud Logging
 logging.basicConfig(
@@ -43,8 +42,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """
     Startup: warm Vertex AI context caches for all 5 Tier-2 agents.
-    Cache warm-up runs as a background task — does NOT block first request.
-    Shutdown: log graceful stop.
+    Cache warm-up runs as a background task.
     """
     logger.info(
         "SpectaSyncAI v3.1.0 — 12-Agent Mesh starting "
@@ -60,26 +58,24 @@ async def lifespan(app: FastAPI):
         except Exception as exc:
             logger.warning(f"Context cache warm-up skipped: {exc}")
     else:
-        logger.info("Vertex AI not configured — context caching disabled (prototype mode).")
+        logger.info("Vertex AI not configured — context caching disabled.")
 
     # ── 2. Pre-Event Analysis Pre-Computation ─────────────────────────────
-    # Trigger a baseline analysis for the default event so the UI is ready
     async def precompute_pre_event():
         try:
-            from api.routers.pre_event import get_mock_pre_event, trigger_pre_event_analysis, PreEventData
+            from api.routers.pre_event import (
+                get_mock_pre_event, trigger_pre_event_analysis, PreEventData
+            )
             mock_data = await get_mock_pre_event()
-            # Wrap in Pydantic model
             pydantic_data = PreEventData(**mock_data)
-            logger.info("[Lifespan] Pre-computing initial Pre-Event Analysis...")
+            logger.info("[Lifespan] Pre-computing Pre-Event Analysis...")
             await trigger_pre_event_analysis(pydantic_data)
             logger.info("[Lifespan] Pre-Event Analysis ready.")
         except Exception as e:
-            logger.warning(f"[Lifespan] Pre-event pre-computation skipped/failed: {e}")
+            logger.warning(f"[Lifespan] Pre-event failed: {e}")
 
     asyncio.create_task(precompute_pre_event())
-
     yield
-
     logger.info("SpectaSyncAI — graceful shutdown complete.")
 
 
@@ -87,11 +83,10 @@ app = FastAPI(
     title="SpectaSyncAI",
     description=(
         "12-Agent Real-Time Crowd Intelligence Mesh. "
-        "Grounded in forensic analysis of 18 anonymized crowd crush incidents (2003–2025), "
-        "across 9 countries, 6,142 deaths. "
-        "Tier 1: 6 Operational Agents (Vision, Orchestrator, Prediction, Queue, Safety, Experience). "
-        "Tier 2: 6 Crisis Prevention Agents & Incident RAG (PerimeterMacro, VIPSync, RumorControl, FailsafeMesh, PreEvent, RAG). "
-        "Powered by Google ADK, Gemini 2.5 Pro/Flash, AlloyDB pgvector, FastMCP, Vertex AI Context Cache."
+        "Grounded in forensic analysis of 18 incident corpora. "
+        "Tier 1: 6 Operational Agents. "
+        "Tier 2: 6 Crisis Prevention Agents & Incident RAG. "
+        "Powered by ADK, Gemini, AlloyDB, FastMCP, Vertex AI."
     ),
     version="3.1.0",
     lifespan=lifespan,
@@ -101,10 +96,12 @@ app = FastAPI(
 )
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-ALLOWED_ORIGINS = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174"
-).split(",")
+_default_origins = (
+    "http://localhost:5173,http://localhost:5174,http://localhost:3000,"
+    "http://127.0.0.1:5173,http://127.0.0.1:5174"
+)
+ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", _default_origins).split(",")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -124,17 +121,16 @@ app.include_router(experience.router, prefix="/v1", tags=["Attendee Experience"]
 
 # ── Tier 2 — Crisis Prevention Agents + Incident RAG ─────────────────────────
 app.include_router(crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"])
-app.include_router(pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"])
+app.include_router(
+    pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"]
+)
 
-# Serve static files for the React frontend
-# The 'static' folder is populated by the Docker multi-stage build (from web/dist)
 if os.path.exists("static"):
     app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    """Dummy favicon to stop 404s in the dashboard."""
     return HTMLResponse(content="")
 
 
@@ -154,9 +150,10 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 @app.get("/", include_in_schema=False)
 async def serve_dashboard():
-    """Serve the React dashboard index.html at the root URL."""
     index_path = os.path.join("static", "index.html")
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>SpectaSyncAI API</h1><p>Frontend not found. <a href='/docs'>View API Docs</a></p>")
+    return HTMLResponse(
+        content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
+    )

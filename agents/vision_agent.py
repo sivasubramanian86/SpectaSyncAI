@@ -101,4 +101,4 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
     try:
         return json.loads(result_text)
     except json.JSONDecodeError:
-        return {"location_id": location_id, "density_score": 0.5, "bottleneck_detected": False}
+        return {"location_id": location_id, "density_score": 0.5, "bottleneck_detected": False}
