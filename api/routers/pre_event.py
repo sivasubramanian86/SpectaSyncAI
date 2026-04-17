@@ -52,10 +52,10 @@ async def get_latest_pre_event_analysis():
     }
 
 
-
 @router.post("/analysis")
 async def trigger_pre_event_analysis(data: PreEventData) -> dict:
     """Triggers the Agent 12: Pre-Event Strategic Analyst loop."""
+
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
         if not isinstance(analysis, dict):

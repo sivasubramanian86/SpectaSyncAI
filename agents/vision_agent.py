@@ -104,6 +104,4 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
         return {
             "location_id": location_id,
             "density_score": 0.5,
-            "bottleneck_detected": False
-        }
-
+        }

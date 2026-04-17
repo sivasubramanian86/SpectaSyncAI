@@ -13,8 +13,9 @@ from google.adk.runners import InMemoryRunner
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
 from google.genai import types as genai_types
 
+from google.adk.sessions import InMemorySessionService
 from agents.memory import AlloyDBMemory
-from .context_cache import get_cached_model_pro
+from agents.context_cache import get_cached_model_pro
 
 
 logger = logging.getLogger(__name__)
