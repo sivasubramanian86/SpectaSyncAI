@@ -10,6 +10,8 @@ Ground-truthed against an anonymized corpus of **18 global crowd incidents (2003
 [![Cloud Storage](https://img.shields.io/badge/Storage-GCS-yellow.svg)](https://cloud.google.com/storage)
 [![Cloud Logging](https://img.shields.io/badge/Logging-Cloud_Logging-blue.svg)](https://cloud.google.com/logging)
 [![Firebase](https://img.shields.io/badge/Sync-Firebase-orange.svg)](https://firebase.google.com)
+[![Pub/Sub](https://img.shields.io/badge/Event-Pub/Sub-blueviolet.svg)](https://cloud.google.com/pubsub)
+[![Analytics](https://img.shields.io/badge/Track-Analytics-blue.svg)](https://analytics.google.com)
 [![Status: Production Ready](https://img.shields.io/badge/Status-100%25%20Ready-gold.svg)](AUDIT.md)
 
 
@@ -246,6 +248,8 @@ SpectaSyncAI is architected for deep integration with Google Services, maximizin
 5.  **Compute (Cloud Run)**: Services are containerized and deployed as serverless functions on **Cloud Run**, ensuring auto-scaling resilience during sudden event surges.
 6.  **Edge & Auth (Firebase)**: The frontend utilizes **Firebase Auth** for operator authentication and **Firebase Realtime Database** for sub-second signal synchronization across the 12-agent mesh UI.
 7.  **Storage (GCS)**: Critical incident frames and agent reasoning logs are archived in **Google Cloud Storage** for post-event forensic auditing.
+8.  **Event-Driven (Pub/Sub)**: High-priority risk signals are broadcast to **Cloud Pub/Sub** topics for downstream alerting and Human-In-The-Loop (HITL) manual intervention triggers.
+9.  **Observability (Cloud Monitoring)**: Custom crowd-stability metrics and system heatmaps are exported to **Google Cloud Monitoring** for real-time SRE/Security dashboards.
 
 
 > **Governance note:** This project contains no personal names, celebrity identifiers, political entity names, or proprietary venue names in any source file, configuration, or documentation. All incident data is referenced exclusively by the INC-YYYY-ISO2-NN anonymized corpus identifier.

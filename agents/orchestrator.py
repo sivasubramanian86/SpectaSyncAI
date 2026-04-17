@@ -5,6 +5,7 @@ Responsibility: Spatial reasoning over venue telemetry, querying historical
 AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventions.
 """
 import json
+from api.services.pubsub_service import pubsub_service
 import logging
 import os
 
@@ -120,6 +121,17 @@ async def run_orchestration_cycle(density_report: dict) -> dict:
 
     logger.info(f"[Orchestrator] Final reasoning: {result_text}")
     logger.info(f"[Orchestrator] Tools invoked: {tool_calls_made}")
+
+    # 5. High-Fidelity Signal Broadcast (Pub/Sub)
+    # Triggered automatically for risks > 70% threshold
+    if density_report.get("risk_confidence", 0) > 0.7:
+        import asyncio
+        asyncio.create_task(pubsub_service.broadcast_risk({
+            "incident_id": "LIVE-SIGNAL-STREAM",
+            "risk_score": density_report.get("risk_confidence"),
+            "domain": "CROWD_STABILITY",
+            "recommended_action": tool_calls_made[0]["name"] if tool_calls_made else "MONITOR"
+        }))
 
     return {
         "action_taken": tool_calls_made,

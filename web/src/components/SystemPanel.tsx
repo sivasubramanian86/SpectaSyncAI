@@ -300,27 +300,29 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <div className="space-y-2">
-                    <p className="text-[10px] font-black uppercase text-blue-400">Compute & Deploy</p>
+                    <p className="text-[10px] font-black uppercase text-blue-400">Compute & Lifecycle</p>
                     <ul className="space-y-2">
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Google Cloud Run (Services)</li>
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Firebase Hosting (Frontend)</li>
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Artifact Registry (CI/CD)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Cloud Run (Mesh Runtime)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Firebase Hosting / Realtime</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Cloud Pub/Sub (Event Bus)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Google Identity (SSO/Auth)</li>
                     </ul>
                  </div>
                  <div className="space-y-2">
                     <p className="text-[10px] font-black uppercase text-blue-400">Generative AI</p>
                     <ul className="space-y-2">
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Gemini 2.5 Pro (Reasoning)</li>
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Vertex AI CachedContent (ADK)</li>
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Gemini multimodality (Vision)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Gemini 2.5 Pro (Orchestration)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Vertex AI Context Cache</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Multimodal (Vision/Audio)</li>
                     </ul>
                  </div>
                  <div className="space-y-2">
                     <p className="text-[10px] font-black uppercase text-blue-400">Data & Observability</p>
                     <ul className="space-y-2">
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> AlloyDB with pgvector (RAG)</li>
-                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Google Cloud Logging SDK</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> AlloyDB + pgvector (RAG)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Google Cloud Logging (Audit)</li>
                        <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Cloud Monitoring Metrics</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Google Analytics (gtag.js)</li>
                     </ul>
                  </div>
               </div>
