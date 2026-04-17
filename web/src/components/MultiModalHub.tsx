@@ -138,15 +138,53 @@ export function MultiModalHub() {
                </div>
              )}
              
-             <div className="absolute top-4 left-4 flex gap-2">
-               <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1">
-                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                 LIVE
-               </span>
-               <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
-                 {activeMedia.name} | {activeMedia.timestamp}
-               </span>
-             </div>
+             <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+                <div className="flex gap-2 text-left">
+                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                    LIVE
+                  </span>
+                  <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
+                    {activeMedia.name} | {activeMedia.timestamp}
+                  </span>
+                </div>
+                
+                {/* ADK Live Reasoning Trace Dashboard */}
+                <div className="bg-blue-600/20 backdrop-blur-3xl border border-blue-500/30 rounded-lg p-3 max-w-[240px] animate-in fade-in slide-in-from-left duration-700 shadow-2xl text-left">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      <span className="text-[10px] font-black text-blue-300 uppercase tracking-widest">ADK Live Mesh Trace</span>
+                    </div>
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-blue-500/30 border border-blue-400/30 text-blue-200">11 AGENTS</span>
+                  </div>
+                  <div className="space-y-2 text-left">
+                    <p className="text-[9px] text-blue-100/90 leading-tight font-mono whitespace-pre-line">
+                      {activeMedia.type === 'video' 
+                        ? '> VisionAgent: Detecting high-frequency flow reversal patterns...\n> CoreOrchestrator: Synced 8/11 Mesh Nodes.' 
+                        : '> LyriaAgent: Isolating non-ambient acoustic distress signatures...\n> IncidentRAG: Analysing INC-2025-IND-02.'}
+                    </p>
+                    <div className="flex gap-1 items-center">
+                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(v => (
+                          <div key={v} className="w-1.5 h-1.5 rounded-full bg-blue-400/40 animate-pulse" style={{ animationDelay: `${v * 0.1}s` }} />
+                       ))}
+                    </div>
+                    <div className="w-full bg-blue-900/40 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-blue-600 to-cyan-400 h-full w-4/5 animate-progress shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Signal Control Overlay */}
+              <div className="absolute bottom-4 left-4 flex gap-2 z-20 text-left">
+                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest text-white hover:bg-blue-600 transition-all group">
+                    <Camera size={12} className="text-blue-400 group-hover:text-white" /> Capture Frame
+                 </button>
+                 <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest text-white hover:bg-emerald-600 transition-all group">
+                    <Mic size={12} className="text-emerald-400 group-hover:text-white" /> Record Loop
+                 </button>
+              </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4">

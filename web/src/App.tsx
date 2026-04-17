@@ -57,7 +57,7 @@ export default function App(): React.ReactElement {
         {/* Dynamic View Switcher */}
         <main className="mt-6">
           {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fade-in flex flex-col h-full max-h-[85vh] overflow-hidden">
               <StatCards
                 avgDensity={avgDensity}
                 criticalCount={criticalZones.length}
