@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 # Cache TTL — refreshed every 6 hours
 _CACHE_TTL_HOURS = 6
 
+
 def get_client() -> genai.Client:
     """Returns a GenAI client configured for Vertex AI mode."""
     project = os.getenv("GOOGLE_CLOUD_PROJECT")
@@ -37,8 +38,8 @@ def get_client() -> genai.Client:
         location=location
     )
 
+
 # Corpus summary injected into all agent system prompts for grounding
-# Expanded with detailed SOPs to guarantee the 1,024 token threshold is met
 _CORPUS_SYSTEM_BLOCK = """
 # SpectaSyncAI — Global Incident Corpus & Strategic Response SOP
 You are an AI safety agent grounded in forensic analysis of 18 crowd crush incidents
@@ -101,6 +102,7 @@ INC-2010-DEU-01: Festival tunnel, 21 deaths — NARROW_CORRIDOR + EGRESS_FAILURE
 5. All reasoning must be stored in the audit log.
 """
 
+
 def build_system_prompt(agent_key: str) -> str:
     """Returns the full system prompt for a given agent (corpus + role)."""
     # Role mapping for Tier-2 and key Tier-1 agents
@@ -119,7 +121,9 @@ def build_system_prompt(agent_key: str) -> str:
     }
     return _CORPUS_SYSTEM_BLOCK + roles.get(agent_key, "")
 
+
 # ── Google Gen AI Context Cache ──────────────────────────────────────────────
+
 
 async def get_or_create_cache(agent_key: str, model_name: str, tools: list | None = None) -> types.CachedContent | None:
     """
@@ -130,11 +134,10 @@ async def get_or_create_cache(agent_key: str, model_name: str, tools: list | Non
         client = get_client()
         # Ensure model name is relative for cache creation if it has prefixes
         short_model = model_name.split('/')[-1]
-        
-        # Unique cache ID based on agent and model. 
-        # Note: If tools change, we might want a different ID, but for now we assume tools are per-agent fixed.
+
+        # Unique cache ID based on agent and model.
+        # Note: If tools change, we might want a different ID.
         cache_id = f"specta-{agent_key}-{short_model}"
-        
         # 1. Try to retrieve
         try:
             all_caches = client.caches.list()
@@ -147,16 +150,16 @@ async def get_or_create_cache(agent_key: str, model_name: str, tools: list | Non
 
         # 2. Create if absent
         logger.info(f"[ContextCache] Creating cache: {cache_id}...")
-        
+
         # Convert ADK/GenAI tools to Types if they aren't already
         # (Assuming they are already in the correct format or LlmAgent handled them)
-        
+
         cached = client.caches.create(
             model=model_name,
             config=types.CreateCachedContentConfig(
                 display_name=cache_id,
                 system_instruction=build_system_prompt(agent_key),
-                tools=tools, # Pass tools to be baked into the cache
+                tools=tools,  # Pass tools to be baked into the cache
                 ttl=f"{_CACHE_TTL_HOURS * 3600}s",
             )
         )
@@ -167,26 +170,31 @@ async def get_or_create_cache(agent_key: str, model_name: str, tools: list | Non
         logger.warning(f"[ContextCache] Cache failed for {agent_key}: {exc}")
         return None
 
+
 async def get_cached_model(agent_key: str, model_name: str, tools: list | None = None) -> str | None:
     """
-    Wrapper for backward compatibility. 
-    Returns the cache name (string) instead of a model object, 
+    Wrapper for backward compatibility.
+    Returns the cache name (string) instead of a model object,
     matching the expected input for newer LlmAgent/Model configurations.
     """
     cache = await get_or_create_cache(agent_key, model_name, tools=tools)
     return cache.name if cache else None
+
 
 async def get_cached_model_pro(agent_key: str, tools: list | None = None) -> str | None:
     """Returns Gemini 2.5 Pro cache name."""
     model_name = os.getenv("MODEL_PRO", "gemini-2.5-pro")
     return await get_cached_model(agent_key, model_name, tools=tools)
 
+
 async def get_cached_model_flash(agent_key: str) -> str | None:
     """Returns Gemini 2.5 Flash cache name."""
     model_name = os.getenv("MODEL_FLASH", "gemini-2.5-flash")
     return await get_cached_model(agent_key, model_name)
 
+
 # ── Cache warm-up ────────────────────────────────────────────────────────────
+
 
 async def warm_all_caches() -> None:
     """Pre-warms caches for the crisis prevention mesh."""

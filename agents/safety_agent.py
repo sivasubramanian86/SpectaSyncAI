@@ -174,6 +174,7 @@ async def run_safety_assessment(
             **classification,
             "summary": (
                 f"Zone {location_id} is at {classification['risk_level']} risk "
-                f"with density {density_score:.0%}. Protocol: {classification['protocol']}."
+                f"with density {density_score:.0%}. "
+                f"Protocol: {classification['protocol']}."
             ),
-        }
+        }

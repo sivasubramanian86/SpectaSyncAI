@@ -23,7 +23,6 @@ import logging
 import math
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 
 from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
@@ -328,4 +327,4 @@ async def run_incident_rag_query(
             "historical_lessons": strategies["consolidated_lessons"][:3],
             "prevention_confidence_pct": min(90, int((1 - max(0, capacity_ratio - 1) / 5) * 90)),
             "corpus_searched": len(INCIDENT_CORPUS),
-        }
+        }

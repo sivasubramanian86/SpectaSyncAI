@@ -8,13 +8,12 @@ import json
 import logging
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
+from .context_cache import get_cached_model_pro
+
 
 logger = logging.getLogger(__name__)
 
-
-from .context_cache import get_cached_model_pro
 
 def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
     """Constructs the Strategic Pre-Event Analyst."""
@@ -31,9 +30,9 @@ def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
         "'precautionary_measures', and 'strategic_recommendation'. "
         "Be extremely analytical and identify 'Deadly Combos' e.g. Heat + Crowd Surge."
     )
-    
+
     model = os.getenv("MODEL_PRO", "gemini-2.5-pro")
-    
+
     # CRITICAL: When using cached_content, the model and instruction are already baked into the cache.
     # Re-specifying them in the request (which LlmAgent might do) causes a 400 error.
     agent_kwargs = {
@@ -81,16 +80,19 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
         # Try to parse JSON if agent returned it
         clean_json = result_text.strip().lstrip("```json").rstrip("```").strip()
         parsed = json.loads(clean_json)
-        
+
         # Resiliency: Handle list response from models occasionally
         if isinstance(parsed, list) and len(parsed) > 0:
             parsed = parsed[0]
-            
+
         if not isinstance(parsed, dict):
             raise ValueError(f"Agent returned invalid JSON structure: {type(parsed)}")
-        
+
         # Validation of required fields for frontend
-        required_fields = ['risk_level', 'expected_crowd_peak', 'weather_impact', 'pro_con_summary', 'precautionary_measures', 'strategic_recommendation']
+        required_fields = [
+            'risk_level', 'expected_crowd_peak', 'weather_impact', 'pro_con_summary',
+            'precautionary_measures', 'strategic_recommendation'
+        ]
         for field in required_fields:
             if field not in parsed:
                 parsed[field] = "Information not available" if field != 'precautionary_measures' else []

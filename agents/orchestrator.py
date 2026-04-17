@@ -7,20 +7,21 @@ AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventio
 import json
 import logging
 import os
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
 from google.genai import types as genai_types
 
 from agents.memory import AlloyDBMemory
+from .context_cache import get_cached_model_pro
+
 
 logger = logging.getLogger(__name__)
 
+
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8001/sse")
 
-
-from .context_cache import get_cached_model_pro
 
 async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
     """

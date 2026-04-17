@@ -10,7 +10,6 @@ import json
 import logging
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 
 logger = logging.getLogger(__name__)

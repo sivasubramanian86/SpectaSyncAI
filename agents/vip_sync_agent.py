@@ -271,7 +271,10 @@ async def run_vip_sync_monitoring(
         if delay > VIP_DELAY_ALERT_THRESHOLD_MINS:
             engagement = activate_crowd_engagement_program("MAIN_ARENA", "ADDRESS_BY_MC", min(delay, 60))
         kinetic = calculate_crowd_kinetic_energy(delay, crowd_size, density_score)
-        surge_vec = calculate_arrival_surge_vector(venue_id, int(convoy.get("distance_to_venue_km", 30)), kinetic["surge_coefficient"])
+        surge_vec = calculate_arrival_surge_vector(
+            venue_id, int(convoy.get("distance_to_venue_km", 30)),
+            kinetic["surge_coefficient"]
+        )
         return {
             "event_id": event_id,
             "delay_mins": delay,
@@ -281,4 +284,4 @@ async def run_vip_sync_monitoring(
             "surge_coefficient": kinetic["surge_coefficient"],
             "arrival_surge_vector": surge_vec,
             "analogous_incident_ids": kinetic["analogous_incidents"],
-        }
+        }

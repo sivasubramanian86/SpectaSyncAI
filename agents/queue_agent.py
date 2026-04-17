@@ -174,4 +174,4 @@ async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
                 "priority": wait["priority"],
                 "recommendation": wait["recommendation"],
             })
-        return sorted(results, key=lambda x: x["estimated_wait_mins"], reverse=True)
+        return sorted(results, key=lambda x: x["estimated_wait_mins"], reverse=True)

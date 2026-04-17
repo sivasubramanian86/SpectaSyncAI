@@ -74,6 +74,8 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"[Lifespan] Pre-event failed: {e}")
 
+    # Initialize Strategic Pre-Event Analysis in Background
+    # Uses Agent 12: Pre-Event Strategic Analyst
     asyncio.create_task(precompute_pre_event())
     yield
     logger.info("SpectaSyncAI — graceful shutdown complete.")

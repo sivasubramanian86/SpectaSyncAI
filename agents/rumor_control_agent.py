@@ -31,6 +31,7 @@ from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
+from .context_cache import get_cached_model_flash
 
 logger = logging.getLogger(__name__)
 
@@ -207,8 +208,6 @@ def broadcast_counter_narrative(
     }
 
 
-from .context_cache import get_cached_model_flash
-
 def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
     """Constructs the Rumor Control Agent using Gemini Flash for speed."""
     corpus_incidents = [
@@ -245,10 +244,9 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
     try:
         cache_name = await get_cached_model_flash("rumor_control")
         agent = build_rumor_control_agent(cache_name=cache_name)
-    except Exception as exc:
-        logger.warning(f"[RumorControlAgent] Falling back to uncached agent: {exc}")
+    except Exception:
         agent = build_rumor_control_agent()
-        
+
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
     session = await session_service.create_session(
@@ -299,4 +297,4 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
             "broadcast_activated": broadcast is not None,
             "broadcast_details": broadcast,
             "analogous_incident_ids": scan.get("analogous_incidents", []),
-        }
+        }

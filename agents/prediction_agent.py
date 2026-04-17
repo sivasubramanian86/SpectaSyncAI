@@ -176,4 +176,4 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
                 "Alert Gate Supervisor for auxiliary gate pre-authorization.",
             ],
             "raw_response": result_text,
-        }
+        }

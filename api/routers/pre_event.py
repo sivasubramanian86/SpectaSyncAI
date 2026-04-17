@@ -34,17 +34,23 @@ async def get_latest_pre_event_analysis():
     # The mock payload is defined in the same module for UI fallback parity.
     await get_mock_pre_event()
     # We don't run a full analysis here to avoid slowing down the initial GET
-    # The background task in main.py should have already populated this if it worked
+    # The background task in main.py should have already populated this
     return {
         "status": "pending_or_failed",
-        "message": "Strategic analysis is being computed or failed to initialize. Try manual run.",
+        "message": (
+            "Strategic analysis is being computed or failed to initialize. "
+            "Try manual run."
+        ),
         "risk_level": "UNKNOWN",
         "expected_crowd_peak": "Awaiting Analysis",
         "weather_impact": "Awaiting Analysis",
         "pro_con_summary": "N/A",
         "precautionary_measures": [],
-        "strategic_recommendation": "Click 'Run Strategic Analysis' to trigger agent reasoning."
+        "strategic_recommendation": (
+            "Click 'Run Strategic Analysis' to trigger agent reasoning."
+        )
     }
+
 
 
 @router.post("/analysis")

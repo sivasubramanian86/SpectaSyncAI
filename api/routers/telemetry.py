@@ -111,7 +111,9 @@ async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
             location_id=payload.location_id,
             density_report=density_report,
             action_taken=[{"tool": "none", "status": "PENDING"}],
-            agent_reasoning="System is running in fail-safe mode. Monitoring zone manually."
+            agent_reasoning=(
+                "System is running in fail-safe mode. Monitoring zone manually."
+            )
         )
 
     return OrchestratorResponse(
