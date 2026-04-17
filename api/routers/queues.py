@@ -22,7 +22,7 @@ async def get_all_queues() -> list[dict]:
         # Return base model as fallback
         results = []
         for zone_id in list(VENUE_ZONES.keys()):
-            wait = calculate_wait_time(40, 10) # Safe mid-range fallback
+            wait = calculate_wait_time(40, 10)  # Safe mid-range fallback
             results.append({
                 "zone_id": zone_id,
                 "queue_length": 40,

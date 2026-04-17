@@ -63,7 +63,7 @@ export default function App(): React.ReactElement {
                 criticalCount={criticalZones.length}
                 totalZones={dashState.zones.length}
                 activeInterventions={activeInterventions}
-                agentCount={11}
+                agentCount={12}
               />
               <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                  <div className="xl:col-span-2 space-y-6">

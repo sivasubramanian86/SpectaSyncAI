@@ -71,7 +71,7 @@ SERVICES = {
         "max_inst":    10,
         "memory":      "1Gi",
         "cpu":         "2",
-        "description": "FastAPI 11-Agent Mesh",
+        "description": "FastAPI 12-Agent Mesh",
     },
 }
 

@@ -1,5 +1,4 @@
 """Predictions router — triggers surge forecasting via Prediction Agent."""
-import os
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel, Field

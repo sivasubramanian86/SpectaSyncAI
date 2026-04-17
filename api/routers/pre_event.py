@@ -2,7 +2,7 @@
 SpectaSyncAI: Pre-Event Analysis Router
 Exposes strategic forecasting capabilities to the Command Hub.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from agents.pre_event_agent import run_pre_event_analysis
 
@@ -29,9 +29,10 @@ async def get_latest_pre_event_analysis():
     """Retrieves the last computed strategic analysis (or triggers a default if missing)."""
     if _LATEST_ANALYSIS["data"]:
         return _LATEST_ANALYSIS["data"]
-    
-    # If no analysis yet, return the default mock scenario to avoid 404/500
-    mock_trigger_data = await get_mock_pre_event()
+
+    # If no analysis yet, return the default mock scenario to avoid 404/500.
+    # The mock payload is defined in the same module for UI fallback parity.
+    await get_mock_pre_event()
     # We don't run a full analysis here to avoid slowing down the initial GET
     # The background task in main.py should have already populated this if it worked
     return {
@@ -52,24 +53,24 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
         if not isinstance(analysis, dict):
-             analysis = {"raw_analysis": str(analysis)}
-        
+            analysis = {"raw_analysis": str(analysis)}
+
         # Update global cache
         _LATEST_ANALYSIS["data"] = analysis
         from datetime import datetime
         _LATEST_ANALYSIS["last_updated"] = datetime.now().isoformat()
-        
+
         return analysis
     except Exception as e:
         import logging
         import traceback
         logging.error(f"Pre-Event Agent Error: {e}")
         logging.error(traceback.format_exc())
-        
+
         fallback = {
             "risk_level": "ELEVATED (Fallback)",
             "expected_crowd_peak": f"~{data.total_reservations + 1200} (Estimated)",
-            "weather_impact": f"Conditions may cause clustering at gate entries.",
+            "weather_impact": "Conditions may cause clustering at gate entries.",
             "pro_con_summary": "PRO: High interest. CON: Expected peak near capacity limits.",
             "precautionary_measures": [
                 "Deploy secondary steward mesh to Zone B",

@@ -1,6 +1,7 @@
 """
-SpectaSyncAI: Unit Tests for 11-Agent Mesh
+SpectaSyncAI: Unit Tests for 12-Agent Mesh
 Tests build and run functions for all Tier-1 and Tier-2 agents.
+Normalized for Google ADK Async/Await patterns.
 """
 import pytest
 import json
@@ -42,104 +43,60 @@ async def test_build_orchestrator_agent():
         agent = await build_orchestrator_agent()
         assert agent.name == "core_orchestrator"
 
+async def mock_runner_gen(mock_event):
+    yield mock_event
+
+def setup_mock_runner(MockRunner, response_text):
+    mock_runner = MagicMock()
+    MockRunner.return_value = mock_runner
+    
+    mock_runner.session_service.create_session = AsyncMock(return_value=MagicMock(id="test_session"))
+    
+    mock_event = MagicMock()
+    mock_event.is_final_response.return_value = True
+    mock_event.content.parts = [MagicMock(text=response_text)]
+    
+    mock_runner.run_async = MagicMock(return_value=mock_runner_gen(mock_event))
+    return mock_runner
+
 @pytest.mark.asyncio
 async def test_run_queue_analysis():
-    with patch("agents.queue_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.queue_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='[{"wait_time": 15}]')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.queue_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '[{"wait_time": 15}]')
         result = await run_queue_analysis(["STAND_1"])
         assert result[0]["wait_time"] == 15
 
 @pytest.mark.asyncio
 async def test_run_experience_recommendations():
-    with patch("agents.experience_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.experience_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='{"engagement_score": 0.9}')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.experience_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '{"engagement_score": 0.9}')
         result = await run_experience_recommendations("EVENT_1")
         assert result["engagement_score"] == 0.9
 
 @pytest.mark.asyncio
 async def test_run_perimeter_assessment():
-    with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.perimeter_macro_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='{"breach_probability": 0.2}')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '{"breach_probability": 0.2}')
         result = await run_perimeter_assessment("VENUE_1", "560001", ["STATION_1"])
         assert result["breach_probability"] == 0.2
 
 @pytest.mark.asyncio
 async def test_run_vip_sync_monitoring():
-    with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.vip_sync_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='{"kinetic_energy": 0.5}')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '{"kinetic_energy": 0.5}')
         result = await run_vip_sync_monitoring("EVT_1", "VENUE_1", 1000, 0.5)
         assert result["kinetic_energy"] == 0.5
 
 @pytest.mark.asyncio
 async def test_run_rumor_monitoring():
-    with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.rumor_control_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='{"rumor_detected": true}')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '{"rumor_detected": true}')
         result = await run_rumor_monitoring("VENUE_1")
         assert result["rumor_detected"] is True
 
 @pytest.mark.asyncio
 async def test_run_failsafe_monitoring():
-    with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.failsafe_mesh_agent.InMemorySessionService") as MockSession:
-        
-        mock_event = MagicMock()
-        mock_event.is_final_response.return_value = True
-        mock_event.content.parts = [MagicMock(text='{"failsafe_active": false}')]
-        
-        async def fake_run(*args, **kwargs):
-            yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
-        
+    with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner:
+        setup_mock_runner(MockRunner, '{"failsafe_active": false}')
         result = await run_failsafe_monitoring("VENUE_1", ["ZONE_1"])
         assert result["failsafe_active"] is False

@@ -133,7 +133,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
               <div className="space-y-1">
                 <h4 className="text-sm font-bold text-blue-400">How does the "Crisis Prevention Mesh" work?</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  It utilizes a Pub/Sub backbone to unify 11 agent types. If a metric (e.g., density &gt; 4.2 ppl/sqm) exceeds safety thresholds, 
+                  It utilizes a Pub/Sub backbone to unify 12 agent types. If a metric (e.g., density &gt; 4.2 ppl/sqm) exceeds safety thresholds, 
                   the Incident RAG agent cross-references a vector-stored corpus of 14,000+ historical events to suggest tailored interventions.
                 </p>
               </div>
@@ -222,7 +222,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <div>
                   <h4 className="text-sm font-bold text-blue-400 mb-2">Technical Foundations</h4>
                   <p className="text-slate-300 text-sm leading-relaxed">
-                    Powered by <strong>Gemini 2.5 Pro</strong>, the system orchestrates 11 specialized agents. 
+                    Powered by <strong>Gemini 2.5 Pro</strong>, the system orchestrates 12 specialized agents. 
                     Unlike static monitoring, SpectaSyncAI performs <strong>Reactive intervention</strong>—automatically 
                     updating digital signage, routing stewards, and notifying emergency services without latency-heavy manual loops.
                   </p>
@@ -251,7 +251,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <div className="glass p-5 border border-blue-500/10">
                   <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                    The 11-Agent Mesh Architecture
+                    The 12-Agent Mesh Architecture
                   </h4>
                   <ul className="grid grid-cols-2 gap-x-6 gap-y-3 text-[11px] font-mono text-slate-400">
                     <li className="flex items-center gap-2 hover:text-blue-300 transition-colors"><ShieldCheck size={12} className="text-blue-500" /> 01 Vision Edge</li>
@@ -264,7 +264,8 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                     <li className="flex items-center gap-2 hover:text-blue-300 transition-colors"><ShieldCheck size={12} className="text-blue-500" /> 08 Truth Verifier</li>
                     <li className="flex items-center gap-2 hover:text-blue-300 transition-colors"><ShieldCheck size={12} className="text-blue-500" /> 09 System Failsafe</li>
                     <li className="flex items-center gap-2 hover:text-blue-300 transition-colors"><ShieldCheck size={12} className="text-blue-500" /> 10 Incident RAG</li>
-                    <li className="flex items-center gap-2 hover:text-blue-300 transition-colors text-blue-400 font-bold"><ShieldCheck size={12} /> 11 AI Orchestrator</li>
+                    <li className="flex items-center gap-2 hover:text-blue-300 transition-colors"><ShieldCheck size={12} className="text-blue-500" /> 11 AI Orchestrator</li>
+                    <li className="flex items-center gap-2 hover:text-blue-300 transition-colors text-blue-400 font-bold"><ShieldCheck size={12} /> 12 Pre-Event Analyst</li>
                   </ul>
                 </div>
               </div>

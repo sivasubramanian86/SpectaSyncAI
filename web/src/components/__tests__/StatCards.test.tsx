@@ -8,7 +8,7 @@ describe('StatCards Component', () => {
     criticalCount: 2,
     totalZones: 12,
     activeInterventions: 5,
-    agentCount: 11,
+    agentCount: 12,
   };
 
   it('renders all metrics correctly', () => {
@@ -25,7 +25,7 @@ describe('StatCards Component', () => {
     expect(screen.getByText('5')).toBeDefined();
     
     expect(screen.getByText('Active Agents')).toBeDefined();
-    expect(screen.getByText('11')).toBeDefined();
+    expect(screen.getByText('12')).toBeDefined();
   });
 
   it('changes critical zones color based on count', () => {

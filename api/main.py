@@ -1,5 +1,5 @@
 """
-SpectaSyncAI FastAPI entry point — 11-Agent Mesh, 8 versioned routers.
+SpectaSyncAI FastAPI entry point — 12-Agent Mesh, 8 versioned routers.
 @07_modern_polyglot_standards | @19_cost_efficiency_architect
 
 Startup sequence:
@@ -45,8 +45,8 @@ async def lifespan(app: FastAPI):
     Shutdown: log graceful stop.
     """
     logger.info(
-        "SpectaSyncAI v3.1.0 — 11-Agent Mesh starting "
-        "(Tier 1: 6 Operational | Tier 2: 4 Crisis Prevention + 1 Incident RAG)."
+        "SpectaSyncAI v3.1.0 — 12-Agent Mesh starting "
+        "(Tier 1: 6 Operational | Tier 2: 6 Crisis Prevention & RAG)."
     )
 
     # Warm context caches in background (non-blocking)
@@ -88,7 +88,7 @@ app = FastAPI(
         "Grounded in forensic analysis of 18 anonymized crowd crush incidents (2003–2025), "
         "across 9 countries, 6,142 deaths. "
         "Tier 1: 6 Operational Agents (Vision, Orchestrator, Prediction, Queue, Safety, Experience). "
-        "Tier 2: 4 Crisis Prevention Agents + Incident RAG (PerimeterMacro, VIPSync, RumorControl, FailsafeMesh). "
+        "Tier 2: 6 Crisis Prevention Agents & Incident RAG (PerimeterMacro, VIPSync, RumorControl, FailsafeMesh, PreEvent, RAG). "
         "Powered by Google ADK, Gemini 2.5 Pro/Flash, AlloyDB pgvector, FastMCP, Vertex AI Context Cache."
     ),
     version="3.1.0",

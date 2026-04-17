@@ -118,8 +118,9 @@ export function useDashboardData() {
       { agent: 'perimeter_macro' as const, type: 'reasoning' as const, message: `Macro View: Detecting secondary pressure point at Section 101.` },
       { agent: 'vip_sync' as const, type: 'tool_call' as const, message: `Syncing VIP escort via Secure Route ${['A','B','C'][Math.floor(Math.random()*3)]}.` },
       { agent: 'rumor_control' as const, type: 'reasoning' as const, message: `Rumor Audit: Clearing false reports regarding Gate East delay.` },
-      { agent: 'failsafe_mesh' as const, type: 'alert' as const, message: `MESH_REDUNDANCY: Health check passing for all 11 nodes.` },
+      { agent: 'failsafe_mesh' as const, type: 'alert' as const, message: `MESH_REDUNDANCY: Health check passing for all 12 nodes.` },
       { agent: 'incident_rag' as const, type: 'reasoning' as const, message: `RAG Insight: Matching pattern with ${2018 + Math.floor(Math.random()*7)} event. Applying mitigations.` },
+      { agent: 'pre_event_analyst' as const, type: 'reasoning' as const, message: 'Strategic Audit complete. High confidence in T-90 min lookahead accuracy.' },
     ];
     const picked = events[Math.floor(Math.random() * events.length)];
     return {

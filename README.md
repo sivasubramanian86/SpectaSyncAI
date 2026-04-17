@@ -184,7 +184,7 @@ python scripts/deploy_cloudrun.py     # GCP Cloud Run deploy
 ## 🧪 Quality Assurance & Testing
 
 SpectaSyncAI enforces a 100% pass-rate policy for all production builds:
-*   **Unit & Integration (Backend)**: Built with `Pytest` and `Vitest`, covering the 11-agent mesh logic and math models.
+*   **Unit & Integration (Backend)**: Built with `Pytest` and `Vitest`, covering the 12-agent mesh logic and math models.
 *   **End-to-End (E2E)**: Built with `Playwright`, validating the full Command Center lifecycle, from heatmap interaction to RAG-triggered agent expansions and multi-lingual UI translation.
 *   **Performance**: Verified 4ms ingestion lag and 1.2k objects/sec vision processing capacity.
 

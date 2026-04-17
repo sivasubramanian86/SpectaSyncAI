@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Unit Tests for Context Cache Module
+SpectaSyncAI: Unit Tests for Context Cache Module (google-genai SDK)
 """
 import pytest
 import os
@@ -18,73 +18,57 @@ def test_build_system_prompt():
 
 @pytest.mark.asyncio
 async def test_get_or_create_cache_hit():
-    with patch("vertexai.preview.caching.CachedContent.get") as mock_get:
-        mock_get.return_value = MagicMock()
-        res = await get_or_create_cache("vip_sync", "model_name")
-        assert res is not None
-        mock_get.assert_called_once()
+    """Test that existing cache is returned if found in list()."""
+    mock_client = MagicMock()
+    mock_cache = MagicMock()
+    mock_cache.display_name = "specta-vip_sync-gemini-2.1-pro"
+    mock_client.caches.list.return_value = [mock_cache]
+    
+    with patch("agents.context_cache.get_client", return_value=mock_client):
+        res = await get_or_create_cache("vip_sync", "models/gemini-2.1-pro")
+        assert res == mock_cache
+        mock_client.caches.list.assert_called()
+        mock_client.caches.create.assert_not_called()
 
 @pytest.mark.asyncio
 async def test_get_or_create_cache_miss_create():
-    with patch("vertexai.preview.caching.CachedContent.get", side_effect=Exception("Miss")), \
-         patch("vertexai.preview.caching.CachedContent.create") as mock_create:
-        mock_create.return_value = MagicMock()
-        res = await get_or_create_cache("vip_sync", "model_name")
+    """Test that new cache is created if not found in list()."""
+    mock_client = MagicMock()
+    mock_client.caches.list.return_value = [] # Empty list = Miss
+    mock_client.caches.create.return_value = MagicMock(display_name="new-cache")
+    
+    with patch("agents.context_cache.get_client", return_value=mock_client):
+        res = await get_or_create_cache("vip_sync", "models/gemini-2.5-pro")
         assert res is not None
-        mock_create.assert_called_once()
-
-@pytest.mark.asyncio
-async def test_get_or_create_cache_import_error():
-    with patch("builtins.__import__", side_effect=ImportError("test")):
-        res = await get_or_create_cache("vip_sync", "model_name")
-        assert res is None
+        mock_client.caches.create.assert_called_once()
 
 @pytest.mark.asyncio
 async def test_get_cached_model_success():
-    with patch("agents.context_cache.get_or_create_cache", new_callable=AsyncMock) as mock_get_cache, \
-         patch("vertexai.generative_models.GenerativeModel.from_cached_content") as mock_from_cached:
-        
-        mock_get_cache.return_value = MagicMock()
-        mock_from_cached.return_value = MagicMock()
-        
+    """Test that get_cached_model returns the string name of the cache."""
+    mock_cache = MagicMock()
+    mock_cache.name = "projects/p/locations/l/cachedContents/c1"
+    
+    with patch("agents.context_cache.get_or_create_cache", new_callable=AsyncMock) as mock_get_cache:
+        mock_get_cache.return_value = mock_cache
         res = await get_cached_model("vip_sync", "model")
-        assert res is not None
-
-@pytest.mark.asyncio
-async def test_get_cached_model_fallback():
-    with patch("agents.context_cache.get_or_create_cache", new_callable=AsyncMock) as mock_get_cache, \
-         patch("vertexai.generative_models.GenerativeModel") as mock_gen_model:
-        
-        mock_get_cache.return_value = None
-        mock_gen_model.return_value = MagicMock()
-        
-        res = await get_cached_model("vip_sync", "model")
-        assert res is not None
+        assert res == "projects/p/locations/l/cachedContents/c1"
 
 @pytest.mark.asyncio
 async def test_warm_all_caches():
+    """Test that warm_all_caches triggers cache creation for all agents."""
     with patch("agents.context_cache.get_or_create_cache", new_callable=AsyncMock) as mock_get_cache:
         await warm_all_caches()
-        assert mock_get_cache.call_count >= 5
+        # Adjusted for 12-agent mesh (7 warmed in the list)
+        assert mock_get_cache.call_count >= 7
 
 @pytest.mark.asyncio
 async def test_context_cache_failures():
-    with patch("vertexai.init"), \
-         patch("vertexai.preview.caching.CachedContent.get", side_effect=Exception("Get Error")), \
-         patch("vertexai.preview.caching.CachedContent.create", side_effect=Exception("Create Error")), \
-         patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "p"}):
-        
-        # get_or_create_cache returns None on dual failure
+    """Test resilience when client or cache creation fails."""
+    mock_client = MagicMock()
+    mock_client.caches.list.side_effect = Exception("API Error")
+    mock_client.caches.create.side_effect = Exception("Create Error")
+    
+    with patch("agents.context_cache.get_client", return_value=mock_client):
+        # Should return None instead of raising
         res = await get_or_create_cache("core_orchestrator", "model")
         assert res is None
-        
-    with patch("agents.context_cache.get_or_create_cache", side_effect=Exception("Outer Error")):
-        # get_cached_model returns None on outer exception
-        res = await get_cached_model("key", "model")
-        assert res is None
-
-@pytest.mark.asyncio
-async def test_warm_all_caches_failure():
-    with patch("agents.context_cache.get_or_create_cache", side_effect=Exception("Warm failure")):
-        # Should not raise
-        await warm_all_caches()

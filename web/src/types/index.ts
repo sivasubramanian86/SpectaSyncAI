@@ -12,7 +12,8 @@ export type AgentName =
   | 'vip_sync'
   | 'rumor_control'
   | 'failsafe_mesh'
-  | 'incident_rag';
+  | 'incident_rag'
+  | 'pre_event_analyst';
 
 export interface VenueZone {
   zone_id: string;

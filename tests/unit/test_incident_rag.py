@@ -63,8 +63,12 @@ def test_aggregate_intervention_strategies():
 
 @pytest.mark.asyncio
 async def test_run_incident_rag_query_success():
-    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.incident_rag_agent.InMemorySessionService") as MockSession:
+    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
+        mock_runner = MagicMock()
+        MockRunner.return_value = mock_runner
+        
+        # Setup session service within the runner
+        mock_runner.session_service.create_session = AsyncMock(return_value=MagicMock(id="test"))
         
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
@@ -72,16 +76,19 @@ async def test_run_incident_rag_query_success():
         
         async def fake_run(*args, **kwargs):
             yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        mock_runner.run_async = fake_run
         
         res = await run_incident_rag_query(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
         assert res["matched_incidents"] == ["INC-001"]
 
 @pytest.mark.asyncio
 async def test_run_incident_rag_query_fallback():
-    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner, \
-         patch("agents.incident_rag_agent.InMemorySessionService") as MockSession:
+    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
+        mock_runner = MagicMock()
+        MockRunner.return_value = mock_runner
+        
+        # Setup session service within the runner
+        mock_runner.session_service.create_session = AsyncMock(return_value=MagicMock(id="test"))
         
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
@@ -89,8 +96,7 @@ async def test_run_incident_rag_query_fallback():
         
         async def fake_run(*args, **kwargs):
             yield mock_event
-        MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        mock_runner.run_async = fake_run
         
         res = await run_incident_rag_query(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
         assert "matched_incidents" in res

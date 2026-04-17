@@ -15,7 +15,7 @@ We take the security of the SpectaSyncAI platform and the safety of our crowd in
 ## Scope
 
 The following components are in scope for security reviews:
-- **11-Agent Mesh Hub:** Logic for agent orchestration and spatial reasoning.
+- **12-Agent Mesh Hub:** Logic for agent orchestration and spatial reasoning.
 - **Incident RAG Agent:** Integrity of the global incident corpus and retrieval logic.
 - **MCP Server:** Authorization and safety of the 7 intervention tools.
 - **FastAPI / React Dashboard:** PII scrubbing and data visualization.

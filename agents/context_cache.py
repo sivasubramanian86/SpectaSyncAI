@@ -196,6 +196,8 @@ async def warm_all_caches() -> None:
         ("vip_sync", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
         ("rumor_control", os.getenv("MODEL_FLASH", "gemini-2.5-flash")),
         ("failsafe_mesh", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
+        ("pre_event_analyst", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
+        ("incident_rag", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
     ]
     for key, model in agents:
         try:
