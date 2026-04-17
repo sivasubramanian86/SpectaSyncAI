@@ -1,5 +1,6 @@
 """MCP Toolbox — 7 venue intervention tools (SSE transport).
-@07_modern_polyglot_standards: PORT from env, structured logging, Cloud Run compatible.
+@07_modern_polyglot_standards: PORT from env, structured logging,
+Cloud Run compatible.
 """
 from __future__ import annotations
 
@@ -38,7 +39,10 @@ async def update_digital_signage(location_id: str, message: str) -> dict:
     Updates a venue digital sign to display a crowd redirection message.
     Addresses failure modes: EXOGENOUS_SURGE, NARROW_CORRIDOR, EGRESS_FAILURE.
     """
-    logger.info("tool=update_digital_signage location=%s message=%r", location_id, message)
+    logger.info(
+        "tool=update_digital_signage location=%s message=%r",
+        location_id, message
+    )
     return {
         "status": "success",
         "tool": "update_digital_signage",
@@ -48,17 +52,24 @@ async def update_digital_signage(location_id: str, message: str) -> dict:
 
 
 @mcp.tool()
-async def dispatch_staff(location_id: str, priority: str = "medium", count: int = 2) -> dict:
+async def dispatch_staff(
+    location_id: str, priority: str = "medium", count: int = 2
+) -> dict:
     """
     Deploys venue staff to a specified zone.
     priority: low | medium | high | emergency.
     count: number of staff to dispatch (default 2).
     Addresses failure modes: EXOGENOUS_SURGE, TEMPORAL_DISRUPT, TEMPLE_SURGE.
     """
-    eta = {"low": "10 mins", "medium": "5 mins", "high": "2 mins", "emergency": "90 secs"}.get(
-        priority, "5 mins"
+    eta_map = {
+        "low": "10 mins", "medium": "5 mins",
+        "high": "2 mins", "emergency": "90 secs"
+    }
+    eta = eta_map.get(priority, "5 mins")
+    logger.info(
+        "tool=dispatch_staff location=%s priority=%s count=%d eta=%s",
+        location_id, priority, count, eta
     )
-    logger.info("tool=dispatch_staff location=%s priority=%s count=%d eta=%s", location_id, priority, count, eta)
     return {
         "status": "dispatched",
         "tool": "dispatch_staff",
@@ -76,7 +87,9 @@ async def open_auxiliary_gate(gate_id: str, direction: str = "both") -> dict:
     direction: entry | exit | both.
     Addresses failure modes: EGRESS_FAILURE, EXOGENOUS_SURGE, TICKETING_CHAOS.
     """
-    logger.info("tool=open_auxiliary_gate gate=%s direction=%s", gate_id, direction)
+    logger.info(
+        "tool=open_auxiliary_gate gate=%s direction=%s", gate_id, direction
+    )
     return {
         "status": "gate_opened",
         "tool": "open_auxiliary_gate",
@@ -87,14 +100,19 @@ async def open_auxiliary_gate(gate_id: str, direction: str = "both") -> dict:
 
 
 @mcp.tool()
-async def trigger_pa_announcement(zone: str, message: str, language_codes: list[str] | None = None) -> dict:
+async def trigger_pa_announcement(
+    zone: str, message: str, language_codes: list[str] | None = None
+) -> dict:
     """
     Broadcasts a multilingual PA announcement in a venue zone.
     language_codes: list of BCP-47 codes e.g. ['en', 'ta', 'kn', 'hi'].
     Addresses failure modes: INFO_CASCADE, PANIC_TRIGGER, INFRA_FAILURE.
     """
     langs = language_codes or ["en"]
-    logger.info("tool=trigger_pa_announcement zone=%s langs=%s message=%r", zone, langs, message)
+    logger.info(
+        "tool=trigger_pa_announcement zone=%s langs=%s message=%r",
+        zone, langs, message
+    )
     return {
         "status": "broadcasted",
         "tool": "trigger_pa_announcement",
@@ -105,7 +123,9 @@ async def trigger_pa_announcement(zone: str, message: str, language_codes: list[
 
 
 @mcp.tool()
-async def trigger_evacuation_protocol(zone: str, severity: str = "partial") -> dict:
+async def trigger_evacuation_protocol(
+    zone: str, severity: str = "partial"
+) -> dict:
     """
     Initiates venue evacuation protocol.
     REQUIRES human operator (HITL) confirmation before physical execution.
@@ -113,7 +133,8 @@ async def trigger_evacuation_protocol(zone: str, severity: str = "partial") -> d
     Addresses failure modes: ALL — last resort intervention.
 
     NOTE: This tool logs the intent and stages the protocol.
-          Final physical execution requires operator confirmation within 90 seconds.
+          Final physical execution requires operator confirmation
+          within 90 seconds.
     """
     logger.warning(
         "tool=trigger_evacuation_protocol HITL_REQUIRED zone=%s severity=%s",
@@ -124,7 +145,10 @@ async def trigger_evacuation_protocol(zone: str, severity: str = "partial") -> d
         "tool": "trigger_evacuation_protocol",
         "zone": zone,
         "severity": severity,
-        "message": "Evacuation protocol staged. Awaiting operator confirmation within 90 seconds.",
+        "message": (
+            "Evacuation protocol staged. "
+            "Awaiting operator confirmation within 90 seconds."
+        ),
         "human_approval_required": True,
         "hitl_timeout_secs": 90,
     }
@@ -132,10 +156,14 @@ async def trigger_evacuation_protocol(zone: str, severity: str = "partial") -> d
 
 @mcp.tool()
 async def send_attendee_push_notification(
-    zone: str, message: str, urgency: str = "info", language_codes: list[str] | None = None
+    zone: str,
+    message: str,
+    urgency: str = "info",
+    language_codes: list[str] | None = None
 ) -> dict:
     """
-    Sends a push notification to attendees in a specified zone via the venue app.
+    Sends a push notification to attendees in a specified zone
+    via the venue app.
     urgency: info | warning | alert.
     language_codes: BCP-47 list for multilingual broadcast.
     Addresses failure modes: INFO_CASCADE, RUMOR spread, EXOGENOUS_SURGE.
@@ -159,13 +187,20 @@ async def send_attendee_push_notification(
 @mcp.tool()
 async def adjust_concession_staffing(stand_id: str, action: str) -> dict:
     """
-    Adjusts staffing at a food/merchandise concession stand to distribute crowd dwell time.
+    Adjusts staffing at a food/merchandise concession stand
+    to distribute crowd dwell time.
     action: increase | decrease | emergency_boost.
-    Addresses failure modes: EXOGENOUS_SURGE (crowd distribution via dwell-time extension).
+    Addresses failure modes: EXOGENOUS_SURGE
+    (crowd distribution via dwell-time extension).
     """
-    staff_delta = {"increase": 2, "decrease": -1, "emergency_boost": 4}.get(action, 1)
+    staff_delta = {
+        "increase": 2, "decrease": -1, "emergency_boost": 4
+    }.get(action, 1)
     eta = 3 if action == "emergency_boost" else 8
-    logger.info("tool=adjust_concession_staffing stand=%s action=%s delta=%d", stand_id, action, staff_delta)
+    logger.info(
+        "tool=adjust_concession_staffing stand=%s action=%s delta=%d",
+        stand_id, action, staff_delta
+    )
     return {
         "status": "requested",
         "tool": "adjust_concession_staffing",
@@ -185,9 +220,13 @@ async def search_missing_person(
     """
     Scans venue CCTV feeds for a person matching a photo/description.
     target_class: child | elderly | woman | general.
-    Optimizes for vulnerability identification (Computer Vision API integration).
+    Optimizes for vulnerability identification
+    (Computer Vision API integration).
     """
-    logger.info("tool=search_missing_person last_zone=%s class=%s", last_known_zone, target_class)
+    logger.info(
+        "tool=search_missing_person last_zone=%s class=%s",
+        last_known_zone, target_class
+    )
     # Priority weighting for vulnerable demographics
     priority = "CRITICAL" if target_class in ["child", "elderly"] else "HIGH"
     return {
@@ -200,13 +239,17 @@ async def search_missing_person(
         "match_timestamp": "2026-04-17T13:58:00Z",
         "priority_level": priority,
         "relative_alert_status": "SENT_VIA_SMS",
-        "instruction": "Automated staff redirection to North Wing (Unit 7) initiated."
+        "instruction": (
+            "Automated staff redirection to North Wing (Unit 7) initiated."
+        )
     }
 
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "8001"))
-    logger.info("SpectaSyncAI MCP Toolbox starting on port %d (SSE transport)", port)
+    logger.info(
+        "SpectaSyncAI MCP Toolbox starting on port %d (SSE transport)", port
+    )
 
     # Configure FastMCP instance settings for SSE Uvicorn transport
     mcp.settings.port = port
