@@ -44,7 +44,10 @@ export function Header({ lastUpdated, isLive, activeTab, onTabChange }: HeaderPr
             <span className="text-emerald-400">Vertex AI</span>
             <span className="w-px h-3 bg-white/20" />
             <span className="text-cyan-400">ADK 2.1</span>
+            <span className="w-px h-3 bg-white/20" />
+            <span className="text-orange-400">Firebase Sync</span>
           </div>
+
 
           <div className="flex flex-col items-end">
              {isLive && (

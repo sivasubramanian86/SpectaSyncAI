@@ -37,6 +37,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# ── Google Cloud Logging Integration ──────────────────────────────────────────
+if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "1":
+    try:
+        import google.cloud.logging
+        client = google.cloud.logging.Client()
+        client.setup_logging()
+        logger.info("Google Cloud Logging handler attached.")
+    except Exception as exc:
+        logger.warning(f"Google Cloud Logging initialization skipped: {exc}")
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

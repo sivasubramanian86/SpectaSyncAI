@@ -4,7 +4,9 @@ import { Header } from './components/Header';
 import type { TabId } from './components/Header';
 import { StatCards } from './components/StatCards';
 import { VenueHeatmap } from './components/VenueHeatmap';
+import { VenueMap } from './components/VenueMap';
 import { AgentFeed } from './components/AgentFeed';
+
 import { PredictionPanel } from './components/PredictionPanel';
 import { QueueBoard } from './components/QueueBoard';
 import { CrisisDashboard } from './components/CrisisDashboard';
@@ -104,8 +106,10 @@ export default function App(): React.ReactElement {
               <MultiModalHub />
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3 space-y-6">
+                  <VenueMap className="rounded-2xl border border-white/5 shadow-2xl" />
                   <VenueHeatmap zones={dashState.zones} />
                   <div className="grid grid-cols-2 gap-6">
+
                     <div className="glass p-5">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Spatial Occupancy Trends</h3>
                       <ZoneOccupancyBars />

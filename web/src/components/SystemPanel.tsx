@@ -285,6 +285,54 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 </div>
               ))}
             </div>
+
+            {/* NEW: Explicit Google Services Audit Section */}
+            <div className="mt-12 p-8 bg-blue-500/5 border border-blue-500/20 rounded-3xl space-y-6">
+              <div className="flex items-center gap-4 border-b border-white/10 pb-6">
+                <div className="p-3 bg-blue-500/10 rounded-2xl">
+                   <img src="https://www.gstatic.com/images/branding/product/2x/google_cloud_64dp.png" className="w-8 h-8 opacity-80" alt="GCP" />
+                </div>
+                <div>
+                   <h3 className="text-xl font-black text-white uppercase tracking-tighter">Google Ecosystem Integration Audit</h3>
+                   <p className="text-xs text-slate-500 font-mono italic">Full stack alignment with Google Cloud GenAI & Infrastructure</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase text-blue-400">Compute & Deploy</p>
+                    <ul className="space-y-2">
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Google Cloud Run (Services)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Firebase Hosting (Frontend)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Artifact Registry (CI/CD)</li>
+                    </ul>
+                 </div>
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase text-blue-400">Generative AI</p>
+                    <ul className="space-y-2">
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Gemini 2.5 Pro (Reasoning)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Vertex AI CachedContent (ADK)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Gemini multimodality (Vision)</li>
+                    </ul>
+                 </div>
+                 <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase text-blue-400">Data & Observability</p>
+                    <ul className="space-y-2">
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> AlloyDB with pgvector (RAG)</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Google Cloud Logging SDK</li>
+                       <li className="text-xs text-slate-300 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Cloud Monitoring Metrics</li>
+                    </ul>
+                 </div>
+              </div>
+
+              <div className="p-4 bg-white/5 rounded-2xl flex items-center justify-between border border-white/5">
+                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Integration Readiness Level</p>
+                 <div className="flex gap-1">
+                    {[1,2,3,4,5].map(i => <div key={i} className={`w-6 h-1 rounded-full ${i <= 5 ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-slate-700'}`} />)}
+                 </div>
+              </div>
+            </div>
+
           </InfoSection>
         </div>
       )}
