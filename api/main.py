@@ -114,18 +114,33 @@ app.add_middleware(
 
 # ── Tier 1 — Operational Agents ──────────────────────────────────────────────
 app.include_router(health.router, prefix="/v1", tags=["Health"])
-app.include_router(telemetry.router, prefix="/v1", tags=["Telemetry & Vision"])
-app.include_router(interventions.router, prefix="/v1", tags=["Interventions"])
-app.include_router(predictions.router, prefix="/v1", tags=["AI Predictions"])
-app.include_router(queues.router, prefix="/v1", tags=["Queue Management"])
-app.include_router(safety.router, prefix="/v1", tags=["Safety & Emergency"])
-app.include_router(experience.router, prefix="/v1", tags=["Attendee Experience"])
+app.include_router(
+    telemetry.router, prefix="/v1", tags=["Telemetry & Vision"]
+)
+app.include_router(
+    interventions.router, prefix="/v1", tags=["Interventions"]
+)
+app.include_router(
+    predictions.router, prefix="/v1", tags=["AI Predictions"]
+)
+app.include_router(
+    queues.router, prefix="/v1", tags=["Queue Management"]
+)
+app.include_router(
+    safety.router, prefix="/v1", tags=["Safety & Emergency"]
+)
+app.include_router(
+    experience.router, prefix="/v1", tags=["Attendee Experience"]
+)
 
 # ── Tier 2 — Crisis Prevention Agents + Incident RAG ─────────────────────────
-app.include_router(crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"])
+app.include_router(
+    crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"]
+)
 app.include_router(
     pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"]
 )
+
 
 if os.path.exists("static"):
     app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
