@@ -12,6 +12,24 @@ interface MediaSource {
   status: 'SAFE' | 'WARNING' | 'CRITICAL';
 }
 
+function AudioVisualizer({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="flex gap-1 items-end h-20 mb-6">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 8, 6, 4, 2].map((_, i) => (
+        <div
+          key={i}
+          className={`w-3 bg-blue-500 rounded-full transition-all duration-150 ${isActive ? 'animate-bounce' : 'h-2'}`}
+          style={{ 
+            height: isActive ? `${Math.random() * 100}%` : '8px',
+            animationDelay: `${i * 0.05}s`,
+            animationDuration: `${0.5 + Math.random()}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 const SAMPLE_MEDIA: MediaSource[] = [
   { id: '1', name: 'Gate 3 - Forensic Sequence (VEO)', url: ['https://storage.googleapis.com/spectasync-public-assets/crowd_surge_precursor.png', 'https://storage.googleapis.com/spectasync-public-assets/thermal_stagnation.png', 'https://storage.googleapis.com/spectasync-public-assets/gate3_surge.png'], type: 'image', timestamp: '10:42:01', status: 'CRITICAL' },
   { id: '2', name: 'Panic Signature - Sector 4 (Lyria)', url: ['https://storage.googleapis.com/spectasync-public-assets/shouting_mob.mp3', 'https://storage.googleapis.com/spectasync-public-assets/angry_mob.mp3'], type: 'audio', timestamp: '10:42:15', status: 'CRITICAL' },
@@ -95,11 +113,11 @@ export function MultiModalHub() {
         <div className="xl:col-span-2 space-y-4">
           <div className="relative aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
              {activeMedia.type === 'video' && (
-               <video src={currentUrl} className="w-full h-full object-cover" autoPlay muted loop />
+               <video key={currentUrl} src={currentUrl} className="w-full h-full object-cover" autoPlay muted loop />
              )}
              {activeMedia.type === 'image' && (
                <div className="relative w-full h-full">
-                 <img src={currentUrl} className="w-full h-full object-cover animate-pulse-slow" alt="Forensic frame" />
+                 <img key={currentUrl} src={currentUrl} className="w-full h-full object-cover" alt="Forensic frame" />
                  {Array.isArray(activeMedia.url) && (
                    <div className="absolute bottom-4 right-4 flex gap-1">
                      {(activeMedia.url as string[]).map((_, i) => (
@@ -110,15 +128,13 @@ export function MultiModalHub() {
                </div>
              )}
              {activeMedia.type === 'audio' && (
-               <div className="w-full h-full flex flex-col items-center justify-center bg-navy-900">
-                  <div className="flex gap-1 items-end h-16 mb-4">
-                    {[3, 8, 5, 10, 4, 7, 2, 9].map((h, i) => (
-                      <div key={i} className="w-2 bg-blue-500 animate-pulse" style={{ height: `${h * 10}%`, animationDelay: `${i * 0.1}s` }} />
-                    ))}
-                  </div>
-                  <Mic size={48} className="text-blue-400 mb-2" />
-                  <p className="text-xs text-slate-400 uppercase font-bold tracking-widest">Processing Acoustic Vectors...</p>
-                  <audio src={currentUrl} hidden autoPlay />
+               <div className="w-full h-full flex flex-col items-center justify-center bg-black/40 backdrop-blur-3xl rounded-2xl overflow-hidden relative">
+                  <AudioVisualizer isActive={true} />
+                  <Mic size={48} className="text-blue-400 mb-2 animate-pulse" />
+                  <p className="text-xs text-slate-300 uppercase font-black tracking-widest">
+                    Analysis in Progress: Distress Transients Detected
+                  </p>
+                  <audio key={currentUrl} src={currentUrl} autoPlay hidden />
                </div>
              )}
              
