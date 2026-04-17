@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -27,6 +27,8 @@ from api.routers import (
     health, telemetry, interventions,
     predictions, queues, safety, experience, crisis, pre_event
 )
+
+import traceback
 
 # Structured logging — stdout for Cloud Logging
 logging.basicConfig(
@@ -84,7 +86,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="SpectaSyncAI",
     description=(
-        "11-Agent Real-Time Crowd Intelligence Mesh. "
+        "12-Agent Real-Time Crowd Intelligence Mesh. "
         "Grounded in forensic analysis of 18 anonymized crowd crush incidents (2003–2025), "
         "across 9 countries, 6,142 deaths. "
         "Tier 1: 6 Operational Agents (Vision, Orchestrator, Prediction, Queue, Safety, Experience). "
@@ -100,7 +102,7 @@ app = FastAPI(
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
 ALLOWED_ORIGINS = os.getenv(
-    "CORS_ORIGINS", 
+    "CORS_ORIGINS",
     "http://localhost:5173,http://localhost:5174,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174"
 ).split(",")
 app.add_middleware(
@@ -136,9 +138,6 @@ async def favicon():
     return HTMLResponse(content="")
 
 
-from fastapi.responses import JSONResponse
-import traceback
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     tb = traceback.format_exc()
@@ -151,6 +150,7 @@ async def global_exception_handler(request: Request, exc: Exception):
             "traceback": tb
         },
     )
+
 
 @app.get("/", include_in_schema=False)
 async def serve_dashboard():
