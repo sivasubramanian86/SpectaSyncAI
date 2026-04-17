@@ -178,7 +178,7 @@ async def adjust_concession_staffing(stand_id: str, action: str) -> dict:
 
 @mcp.tool()
 async def search_missing_person(
-    photo_reference: str, 
+    photo_reference: str,
     last_known_zone: str,
     target_class: str = "general"
 ) -> dict:
@@ -188,10 +188,8 @@ async def search_missing_person(
     Optimizes for vulnerability identification (Computer Vision API integration).
     """
     logger.info("tool=search_missing_person last_zone=%s class=%s", last_known_zone, target_class)
-    
     # Priority weighting for vulnerable demographics
     priority = "CRITICAL" if target_class in ["child", "elderly"] else "HIGH"
-    
     return {
         "status": "active_search",
         "tool": "search_missing_person",

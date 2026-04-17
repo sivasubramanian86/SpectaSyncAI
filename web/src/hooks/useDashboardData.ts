@@ -4,7 +4,15 @@
  * Uses 5-second polling (production: replace with SSE/WebSocket).
  */
 import { useState, useEffect, useCallback } from 'react';
-import type { DashboardState, VenueZone, AgentEvent, SurgeForecast } from '../types';
+import type { 
+  DashboardState, 
+  VenueZone, 
+  AgentEvent, 
+  SurgeForecast, 
+  Recommendation, 
+  QueueStatus, 
+  SafetyAlert 
+} from '../types';
 
 
 
@@ -63,39 +71,62 @@ function classifyDensity(d: number): VenueZone['level'] {
   return 'NORMAL';
 }
 
+const ACTUALLY_RECOMMENDED: Recommendation[] = [
+  { priority: 1, category: 'ENTRY_EXIT', message: 'Deploy 3 additional staff to Gate North immediately.', timing: 'NOW' },
+  { priority: 2, category: 'ENTRY_EXIT', message: 'Update Gate South/East signage: "Gate North Closed — Use Gate East".', timing: 'T+2 mins' },
+  { priority: 3, category: 'TIMING', message: 'Trigger PA announcement in North Concourse.', timing: 'T+5 mins' },
+  { priority: 4, category: 'ENTRY_EXIT', message: 'Pre-authorize Gate North auxiliary gate for emergency egress.', timing: 'T+8 mins' },
+];
+
+const MOCK_QUEUES: QueueStatus[] = [
+  { zone_id: 'GATE_NORTH', queue_length: 145, estimated_wait_mins: 22, priority: 'CRITICAL', recommendation: 'Redirect to East' },
+  { zone_id: 'FOOD_STAND_A', queue_length: 32, estimated_wait_mins: 12, priority: 'HIGH', recommendation: 'Check Stand C' },
+  { zone_id: 'RESTROOM_NORTH', queue_length: 18, estimated_wait_mins: 8, priority: 'MODERATE', recommendation: 'Clear zone' },
+];
+
+const MOCK_ALERTS: SafetyAlert[] = [
+  { 
+    location_id: 'GATE_NORTH', 
+    risk_level: 'CRITICAL', 
+    protocol: 'CROWD_CONTROL_ALPHA', 
+    immediate_actions: ['Lock main turnstiles', 'Open aux egress', 'Dispatch response team'],
+    human_approval_required: true,
+    summary: 'Sustained density > 90% detected for 5+ minutes at main north ingress.'
+  }
+];
+
 export function useDashboardData() {
   const [state, setState] = useState<DashboardState>({
     zones: MOCK_ZONES,
     agentFeed: INITIAL_AGENT_FEED,
     forecasts: [MOCK_FORECAST],
-    queues: [],
-    safetyAlerts: [],
-    recommendations: [],
+    queues: MOCK_QUEUES,
+    safetyAlerts: MOCK_ALERTS,
+    recommendations: ACTUALLY_RECOMMENDED,
     lastUpdated: new Date(),
     isLive: true,
   });
 
   const generateAgentEvent = useCallback((): AgentEvent => {
-
     const events = [
-      { agent: 'vision_agent' as const, message: `analyze_cctv_frame(GATE_${['NORTH','SOUTH','EAST','WEST'][Math.floor(Math.random()*4)]}) → density: ${(Math.random()*0.5+0.5).toFixed(2)}` },
-      { agent: 'core_orchestrator' as const, message: `MCP: dispatch_staff(GATE_NORTH, priority=high) → ETA 2mins` },
-      { agent: 'prediction_agent' as const, message: `Surge forecast T+15: ${(Math.random()*0.3+0.7).toFixed(2)} [${['HIGH','CRITICAL'][Math.floor(Math.random()*2)]}] conf:${Math.floor(Math.random()*20+75)}%` },
-      { agent: 'queue_agent' as const, message: `FOOD_STAND_A wait: ${Math.floor(Math.random()*10+8)}mins [HIGH]` },
-      { agent: 'safety_agent' as const, message: `Safety scan complete — ${['CRITICAL','HIGH','MODERATE'][Math.floor(Math.random()*3)]} risk detected in North Stand` },
-      { agent: 'experience_agent' as const, message: `Rec sent: "Visit Food Stand C now — only 2min wait"` },
-      { agent: 'perimeter_macro' as const, message: `Analyzing perimeter macro view: Crowd flow stabilizing in East concourse` },
-      { agent: 'vip_sync' as const, message: `VIP identified at SOUTH_VIP_ENTRY. Synchronizing escort protocol.` },
-      { agent: 'rumor_control' as const, message: `Social monitor: debunking rumor regarding Section 101 closure` },
-      { agent: 'failsafe_mesh' as const, message: `Failsafe standby: all backup communication nodes operational` },
-      { agent: 'incident_rag' as const, message: `RAG lookup: matching current pattern with 2024 Final Crowd Incident` },
+      { agent: 'vision_agent' as const, type: 'tool_call' as const, message: `analyze_cctv_frame(GATE_NORTH) [FRAME_${Math.floor(Math.random()*9000+1000)}] → density_score: ${(0.85 + Math.random() * 0.1).toFixed(2)}` },
+      { agent: 'core_orchestrator' as const, type: 'intervention' as const, message: `MESH_INTERVENTION: Executing dynamic rerouting sequence #${Math.floor(Math.random()*5+1)}` },
+      { agent: 'prediction_agent' as const, type: 'reasoning' as const, message: `Surge alert validated. Probability of bottleneck at GATE_NORTH is ${Math.floor(Math.random()*10+85)}%.` },
+      { agent: 'queue_agent' as const, type: 'tool_call' as const, message: `mcp:calculate_wait_time(GATE_NORTH) -> ${Math.floor(Math.random()*10+20)} mins.` },
+      { agent: 'safety_agent' as const, type: 'alert' as const, message: `CRITICAL: Density threshold exceeded. Initiating safety mesh response.` },
+      { agent: 'experience_agent' as const, type: 'intervention' as const, message: `Broadcast: Dynamic signage updated for North Concourse speaker group.` },
+      { agent: 'perimeter_macro' as const, type: 'reasoning' as const, message: `Macro View: Detecting secondary pressure point at Section 101.` },
+      { agent: 'vip_sync' as const, type: 'tool_call' as const, message: `Syncing VIP escort via Secure Route ${['A','B','C'][Math.floor(Math.random()*3)]}.` },
+      { agent: 'rumor_control' as const, type: 'reasoning' as const, message: `Rumor Audit: Clearing false reports regarding Gate East delay.` },
+      { agent: 'failsafe_mesh' as const, type: 'alert' as const, message: `MESH_REDUNDANCY: Health check passing for all 11 nodes.` },
+      { agent: 'incident_rag' as const, type: 'reasoning' as const, message: `RAG Insight: Matching pattern with ${2018 + Math.floor(Math.random()*7)} event. Applying mitigations.` },
     ];
     const picked = events[Math.floor(Math.random() * events.length)];
     return {
       id: crypto.randomUUID(),
       timestamp: new Date(),
       agent: picked.agent,
-      event_type: ['tool_call', 'reasoning', 'intervention', 'alert'][Math.floor(Math.random() * 4)] as AgentEvent['event_type'],
+      event_type: picked.type,
       message: picked.message,
     };
   }, []);
@@ -109,8 +140,32 @@ export function useDashboardData() {
           return { ...z, density: newDensity, level: classifyDensity(newDensity) };
         });
 
-        // Add agent event to feed (keep last 20)
+        const northGateDensity = updatedZones.find(z => z.zone_id === 'GATE_NORTH')?.density || 0.9;
+
+        // Mutate forecast based on live density
+        const updatedForecasts: SurgeForecast[] = [{
+          ...prev.forecasts[0],
+          current_density: northGateDensity,
+          confidence_score: Math.floor(82 + Math.random() * 12),
+          predicted_peak_time_mins: Math.max(2, prev.forecasts[0].predicted_peak_time_mins - (Math.random() > 0.85 ? 1 : 0)),
+          forecast: {
+            'T+10_mins': { density: Math.min(0.99, northGateDensity + 0.04), level: classifyDensity(northGateDensity + 0.04) },
+            'T+20_mins': { density: Math.min(0.99, northGateDensity + 0.07), level: classifyDensity(northGateDensity + 0.07) },
+            'T+30_mins': { density: Math.min(0.99, northGateDensity + 0.01), level: classifyDensity(northGateDensity + 0.01) },
+          }
+        }];
+
+        // Dynamic Recommendations: Adjust based on density
+        const updatedRecommendations = northGateDensity > 0.88 
+          ? ACTUALLY_RECOMMENDED 
+          : ACTUALLY_RECOMMENDED.slice(0, 3);
+
+        // Add agent event to feed
+        const isActual = Math.random() > 0.2; 
         const newEvent = generateAgentEvent();
+        const prefix = isActual ? '[MESH_STREAM] (Actual)' : '[MESH_LOG] (Log)';
+        newEvent.message = `${prefix} ${newEvent.message}`;
+        
         const updatedFeed = [newEvent, ...prev.agentFeed].slice(0, 20);
 
         return {
@@ -118,6 +173,10 @@ export function useDashboardData() {
           zones: updatedZones,
           agentFeed: updatedFeed,
           lastUpdated: new Date(),
+          forecasts: updatedForecasts,
+          recommendations: updatedRecommendations,
+          queues: prev.queues,
+          safetyAlerts: prev.safetyAlerts,
         };
       });
     }, 3000);

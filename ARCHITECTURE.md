@@ -19,7 +19,7 @@ graph TB
     end
 
     subgraph "Agentic Mesh (The Brain)"
-        Orch["Core Orchestrator (Gemini 2.5 Pro)"]
+        Orch["Core Orchestrator (Gemini 2.0 Pro)"]
         RAG["Incident RAG Agent (AlloyDB + pgvector)"]
         VIP["VIP Sync Agent"]
         Safety["Safety Guardrail Agent"]
@@ -49,7 +49,7 @@ graph TB
 
 | Layer | Technology | Role |
 | :--- | :--- | :--- |
-| **LLM / Foundation** | Gemini 2.5 Pro & Flash | Core Reasoning & Multimodal Ingestion |
+| **LLM / Foundation** | Gemini 2.0 Pro & Flash | Core Reasoning & Multimodal Ingestion |
 | **Agentic Framework** | Google ADK & LangGraph | Multi-agent coordination and state management |
 | **Vector Database** | AlloyDB Omni + pgvector | High-performance RAG over legacy incident corpora |
 | **API Backend** | FastAPI (Python 3.12) | Real-time signal routing and life-lifeline management |

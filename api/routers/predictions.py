@@ -9,8 +9,8 @@ router = APIRouter()
 
 
 class PredictionRequest(BaseModel):
-    location_id: str = Field(..., example="GATE_NORTH")
-    current_density: float = Field(..., ge=0.0, le=1.0, example=0.74)
+    location_id: str = Field(..., json_schema_extra={"example": "GATE_NORTH"})
+    current_density: float = Field(..., ge=0.0, le=1.0, json_schema_extra={"example": 0.74})
 
 
 @router.post(

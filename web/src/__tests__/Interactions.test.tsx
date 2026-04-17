@@ -57,7 +57,7 @@ describe('User Interactions', () => {
     await act(async () => {
       fireEvent.click(audioButton);
     });
-    expect(screen.getByText('Processing Acoustic Vectors...')).toBeDefined();
+    expect(screen.getByText('Analysis in Progress: Distress Transients Detected')).toBeDefined();
 
     // Thermal image (Now Drone Patrol video)
     const thermalButton = screen.getByText('Drone Patrol - North Plaza (VEO)');
@@ -88,7 +88,7 @@ describe('User Interactions', () => {
 
   it('interacts with SystemPanel settings (mock)', () => {
     render(<App />);
-    fireEvent.click(screen.getByText('System'));
+    fireEvent.click(screen.getByText('Settings'));
     
     // Find a toggle (mock)
     const toggles = screen.getAllByRole('generic').filter(el => el.className?.includes('w-10 h-5'));
@@ -96,6 +96,8 @@ describe('User Interactions', () => {
       fireEvent.click(toggles[0]);
     }
     // Just verifying it doesn't crash
+    // Switch to About to verify About section
+    fireEvent.click(screen.getByText('About'));
     expect(screen.getByText('About SpectaSyncAI')).toBeDefined();
   });
 

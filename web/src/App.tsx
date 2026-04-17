@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDashboardData } from './hooks/useDashboardData';
-import { Header, TabId } from './components/Header';
+import { Header } from './components/Header';
+import type { TabId } from './components/Header';
 import { StatCards } from './components/StatCards';
 import { VenueHeatmap } from './components/VenueHeatmap';
 import { AgentFeed } from './components/AgentFeed';
@@ -15,11 +16,10 @@ import {
   SentimentPie 
 } from './components/AnalyticsWidgets';
 import { MultiModalHub } from './components/MultiModalHub';
+import { DemographicInsights } from './components/DemographicInsights';
+import { Bot } from 'lucide-react';
 import './index.css';
 
-/**
- * SpectaSyncAI Command Center — v3.2.0 (High Density)
- */
 export default function App(): React.ReactElement {
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const dashState = useDashboardData();
@@ -57,7 +57,7 @@ export default function App(): React.ReactElement {
         {/* Dynamic View Switcher */}
         <main className="mt-6">
           {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-fade-in flex flex-col h-full max-h-[85vh] overflow-hidden">
+            <div className="space-y-6 animate-fade-in flex flex-col h-full">
               <StatCards
                 avgDensity={avgDensity}
                 criticalCount={criticalZones.length}
@@ -138,16 +138,20 @@ export default function App(): React.ReactElement {
                         { l: 'Section 102', v: '0.8 m/s', d: 'SLOW' },
                         { l: 'Main Exit', v: '1.2 m/s', d: 'OFF' },
                       ].map(f => (
-                         <div key={f.l} className="flex justify-between items-center p-2 bg-white/5 rounded border border-white/5">
-                            <span className="text-xs font-semibold">{f.l}</span>
-                            <span className={`text-[10px] font-mono p-1 rounded ${f.d === 'SLOW' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-400'}`}>{f.v}</span>
-                         </div>
+                        <div key={f.l} className="flex items-center justify-between">
+                          <span className="text-[10px] text-slate-300 font-bold uppercase">{f.l}</span>
+                          <span className={`text-[10px] font-mono ${f.d === 'SLOW' ? 'text-amber-400' : 'text-emerald-400'}`}>{f.v}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === 'demographics' && (
+            <DemographicInsights />
           )}
 
           {activeTab === 'crisis' && (
@@ -179,7 +183,18 @@ export default function App(): React.ReactElement {
               <div className="lg:col-span-3 space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                    <div className="glass p-6">
-                      <h3 className="text-lg font-semibold mb-2">Search Corpus Map</h3>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Bot size={16} className="text-purple-400" aria-hidden="true" />
+                        <h2 className="text-sm font-semibold text-slate-200">Agent Mesh Activity</h2>
+                        <div className="ml-auto flex items-center gap-2">
+                           <div className="flex gap-0.5 items-center">
+                             <div className="w-1 h-3 bg-blue-500/40 animate-pulse" />
+                             <div className="w-1 h-3 bg-blue-500/60 animate-pulse delay-75" />
+                             <div className="w-1 h-3 bg-blue-500/80 animate-pulse delay-150" />
+                           </div>
+                           <span className="text-[10px] text-blue-400 font-mono italic">Pub/Sub Streaming</span>
+                        </div>
+                      </div>
                       <p className="text-xs text-slate-400 mb-6">Semantic clusters across historical incident databases.</p>
                       <div className="h-64 flex items-end gap-1 px-2 border-b border-white/10">
                         {[65, 40, 85, 30, 90, 45, 70, 55, 80, 40, 95, 60].map((h, i) => (
@@ -212,8 +227,16 @@ export default function App(): React.ReactElement {
             </div>
           )}
 
+          {activeTab === 'about' && (
+             <div className="max-w-4xl mx-auto"><SystemPanel view="about" /></div>
+          )}
+
+          {activeTab === 'faq' && (
+             <div className="max-w-4xl mx-auto"><SystemPanel view="faq" /></div>
+          )}
+
           {activeTab === 'system' && (
-            <SystemPanel />
+             <div className="max-w-4xl mx-auto"><SystemPanel view="system" /></div>
           )}
         </main>
       </div>

@@ -37,7 +37,7 @@ async def get_telemetry_meta(location_id: str) -> dict:
 class TelemetryPayload(BaseModel):
     """Incoming telemetry payload from edge sensors / CCTV proxy."""
 
-    location_id: str = Field(..., example="GATE_3", description="Zone ID")
+    location_id: str = Field(..., json_schema_extra={"example": "GATE_3"}, description="Zone ID")
     image_b64: str | None = Field(
         None,
         description="Optional base64-encoded JPEG frame from CCTV",

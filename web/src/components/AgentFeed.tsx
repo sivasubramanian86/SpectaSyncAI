@@ -39,7 +39,14 @@ export function AgentFeed({ events }: AgentFeedProps) {
       <div className="flex items-center gap-2 mb-3">
         <Bot size={16} className="text-purple-400" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-slate-200">Agent Mesh Activity</h2>
-        <span className="ml-auto text-xs text-slate-600 font-mono italic">live_mesh_stream</span>
+        <div className="ml-auto flex items-center gap-2">
+           <div className="flex gap-0.5 items-center">
+             <div className="w-1 h-3 bg-blue-500/40 animate-pulse" />
+             <div className="w-1 h-3 bg-blue-500/60 animate-pulse delay-75" />
+             <div className="w-1 h-3 bg-blue-500/80 animate-pulse delay-150" />
+           </div>
+           <span className="text-[10px] text-blue-400 font-mono italic">Pub/Sub Streaming</span>
+        </div>
       </div>
 
       <div className="space-y-2 overflow-y-auto pr-1 flex-1 scrollbar-thin" role="log" aria-live="polite">

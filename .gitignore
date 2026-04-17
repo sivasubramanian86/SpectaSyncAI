@@ -27,12 +27,41 @@ web/node_modules/
 web/dist/
 web/.cache/
 web/coverage
+web/blob-report
 
 # Environment
 .env
 .env.*
 !.env.example
 *.env.local
+
+# Test results and Reports
+test-results/
+playwright-report/
+web/test-results/
+web/playwright-report/
+web/blob-report/
+
+# Data and Tools
+data/
+tools/
+sample_data/
+db/seed_data/
+
+# Binaries / Large assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.pdf
+*.zip
+*.tar.gz
+*.mp4
+*.mp3
+*.exe
+*.dll
+*.pyc
 
 # IDEs
 .vscode/

@@ -14,7 +14,7 @@ router = APIRouter()
     summary="Get personalized attendee recommendations"
 )
 async def get_recommendations(
-    zone: str = Query("SECTION_101", example="SECTION_101")
+    zone: str = Query("SECTION_101", examples=["SECTION_101"])
 ) -> dict:
     """
     Invokes Experience Agent for venue navigation

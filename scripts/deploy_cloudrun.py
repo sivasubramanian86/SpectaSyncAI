@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(override=True)
 except ImportError:
     pass
 
@@ -46,8 +46,8 @@ REGION      = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 AR_REPO     = "spectasync-docker"
 AR_HOST     = f"{REGION}-docker.pkg.dev"
 SA_EMAIL    = f"spectasync-runner@{PROJECT_ID}.iam.gserviceaccount.com"
-MODEL_PRO   = os.environ.get("MODEL_PRO",   "gemini-2.5-pro-preview-03-25")
-MODEL_FLASH = os.environ.get("MODEL_FLASH", "gemini-2.5-flash-preview-04-17")
+MODEL_PRO   = os.environ.get("MODEL_PRO",   "gemini-2.0-pro-exp-02-05")
+MODEL_FLASH = os.environ.get("MODEL_FLASH", "gemini-2.0-flash-001")
 
 # Cloud Run service definitions
 SERVICES = {

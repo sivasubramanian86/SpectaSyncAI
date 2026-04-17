@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 class SafetyAssessmentRequest(BaseModel):
-    location_id: str = Field(..., example="GATE_NORTH")
+    location_id: str = Field(..., json_schema_extra={"example": "GATE_NORTH"})
     density_score: float = Field(..., ge=0.0, le=1.0)
     rate_of_change: float = Field(0.02, description="Density increase/min")
 

@@ -33,17 +33,17 @@ describe('App Component', () => {
     const tabButton = screen.getByText('Incident RAG');
     fireEvent.click(tabButton);
     
-    expect(screen.getByText('Search Corpus Map')).toBeDefined();
+    expect(screen.getAllByText('Agent Mesh Activity')[0]).toBeDefined();
     expect(screen.getByText('AI Extraction Flow')).toBeDefined();
   });
 
-  it('switches to System tab', () => {
+  it('switches to Settings tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('System');
+    const tabButton = screen.getByText('Settings');
     fireEvent.click(tabButton);
     
-    expect(screen.getByText('About SpectaSyncAI')).toBeDefined();
     expect(screen.getByText('System Settings')).toBeDefined();
+    expect(screen.getByText('Academic Research Track')).toBeDefined();
   });
 
   it('shows critical alert banner when zones are critical', () => {
