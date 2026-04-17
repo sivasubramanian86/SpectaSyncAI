@@ -1,0 +1,82 @@
+import React from 'react';
+import { Users, AlertTriangle, Activity, Cpu, TrendingUp } from 'lucide-react';
+
+interface StatCardsProps {
+  avgDensity: number;
+  criticalCount: number;
+  totalZones: number;
+  activeInterventions: number;
+  agentCount: number;
+}
+
+function StatCard({
+  icon, label, value, unit, color, sublabel,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  unit?: string;
+  color: string;
+  sublabel?: string;
+}) {
+  return (
+    <article className="stat-card" aria-label={`${label}: ${value}${unit ?? ''}`}>
+      <div className={`flex items-center justify-center w-9 h-9 rounded-lg ${color} mb-1`}>
+        {icon}
+      </div>
+      <div className="flex items-baseline gap-1">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        {unit && <span className="text-sm text-slate-400">{unit}</span>}
+      </div>
+      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{label}</p>
+      {sublabel && <p className="text-xs text-slate-600">{sublabel}</p>}
+    </article>
+  );
+}
+
+/**
+ * Top-level summary metrics row for the Command Center.
+ */
+export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount }: StatCardsProps): React.ReactElement {
+  return (
+    <section aria-label="Venue summary statistics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <StatCard
+        icon={<Users size={18} className="text-blue-300" aria-hidden="true" />}
+        label="Avg Density"
+        value={`${Math.round(avgDensity * 100)}`}
+        unit="%"
+        color="bg-blue-500/15"
+        sublabel="Across all zones"
+      />
+      <StatCard
+        icon={<AlertTriangle size={18} className="text-red-300" aria-hidden="true" />}
+        label="Critical Zones"
+        value={`${criticalCount}`}
+        unit={`/ ${totalZones}`}
+        color={criticalCount > 0 ? 'bg-red-500/20' : 'bg-emerald-500/15'}
+        sublabel="Require attention"
+      />
+      <StatCard
+        icon={<Activity size={18} className="text-amber-300" aria-hidden="true" />}
+        label="Interventions"
+        value={`${activeInterventions}`}
+        color="bg-amber-500/15"
+        sublabel="Agent-dispatched"
+      />
+      <StatCard
+        icon={<Cpu size={18} className="text-purple-300" aria-hidden="true" />}
+        label="Active Agents"
+        value={`${agentCount}`}
+        color="bg-purple-500/15"
+        sublabel="Google ADK Mesh"
+      />
+      <StatCard
+        icon={<TrendingUp size={18} className="text-emerald-300" aria-hidden="true" />}
+        label="Predictions"
+        value="Live"
+        color="bg-emerald-500/15"
+        sublabel="T+10/20/30 forecast"
+      />
+    </section>
+  );
+}

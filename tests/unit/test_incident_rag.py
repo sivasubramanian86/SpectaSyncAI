@@ -1,0 +1,97 @@
+"""
+SpectaSyncAI: Unit Tests for Incident RAG Agent
+"""
+import pytest
+import json
+from agents.incident_rag_agent import (
+    _vectorize_incident,
+    _cosine_similarity,
+    search_similar_incidents,
+    aggregate_intervention_strategies,
+    build_incident_rag_agent,
+    run_incident_rag_query
+)
+from agents.incident_corpus import IncidentRecord, INCIDENT_CORPUS
+from unittest.mock import AsyncMock, patch, MagicMock
+
+@pytest.fixture
+def sample_record():
+    return IncidentRecord(
+        incident_id="TEST-001",
+        year=2025,
+        country_iso2="TS",
+        event_type="concert",
+        estimated_attendance=10000,
+        venue_capacity=10000,
+        deaths=10,
+        injuries=50,
+        failure_modes=["EXOGENOUS_SURGE"],
+        primary_trigger="Test",
+        key_precursor_signals=[],
+        interventions_that_would_have_helped=["Action"],
+        time_of_day_category="during_event",
+        venue_type="stadium",
+        vip_delay_involved=False,
+        infra_failure_involved=False,
+        rumor_involved=False,
+        lessons_learned=["Lesson"]
+    )
+
+def test_vectorize_incident(sample_record):
+    vec = _vectorize_incident(sample_record)
+    assert len(vec) > 20
+    assert vec[0] == 1.0  # EXOGENOUS_SURGE
+
+def test_cosine_similarity():
+    v1 = [1.0, 0.0, 0.0]
+    v2 = [1.0, 0.0, 0.0]
+    v3 = [0.0, 1.0, 0.0]
+    assert _cosine_similarity(v1, v2) == 1.0
+    assert _cosine_similarity(v1, v3) == 0.0
+    assert _cosine_similarity([0,0], [1,1]) == 0.0
+
+def test_search_similar_incidents():
+    res = search_similar_incidents(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
+    assert "similar_incidents" in res
+    assert len(res["similar_incidents"]) == 3
+
+def test_aggregate_intervention_strategies():
+    ids = [INCIDENT_CORPUS[0].incident_id]
+    res = aggregate_intervention_strategies(ids)
+    assert res["incident_count"] == 1
+    assert len(res["unified_interventions"]) > 0
+
+@pytest.mark.asyncio
+async def test_run_incident_rag_query_success():
+    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner, \
+         patch("agents.incident_rag_agent.InMemorySessionService") as MockSession:
+        
+        mock_event = MagicMock()
+        mock_event.is_final_response.return_value = True
+        mock_event.content.parts = [MagicMock(text='{"matched_incidents": ["INC-001"]}')]
+        
+        async def fake_run(*args, **kwargs):
+            yield mock_event
+        MockRunner.return_value.run_async = fake_run
+        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        
+        res = await run_incident_rag_query(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
+        assert res["matched_incidents"] == ["INC-001"]
+
+@pytest.mark.asyncio
+async def test_run_incident_rag_query_fallback():
+    with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner, \
+         patch("agents.incident_rag_agent.InMemorySessionService") as MockSession:
+        
+        mock_event = MagicMock()
+        mock_event.is_final_response.return_value = True
+        mock_event.content.parts = [MagicMock(text='invalid json')]
+        
+        async def fake_run(*args, **kwargs):
+            yield mock_event
+        MockRunner.return_value.run_async = fake_run
+        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        
+        res = await run_incident_rag_query(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
+        assert "matched_incidents" in res
+        assert res["corpus_searched"] > 0

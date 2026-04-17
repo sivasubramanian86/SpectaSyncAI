@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-navy-950 text-slate-100 antialiased;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.03)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+  .glass-dark {
+    @apply bg-black/30 backdrop-blur-lg border border-white/10 rounded-xl;
+  }
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-all duration-200 active:scale-95;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-lg text-sm font-medium transition-all duration-200 border border-white/10;
+  }
+  .stat-card {
+    @apply glass p-5 flex flex-col gap-1 hover:bg-white/10 transition-colors duration-300;
+  }
+  .zone-cell {
+    @apply rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all duration-500 border border-transparent relative overflow-hidden;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-critical { @apply badge bg-red-500/20 text-red-300 border border-red-500/30; }
+  .badge-high { @apply badge bg-amber-500/20 text-amber-300 border border-amber-500/30; }
+  .badge-moderate { @apply badge bg-yellow-500/20 text-yellow-300 border border-yellow-500/30; }
+  .badge-normal { @apply badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30; }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+}

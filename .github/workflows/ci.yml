@@ -1,0 +1,102 @@
+name: SpectaSyncAI CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PROJECT_ID: spectasyncai
+  REGION: us-central1
+
+jobs:
+  # ─── Backend: Lint + Test ─────────────────────────────────────────
+  backend-ci:
+    name: Backend — Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest-cov
+
+      - name: Lint (flake8)
+        run: |
+          pip install flake8
+          flake8 agents/ api/ mcp_server/ --max-line-length=100 --ignore=E501,W503
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ -v --tb=short --cov=agents --cov=api --cov-report=xml --cov-fail-under=75
+        env:
+          DATABASE_URL: ""
+          MCP_SERVER_URL: "http://localhost:8001/sse"
+
+  # ─── Frontend: Build ──────────────────────────────────────────────
+  frontend-ci:
+    name: Frontend — Type Check & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+        working-directory: web
+
+      - name: Build
+        run: npm run build
+        working-directory: web
+
+#  # ─── Deploy to Cloud Run (main branch only) ───────────────────────
+#  deploy:
+#    name: Deploy to Cloud Run
+#    needs: [backend-ci, frontend-ci]
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#    permissions:
+#      contents: read
+#      id-token: write
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Authenticate to Google Cloud
+#        uses: google-github-actions/auth@v2
+#        with:
+#          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+#          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+#
+#      - name: Set up gcloud
+#        uses: google-github-actions/setup-gcloud@v2
+#
+#      - name: Deploy API to Cloud Run
+#        run: |
+#          gcloud run deploy spectasync-api \
+#            --source . \
+#            --region ${{ env.REGION }} \
+#            --project ${{ env.PROJECT_ID }} \
+#            --service-account spectasync-runner@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
+#            --cpu-boost \
+#            --min-instances 0 \
+#            --max-instances 10 \
+#            --allow-unauthenticated \
+#            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},GOOGLE_CLOUD_LOCATION=${{ env.REGION }} \
+#            --quiet

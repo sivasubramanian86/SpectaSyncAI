@@ -1,0 +1,201 @@
+import { useState, useEffect } from 'react';
+import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
+
+type MediaType = 'video' | 'audio' | 'image';
+
+interface MediaSource {
+  id: string;
+  name: string;
+  url: string | string[];
+  type: MediaType;
+  timestamp: string;
+  status: 'SAFE' | 'WARNING' | 'CRITICAL';
+}
+
+const SAMPLE_MEDIA: MediaSource[] = [
+  { id: '1', name: 'Gate 3 - Forensic Sequence (VEO)', url: ['https://storage.googleapis.com/spectasync-public-assets/crowd_surge_precursor.png', 'https://storage.googleapis.com/spectasync-public-assets/thermal_stagnation.png', 'https://storage.googleapis.com/spectasync-public-assets/gate3_surge.png'], type: 'image', timestamp: '10:42:01', status: 'CRITICAL' },
+  { id: '2', name: 'Panic Signature - Sector 4 (Lyria)', url: ['https://storage.googleapis.com/spectasync-public-assets/shouting_mob.mp3', 'https://storage.googleapis.com/spectasync-public-assets/angry_mob.mp3'], type: 'audio', timestamp: '10:42:15', status: 'CRITICAL' },
+  { id: '3', name: 'Drone Patrol - North Plaza (VEO)', url: 'https://storage.googleapis.com/spectasync-public-assets/crowd_surge.mp4', type: 'video', timestamp: '10:41:55', status: 'SAFE' },
+];
+
+export function MultiModalHub() {
+  const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
+  const [language, setLanguage] = useState('EN');
+  const [frameIdx, setFrameIdx] = useState(0);
+
+  // Auto-cycle frames for sequences
+  useEffect(() => {
+    if (Array.isArray(activeMedia.url)) {
+      const interval = setInterval(() => {
+        setFrameIdx((prev) => (prev + 1) % (activeMedia.url as string[]).length);
+      }, 3000);
+      return () => clearInterval(interval);
+    } else {
+      setFrameIdx(0);
+    }
+  }, [activeMedia]);
+
+  const currentUrl = Array.isArray(activeMedia.url) 
+    ? (activeMedia.url as string[])[frameIdx] 
+    : (activeMedia.url as string);
+
+  const translations: Record<string, any> = {
+    EN: { title: 'Multi-Modal Intelligence', capture: 'Live Capture', reco: 'AI Recommendation', lang: 'Select Language', action: 'Close Entry Gate 3 immediately & redirect flow to Sector 4.' },
+    HI: { title: 'मल्टी-मॉडल इंटेलिजेंस', capture: 'लाइव कैप्चर', reco: 'एआई सिफारिश', lang: 'भाषा चुनें', action: 'प्रवेश द्वार 3 को तुरंत बंद करें और भीड़ को सेक्टर 4 की ओर मोड़ें।' },
+    TE: { title: 'మల్టీ-మోడల్ ఇంటెలిజెన్స్', capture: 'లైవ్ క్యాప్చర్', reco: 'ఏఐ సిఫార్సు', lang: 'భాషను ఎంచుకోండి', action: 'గేట్ 3ని వెంటనే మూసివేయండి మరియు ప్రవాహాన్ని సెక్టార్ 4 వైపు మళ్లించండి.' },
+    TA: { title: 'மல்டி-மாடல் இன்டெலிஜென்ஸ்', capture: 'நேரடி பிடிப்பு', reco: 'AI பரிந்துரை', lang: 'மொழியைத் தேர்ந்தெடுக்கவும்', action: 'நுழைவு வாயில் 3-ஐ உடனடியாக மூடி, ஓட்டத்தை பிரிவு 4-க்கு மாற்றவும்.' },
+    BN: { title: 'মাল্টি-মোডাল ইন্টেলিজেন্স', capture: 'লাইভ ক্যাপচার', reco: 'AI সুপারিশ', lang: 'ভাষা নির্বাচন করুন', action: 'গেট ৩ অবিলম্বে বন্ধ করুন এবং ভিড় ১ নং সেক্টরের দিকে ঘুরিয়ে দিন।' },
+    ML: { title: 'മൾട്ടി-മോഡൽ ഇൻ്റലിജൻസ്', capture: 'ലൈവ് ക്യാപ്‌ചർ', reco: 'AI ശുപാർശ', lang: 'ഭാഷ തിരഞ്ഞെടുക്കുക', action: 'ഗേറ്റ് 3 ഉടൻ അടച്ച് ഒഴുക്ക് സെക്ടർ 4 ലേക്ക് തിരിച്ചുവിടുക.' },
+    KN: { title: 'ಮಲ್ಟಿ-ಮೋಡಲ್ ಇಂಟೆಲಿಜೆンス', capture: 'ಲೈವ್ ಕ್ಯಾಪ್ಚರ್', reco: 'AI ಶಿಫಾರಸು', lang: 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ', action: 'ಗೇಟ್ 3 ಅನ್ನು ಕೂಡಲೇ ಮುಚ್ಚಿ ಮತ್ತು ಹರಿವನ್ನು ಸೆಕ್ಟರ್ 4 ಗೆ ತಿರುಗಿಸಿ.' },
+    ZH: { title: '多模态智能', capture: '实况捕获', reco: 'AI 建议', lang: '选择语言', action: '立即关闭3号入口门并将人流重定向至第4区。' },
+    JA: { title: 'マルチモーダル・インテリジェンス', capture: 'ライブキャプチャ', reco: 'AI 推奨', lang: '言語を選択', action: 'ただちに3番ゲートを閉じ、流入をセクター4に誘導してください。' },
+    ES: { title: 'Inteligencia Multimodal', capture: 'Captura en Vivo', reco: 'Recomendación IA', lang: 'Seleccionar Idioma', action: 'Cierre la puerta de entrada 3 de inmediato y redirija el flujo al Sector 4.' },
+    FR: { title: 'Intelligence Multimodale', capture: 'Capture en Direct', reco: 'Recommandation IA', lang: 'Choisir la Langue', action: 'Fermer immédiatement la porte d\'entrée 3 et rediriger le flux vers le secteur 4.' }
+  };
+
+  const t = translations[language] || translations.EN;
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/20 rounded-lg">
+            <MonitorPlay size={20} className="text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white uppercase tracking-wider">{t.title}</h2>
+            <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.0 Flash Multi-Modal</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Globe size={14} className="text-slate-500" />
+          <select 
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="bg-navy-900 border border-white/10 rounded px-3 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+          >
+            <option value="EN">English</option>
+            <option value="HI">हिन्दी (Hindi)</option>
+            <option value="TE">తెలుగు (Telugu)</option>
+            <option value="TA">தமிழ் (Tamil)</option>
+            <option value="BN">বাংলা (Bengali)</option>
+            <option value="ML">മലയാളം (Malayalam)</option>
+            <option value="KN">ಕನ್ನಡ (Kannada)</option>
+            <option value="ZH">中文 (Chinese)</option>
+            <option value="JA">日本語 (Japanese)</option>
+            <option value="ES">Español (Spanish)</option>
+            <option value="FR">Français (French)</option>
+            <option value="IT">Italiano (Italian)</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 space-y-4">
+          <div className="relative aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
+             {activeMedia.type === 'video' && (
+               <video src={currentUrl} className="w-full h-full object-cover" autoPlay muted loop />
+             )}
+             {activeMedia.type === 'image' && (
+               <div className="relative w-full h-full">
+                 <img src={currentUrl} className="w-full h-full object-cover animate-pulse-slow" alt="Forensic frame" />
+                 {Array.isArray(activeMedia.url) && (
+                   <div className="absolute bottom-4 right-4 flex gap-1">
+                     {(activeMedia.url as string[]).map((_, i) => (
+                       <div key={i} className={`w-2 h-2 rounded-full ${i === frameIdx ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]' : 'bg-white/20'}`} />
+                     ))}
+                   </div>
+                 )}
+               </div>
+             )}
+             {activeMedia.type === 'audio' && (
+               <div className="w-full h-full flex flex-col items-center justify-center bg-navy-900">
+                  <div className="flex gap-1 items-end h-16 mb-4">
+                    {[3, 8, 5, 10, 4, 7, 2, 9].map((h, i) => (
+                      <div key={i} className="w-2 bg-blue-500 animate-pulse" style={{ height: `${h * 10}%`, animationDelay: `${i * 0.1}s` }} />
+                    ))}
+                  </div>
+                  <Mic size={48} className="text-blue-400 mb-2" />
+                  <p className="text-xs text-slate-400 uppercase font-bold tracking-widest">Processing Acoustic Vectors...</p>
+                  <audio src={currentUrl} hidden autoPlay />
+               </div>
+             )}
+             
+             <div className="absolute top-4 left-4 flex gap-2">
+               <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1">
+                 <div className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                 LIVE
+               </span>
+               <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10">
+                 {activeMedia.name} | {activeMedia.timestamp}
+               </span>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            {SAMPLE_MEDIA.map(media => (
+              <button 
+                key={media.id}
+                onClick={() => setActiveMedia(media)}
+                className={`p-3 rounded-xl border transition-all ${activeMedia.id === media.id ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  {media.type === 'video' ? <Camera size={14} /> : media.type === 'audio' ? <Mic size={14} /> : <Camera size={14} />}
+                  <span className="text-[10px] font-black uppercase tracking-widest">{media.type}</span>
+                </div>
+                <p className="text-xs font-bold truncate text-left">{media.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+            <div className="glass p-5 border-l-4 border-l-blue-500">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.reco}</h3>
+                <ShieldAlert size={14} className={activeMedia.status === 'CRITICAL' ? 'text-red-500' : 'text-amber-500'} />
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
+                  <p className="text-[10px] text-red-500 font-bold uppercase mb-1">Agentic Multi-Modal Reasoning</p>
+                  <p className="text-xs text-slate-200 leading-relaxed italic">
+                    {activeMedia.id === '1' ? 
+                      '"Detected fluid-dynamic inversion at Gate 3. Bounding box density exceeds 7.8 persons/sqm. Probability of shockwave: 92%."' :
+                      activeMedia.id === '2' ?
+                      '"Acoustic spectrum analysis detects high-frequency distress transients in Sector 4. Correlation with kinetic stasis confirms crushing event."' :
+                      '"Thermal indices in Section 102 indicate critical stagnation. Heat-to-Flow ratio is stalled. Evacuation mesh engagement recommended."'
+                    }
+                  </p>
+                </div>
+
+                <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                  <p className="text-[10px] text-blue-400 font-bold uppercase mb-1">Recommendation ({language})</p>
+                  <p className="text-sm text-white font-semibold leading-relaxed">
+                    {t.action}
+                  </p>
+                </div>
+              </div>
+           </div>
+
+           <div className="glass p-5">
+              <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Security Guardrails</h3>
+              <div className="space-y-3">
+                 {[
+                   { label: 'Prompt Injection Filter', state: 'ACTIVE' },
+                   { label: 'PII Scrubbing (Auto)', state: 'ACTIVE' },
+                   { label: 'ROI Safety Override', state: 'READY' },
+                 ].map(g => (
+                    <div key={g.label} className="flex justify-between items-center bg-navy-900 p-2 rounded border border-white/5">
+                       <span className="text-[10px] font-bold text-slate-500 uppercase">{g.label}</span>
+                       <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black">{g.state}</span>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+}

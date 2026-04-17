@@ -1,0 +1,47 @@
+# MCP / Agent Context
+AUDIT.md
+knowledge/
+brain/
+scratch/
+.system_generated/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.sqlite
+*.db
+
+# Node
+web/node_modules/
+web/dist/
+web/.cache/
+web/coverage
+
+# Environment
+.env
+.env.*
+!.env.example
+*.env.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.bak
+
+# GCP
+.gcp/
+service-account-key.json
+*.key
+*.pem
