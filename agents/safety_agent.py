@@ -1,19 +1,20 @@
 """
-SpectaSyncAI: Safety Agent — @03 @05 @04
+SpectaSyncAI: Safety Agent - @03 @05 @04
 Powered by: google-adk + Gemini 2.5 Pro
 Responsibility: Emergency detection from sensor anomalies, triggering
 automated evacuation protocols and emergency service coordination.
-Implements responsible AI — all critical decisions require human confirmation
+Implements responsible AI - all critical decisions require human confirmation
 in production. Prototype uses structured decision output only.
 """
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
-
 from google.genai import types as genai_types
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ def classify_safety_risk(density_score: float, rate_of_change: float) -> dict:
     High rate-of-change signals stampede-like conditions.
 
     Args:
-        density_score: Current density (0.0–1.0).
+        density_score: Current density (0.0-1.0).
         rate_of_change: Density increase per minute.
 
     Returns:
@@ -101,7 +102,7 @@ def build_safety_agent() -> LlmAgent:
             "and coordinates emergency response protocols with full audit trail."
         ),
         instruction=(
-            "You are the SpectaSyncAI Safety Agent — responsible for crowd safety. "
+            "You are the SpectaSyncAI Safety Agent - responsible for crowd safety. "
             "When given density and rate_of_change data:\n"
             "1. Call classify_safety_risk(density_score, rate_of_change) to assess risk.\n"
             "2. Call get_emergency_contact_list() if risk is CRITICAL or EMERGENCY.\n"
@@ -109,7 +110,7 @@ def build_safety_agent() -> LlmAgent:
             "immediate_actions, contacts (if applicable), and a brief plain-English "
             "summary for the operations manager. "
             "NOTE: Flag human_approval_required=True for EVACUATION protocols. "
-            "Never autonomously trigger evacuation — only recommend it. "
+            "Never autonomously trigger evacuation - only recommend it. "
             "This is a RESPONSIBLE AI safety constraint."
         ),
         tools=[classify_safety_risk, get_emergency_contact_list],
@@ -124,12 +125,15 @@ async def run_safety_assessment(
 
     Args:
         location_id: Venue zone identifier.
-        density_score: Current density (0.0–1.0).
+        density_score: Current density (0.0-1.0).
         rate_of_change: Density change per minute (positive = increasing).
 
     Returns:
         dict: Safety assessment with risk level, protocol, and actions.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_safety_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -147,34 +151,49 @@ async def run_safety_assessment(
     )
 
     result_text = ""
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=prompt)],
-        ),
-    ):
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
-
-    logger.info(f"[SafetyAgent] Assessment for {location_id}: {result_text}")
-
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        classification = classify_safety_risk(density_score, rate_of_change)
-        return {
-            "location_id": location_id,
-            "density_score": density_score,
-            "rate_of_change": rate_of_change,
-            **classification,
-            "summary": (
-                f"Zone {location_id} is at {classification['risk_level']} risk "
-                f"with density {density_score:.0%}. "
-                f"Protocol: {classification['protocol']}."
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=prompt)],
             ),
-        }
+        ):
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+        logger.info(f"[SafetyAgent] Assessment for {location_id}: {result_text}")
+
+        try:
+            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            result = json.loads(clean)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+        except json.JSONDecodeError:
+            fallback = True
+            classification = classify_safety_risk(density_score, rate_of_change)
+            result = {
+                "location_id": location_id,
+                "density_score": density_score,
+                "rate_of_change": rate_of_change,
+                **classification,
+                "summary": (
+                    f"Zone {location_id} is at {classification['risk_level']} risk "
+                    f"with density {density_score:.0%}. "
+                    f"Protocol: {classification['protocol']}."
+                ),
+            }
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+    finally:
+        observability_service.schedule_agent_run(
+            "safety_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

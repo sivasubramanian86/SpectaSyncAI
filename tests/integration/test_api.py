@@ -2,7 +2,7 @@ from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 from api.main import app
 
-client = TestClient(app)
+client = TestClient(app, raise_server_exceptions=False)
 
 
 def test_api_root():
@@ -207,3 +207,56 @@ def test_telemetry_get_single_success():
     response = client.get("/v1/telemetry/ZONE_A")
     assert response.status_code == 200
     assert response.json()["location_id"] == "ZONE_A"
+
+def test_pre_event_flow():
+    # Clear the global cache to test initial state if possible
+    # But since it's a module global, we might just check if it's there
+    response = client.get("/v1/pre-event/analysis")
+    assert response.status_code == 200
+    # It might be SUCCESS from lifespan or pending if lifespan didn't finish
+    assert "status" in response.json() or "risk_level" in response.json()
+
+    # Test POST analysis (Success)
+    p_pre = "api.routers.pre_event.run_pre_event_analysis"
+    with patch(p_pre, new_callable=AsyncMock) as mock_analysis:
+        mock_analysis.return_value = {"status": "SUCCESS", "risk_level": "LOW"}
+        payload = {
+            "event_name": "Test Event",
+            "total_reservations": 100,
+            "venue_capacity": 200,
+            "expected_peak_time": "12:00",
+            "weather_forecast": {"temp": 25}
+        }
+        response = client.post("/v1/pre-event/analysis", json=payload)
+        assert response.status_code == 200
+        assert response.json()["risk_level"] == "LOW"
+
+    # Test GET analysis (Cached)
+    response = client.get("/v1/pre-event/analysis")
+    assert response.status_code == 200
+    assert response.json()["risk_level"] == "LOW"
+
+    # Test POST breakdown/failure
+    with patch(p_pre, side_effect=Exception("Analyst went on strike")):
+        response = client.post("/v1/pre-event/analysis", json=payload)
+        assert response.status_code == 200
+        assert "fallback" in response.json()["risk_level"].lower()
+
+def test_runtime_config_js():
+    response = client.get("/v1/runtime-config.js")
+    assert response.status_code == 200
+    assert "window.__SPECTASYNC_RUNTIME__" in response.text
+    assert "application/javascript" in response.headers["content-type"]
+
+def test_global_exception_handler():
+    # Force a 500 by mocking memory in interventions to throw
+    p_mem = "api.routers.interventions.AlloyDBMemory.get_historical_context"
+    with patch(p_mem, side_effect=RuntimeError("AlloyDB Crash")):
+        response = client.get("/v1/interventions/history?location_id=L1")
+        assert response.status_code == 500
+        assert "detail" in response.json()
+
+def test_pre_event_mock_data():
+    response = client.get("/v1/pre-event/mock-data")
+    assert response.status_code == 200
+    assert "event_name" in response.json()

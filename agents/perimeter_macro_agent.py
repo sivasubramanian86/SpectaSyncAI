@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Perimeter Macro Agent — @03 @05
+SpectaSyncAI: Perimeter Macro Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: EXOGENOUS_SURGE
 
@@ -7,29 +7,31 @@ Incident Reference: INC-2025-IND-02
 A 2025 sports celebration venue had its official capacity overwhelmed by an
 estimated 6x excess external crowd before gates opened. Traditional in-venue
 CCTV was architecturally blind to this. No external crowd monitoring existed.
-Cell tower network load showed elevated congestion 90 minutes before the crush —
+Cell tower network load showed elevated congestion 90 minutes before the crush -
 a detectable signal that went unread. See: agents/incident_corpus.py INC-2025-IND-02.
 
-Also relevant: INC-2022-KOR-01 (narrow street crush, 159 deaths — external crowds
+Also relevant: INC-2022-KOR-01 (narrow street crush, 159 deaths - external crowds
 with no monitoring), INC-2010-DEU-01 (tunnel bottleneck at festival).
 
 Responsibility:
-  Monitors telemetry EXTERNAL to the venue — cell tower network load,
-  metro/bus ridership anomalies, traffic density APIs — to detect dangerous
+  Monitors telemetry EXTERNAL to the venue - cell tower network load,
+  metro/bus ridership anomalies, traffic density APIs - to detect dangerous
   crowd accumulation BEFORE it reaches the perimeter.
 """
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
-# Venue capacity register — keyed by venue identifier token (no proper nouns)
+# Venue capacity register - keyed by venue identifier token (no proper nouns)
 VENUE_CAPACITY_REGISTER: dict[str, int] = {
     "large_cricket_stadium": 50_000,
     "medium_cricket_stadium": 40_000,
@@ -49,7 +51,7 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
     of the venue perimeter as a real-time crowd density proxy.
 
     Historical precedent (INC-2025-IND-02): Cell towers in the vicinity showed
-    4x+ normal load 90 minutes before a fatal crowd crush — a fully detectable
+    4x+ normal load 90 minutes before a fatal crowd crush - a fully detectable
     signal. Had this data been acted on, the incident was preventable.
 
     Production: Integrates with Telecom Operator Network Analytics API.
@@ -122,9 +124,9 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
     Draws comparison against known incident signatures from the corpus.
 
     Historical precedent:
-      INC-2025-IND-02: 6.25x capacity → certain crush.
-      INC-2025-IND-01: 4–5x capacity → certain crush.
-      INC-2022-KOR-01: Narrow street — no official capacity, density >9 persons/m².
+      INC-2025-IND-02: 6.25x capacity -> certain crush.
+      INC-2025-IND-01: 4-5x capacity -> certain crush.
+      INC-2022-KOR-01: Narrow street - no official capacity, density >9 persons/m2.
       INC-2010-DEU-01: 5.6x capacity via single access tunnel.
 
     Args:
@@ -182,7 +184,7 @@ def activate_street_diversion_protocol(
         dict: Diversion activation confirmation.
     """
     logger.critical(
-        f"[PerimeterMacroAgent] STREET DIVERSION ACTIVATED — "
+        f"[PerimeterMacroAgent] STREET DIVERSION ACTIVATED - "
         f"Venue: {venue_id} | Blocking: {approach_corridors}"
     )
     return {
@@ -206,7 +208,7 @@ def build_perimeter_macro_agent() -> LlmAgent:
         description=(
             "Monitors external crowd accumulation via cell-tower network load and "
             "transit ridership anomalies. Triggers street-level diversion protocols "
-            "before crowds reach venue gates — preventing EXOGENOUS_SURGE incidents."
+            "before crowds reach venue gates - preventing EXOGENOUS_SURGE incidents."
         ),
         instruction=(
             f"You are SpectaSyncAI's Perimeter Macro Agent.\n"
@@ -234,6 +236,9 @@ async def run_perimeter_assessment(
     venue_id: str, area_code: str, station_ids: list[str]
 ) -> dict:
     """Runs the Perimeter Macro Agent for a venue ahead of an event."""
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_perimeter_macro_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -241,7 +246,7 @@ async def run_perimeter_assessment(
         app_name="spectasync_perimeter", user_id="system"
     )
     prompt = (
-        f"PERIMETER ASSESSMENT — Venue: {venue_id} | Area: {area_code}\n"
+        f"PERIMETER ASSESSMENT - Venue: {venue_id} | Area: {area_code}\n"
         f"Transit stations: {', '.join(station_ids)}\n"
         "Assess external crowd pressure and activate street diversion if required."
     )
@@ -261,8 +266,11 @@ async def run_perimeter_assessment(
 
     try:
         clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
+        parsed = json.loads(clean)
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
+        return parsed
     except json.JSONDecodeError:
+        fallback = True
         tower = query_cell_tower_load(area_code)
         transit = query_transit_ridership_anomalies(station_ids)
         breach = calculate_capacity_breach_risk(venue_id, tower["estimated_external_crowd"])
@@ -274,4 +282,14 @@ async def run_perimeter_assessment(
             result["diversion_activated"] = True
         else:
             result["diversion_activated"] = False
+        output_size = len(json.dumps(result, ensure_ascii=False))
         return result
+    finally:
+        observability_service.schedule_agent_run(
+            "perimeter_macro_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

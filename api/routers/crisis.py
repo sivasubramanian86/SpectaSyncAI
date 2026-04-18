@@ -1,5 +1,5 @@
 """
-Crisis Prevention router — Tier-2 crisis agents REST API.
+Crisis Prevention router - Tier-2 crisis agents REST API.
 Addresses EXOGENOUS_SURGE, TEMPORAL_DISRUPTION, INFO_CASCADE, INFRA_FAILURE.
 """
 import os
@@ -69,7 +69,7 @@ class IncidentRAGRequest(BaseModel):
 
 @router.post(
     "/crisis/perimeter",
-    summary="Perimeter Macro Agent — detect surge (EXOGENOUS_SURGE)",
+    summary="Perimeter Macro Agent - detect surge (EXOGENOUS_SURGE)",
 )
 async def assess_perimeter(payload: PerimeterRequest) -> dict:
     """Detects external crowd pressure via cell/transit telemetry."""
@@ -91,7 +91,7 @@ async def assess_perimeter(payload: PerimeterRequest) -> dict:
 
 @router.post(
     "/crisis/vip-delay",
-    summary="VIP Sync Agent — delay tracking (TEMPORAL_DISRUPTION)",
+    summary="VIP Sync Agent - delay tracking (TEMPORAL_DISRUPTION)",
 )
 async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
     """Tracks act convoy GPS. Calculates crowd kinetic energy from delay."""
@@ -115,7 +115,7 @@ async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
 
 @router.post(
     "/crisis/rumor-monitor",
-    summary="Rumor Control Agent — counter-narrative (INFO_CASCADE)",
+    summary="Rumor Control Agent - counter-narrative (INFO_CASCADE)",
 )
 async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
     """Scans social media for venue keywords. Classifies rumor risk."""
@@ -134,7 +134,7 @@ async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
 
 @router.post(
     "/crisis/infra-failsafe",
-    summary="Failsafe Mesh Agent — infra failure (INFRA_FAILURE)",
+    summary="Failsafe Mesh Agent - infra failure (INFRA_FAILURE)",
 )
 async def check_infrastructure(payload: InfraRequest) -> dict:
     """Monitors venue infrastructure. Triggers BLE mesh on failure."""
@@ -152,7 +152,7 @@ async def check_infrastructure(payload: InfraRequest) -> dict:
 
 @router.post(
     "/crisis/incident-rag",
-    summary="Incident RAG Agent — semantic search",
+    summary="Incident RAG Agent - semantic search",
 )
 async def query_incident_rag(payload: IncidentRAGRequest) -> dict:
     """Performs cosine similarity search against 12-incident corpus."""
@@ -192,7 +192,7 @@ async def list_incident_corpus() -> dict:
     """Returns the full anonymized incident corpus metadata."""
     return {
         "total_incidents": len(INCIDENT_CORPUS),
-        "date_range": "2010–2025",
+        "date_range": "2010-2025",
         "countries": len(set(r.country_iso2 for r in INCIDENT_CORPUS)),
         "total_deaths": sum(r.deaths for r in INCIDENT_CORPUS),
         "total_injuries": sum(r.injuries for r in INCIDENT_CORPUS),
@@ -213,7 +213,7 @@ async def list_incident_corpus() -> dict:
 
 @router.get(
     "/crisis/status",
-    summary="Crisis prevention mesh status — all 5 agents (4 + RAG)",
+    summary="Crisis prevention mesh status - all 5 agents (4 + RAG)",
 )
 async def crisis_status() -> dict:
     """Returns the operational status of all crisis prevention agents."""
@@ -257,7 +257,7 @@ async def crisis_status() -> dict:
                 "model": os.getenv("MODEL_PRO", "gemini-2.5-pro"),
                 "failure_mode": "ALL_MODES",
                 "corpus_size": len(INCIDENT_CORPUS),
-                "corpus_span": "2010–2025",
+                "corpus_span": "2010-2025",
                 "countries": len(set(r.country_iso2 for r in INCIDENT_CORPUS)),
                 "status": "ACTIVE",
             },

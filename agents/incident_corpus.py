@@ -1,8 +1,8 @@
 """
-SpectaSyncAI: Global Incident Corpus — RAG Knowledge Base
+SpectaSyncAI: Global Incident Corpus - RAG Knowledge Base
 @12 @11 @03
 
-Incident registry covering 18 crowd crush events from 2003–2025.
+Incident registry covering 18 crowd crush events from 2003-2025.
 All incidents are anonymized by incident code: INC-{YEAR}-{ISO2}-{SEQ}.
 No individual names, political entities, or proprietary venue identifiers are stored.
 
@@ -14,18 +14,18 @@ Purpose:
      when making intervention and routing decisions.
 
 Failure Mode Taxonomy:
-  EXOGENOUS_SURGE    — External crowd volume exceeds venue absorption rate
-  TEMPORAL_DISRUPT   — VIP/event delay creates pent-up crowd kinetic energy
-  INFO_CASCADE       — Unverified rumor triggers simultaneous mass movement
-  INFRA_FAILURE      — Power/comms collapse disables all digital coordination
-  EGRESS_FAILURE     — Exits locked, blocked, or capacity-mismatched
-  NARROW_CORRIDOR    — Physical geometry creates fatal bottleneck pressure
-  PANIC_TRIGGER      — External stimuli (loud noise, projectile) causes counter-surge
-  BRIDGE_BOTTLENECK  — Single elevated structure becomes choke point under load
-  TICKETING_CHAOS    — Late or contradictory entry information causes simultaneous rush
-  TEMPLE_SURGE       — Religious gathering density exceeds all safe limits
-  GHAT_CRUSH         — River-bank bathing platform overwhelmed on auspicious date
-  STAIRWAY_COLLAPSE  — Pedestrian failure on temple/bridge steps under crowd load
+  EXOGENOUS_SURGE    - External crowd volume exceeds venue absorption rate
+  TEMPORAL_DISRUPT   - VIP/event delay creates pent-up crowd kinetic energy
+  INFO_CASCADE       - Unverified rumor triggers simultaneous mass movement
+  INFRA_FAILURE      - Power/comms collapse disables all digital coordination
+  EGRESS_FAILURE     - Exits locked, blocked, or capacity-mismatched
+  NARROW_CORRIDOR    - Physical geometry creates fatal bottleneck pressure
+  PANIC_TRIGGER      - External stimuli (loud noise, projectile) causes counter-surge
+  BRIDGE_BOTTLENECK  - Single elevated structure becomes choke point under load
+  TICKETING_CHAOS    - Late or contradictory entry information causes simultaneous rush
+  TEMPLE_SURGE       - Religious gathering density exceeds all safe limits
+  GHAT_CRUSH         - River-bank bathing platform overwhelmed on auspicious date
+  STAIRWAY_COLLAPSE  - Pedestrian failure on temple/bridge steps under crowd load
 """
 
 from dataclasses import dataclass
@@ -126,7 +126,7 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         rumor_involved=True,
         lessons_learned=[
             "Unverified entry announcements are functionally identical to dangerous rumors",
-            "External crowd size is detectable 60–90 mins in advance via telco APIs",
+            "External crowd size is detectable 60-90 mins in advance via telco APIs",
             "Social media viral velocity is a leading crowd surge indicator",
         ],
     ),
@@ -144,7 +144,7 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         failure_modes=["NARROW_CORRIDOR", "EXOGENOUS_SURGE", "TEMPORAL_DISRUPT"],
         primary_trigger=(
             "Organizer-less public gathering in a narrow sloped alleyway during a public holiday. "
-            "Crowd density reached >9 persons/m² — the threshold for pressure-wave crush."
+            "Crowd density reached >9 persons/m² - the threshold for pressure-wave crush."
         ),
         key_precursor_signals=[
             "Crowd density in target alleyway measured >6/m² at T-45 mins",
@@ -188,12 +188,12 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         key_precursor_signals=[
             "Post-match crowd disorder (pitch invasion) detected at T+0",
             "Tear gas deployed at T+5 triggering non-directional panic surge",
-            "Exit gates locked — confirmed bottleneck with no egress capacity",
+            "Exit gates locked - confirmed bottleneck with no egress capacity",
         ],
         interventions_that_would_have_helped=[
             "Exit gate sensor monitoring (locked state detection = immediate alert)",
             "Non-chemical crowd dispersal protocols at high-density venues",
-            "Panic trigger detection — sudden bidirectional crowd movement signature",
+            "Panic trigger detection - sudden bidirectional crowd movement signature",
             "Automated exit gate unlock command via MCP toolset",
         ],
         time_of_day_category="post_event",
@@ -265,7 +265,7 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         key_precursor_signals=[
             "Dual-stream crowd convergence predicted by pilgrimage schedule at T-90 mins",
             "Pedestrian density at junction: >8 persons/m² at T-30 mins",
-            "Route allocation system overloaded — no dynamic rerouting available",
+            "Route allocation system overloaded - no dynamic rerouting available",
         ],
         interventions_that_would_have_helped=[
             "Predictive flow routing with time-window staggering for scheduled rituals",
@@ -302,12 +302,12 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         ),
         key_precursor_signals=[
             "Single tunnel usage at 100% capacity for 90 continuous minutes",
-            "Bidirectional flow at T-20 mins — counterflow detected in sensor data",
+            "Bidirectional flow at T-20 mins - counterflow detected in sensor data",
             "Density model showed >8 persons/m² inside tunnel at T-15 mins",
         ],
         interventions_that_would_have_helped=[
             "Physical flow segmentation (ingress vs. egress) before event starts",
-            "Tunnel density sensor with hard capacity lock — no entry when density > threshold",
+            "Tunnel density sensor with hard capacity lock - no entry when density > threshold",
             "Overflow crowd routing to secondary access before saturation",
             "Bidirectional flow detection from CCTV as emergency trigger",
         ],
@@ -416,7 +416,7 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         ),
         key_precursor_signals=[
             "Weather alert (heavy rain) causing rapid crowd concentration at station at T-20 mins",
-            "Exit stairways overwhelmed at T-10 mins — lateral crush building",
+            "Exit stairways overwhelmed at T-10 mins - lateral crush building",
             "Emergency lighting failure at T-5 mins during peak surge",
         ],
         interventions_that_would_have_helped=[
@@ -545,8 +545,8 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         infra_failure_involved=False,
         rumor_involved=False,
         lessons_learned=[
-            "River ghats are structurally unrated for large crowd loads — monitoring is critical",
-            "Annual religious events show predictable attendance surge — model from historical data",
+            "River ghats are structurally unrated for large crowd loads - monitoring is critical",
+            "Annual religious events show predictable attendance surge - model from historical data",
             "Time-slotted bathing access is the single highest-impact intervention for ghat safety",
         ],
     ),
@@ -647,7 +647,7 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         ),
         key_precursor_signals=[
             "New Year + religious calendar convergence predicted 3x average attendance",
-            "Stairway lit only by handheld torches — no fixed emergency lighting",
+            "Stairway lit only by handheld torches - no fixed emergency lighting",
             "No crowd direction segregation on the single approach stairway",
         ],
         interventions_that_would_have_helped=[

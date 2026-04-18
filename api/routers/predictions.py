@@ -1,4 +1,4 @@
-"""Predictions router — triggers surge forecasting via Prediction Agent."""
+"""Predictions router - triggers surge forecasting via Prediction Agent."""
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel, Field

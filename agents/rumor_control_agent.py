@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Rumor Control Agent — @03 @05
+SpectaSyncAI: Rumor Control Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
 Failure Mode Addressed: INFO_CASCADE
 
@@ -10,9 +10,9 @@ announcement spread via social media in under 12 minutes, converting a
 manageable crowd into a fatal one. See agents/incident_corpus.py INC-2025-IND-02.
 
 Also relevant:
-  INC-2013-IND-01 — A false bridge-collapse rumor at a pilgrimage site caused
+  INC-2013-IND-01 - A false bridge-collapse rumor at a pilgrimage site caused
       bidirectional counter-crush. 115 deaths.
-  INC-2021-USA-01 — Concert crowd crush worsened by social media 'keep pushing'
+  INC-2021-USA-01 - Concert crowd crush worsened by social media 'keep pushing'
       messaging amplifying instead of calming the crowd.
 
 Responsibility:
@@ -25,6 +25,7 @@ import os
 import json
 import logging
 import re
+import time
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
@@ -32,10 +33,11 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
 from .context_cache import get_cached_model_flash
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
-# Keyword risk taxonomy — no specific brand/event names. Pattern-based.
+# Keyword risk taxonomy - no specific brand/event names. Pattern-based.
 RUMOR_KEYWORD_PATTERNS = [
     # Unauthorized entry signals (corpus: INC-2025-IND-02, INC-2019-AGO-01)
     (r"\bfree\s*(?:entry|ticket|pass)\b", "UNAUTHORIZED_ENTRY", 0.8),
@@ -148,7 +150,7 @@ def broadcast_counter_narrative(
     Target response time: < 12 seconds from viral threshold detection.
 
     Historical precedent: INC-2025-IND-02's 12-minute viral window was enough.
-    INC-2013-IND-01: Incorrect PA messaging accelerated panic — content matters.
+    INC-2013-IND-01: Incorrect PA messaging accelerated panic - content matters.
 
     Counter-narrative templates are crafted for CALM COMPLIANCE, not urgency.
     All messages are reviewed by a human operator within the 12-second window
@@ -169,10 +171,7 @@ def broadcast_counter_narrative(
                 "OFFICIAL NOTICE: Entry is by valid ticket only. All gates are "
                 "operating normally. Please join the designated queues."
             ),
-            "ta": (
-                "அதிகாரப்பூர்வ அறிவிப்பு: செல்லாத டிக்கெட் இல்லாமல் நுழைவு இல்லை. "
-                "அனைத்து வாயில்களும் இயல்பாக செயல்படுகின்றன."
-            ),
+            "ta": "அதிகாரப்பூர்வ அறிவிப்பு: செல்லாத டிக்கெட் இல்லாமல் நுழைவு இல்லை. அனைத்து வாயில்களும் இயல்பாக செயல்படுகின்றன.",
             "kn": "ಅಧಿಕೃತ ಸೂಚನೆ: ಟಿಕೆಟ್ ಇಲ್ಲದೆ ಪ್ರವೇಶವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಿಗದಿತ ಸರತಿಗೆ ಸೇರಿ.",
             "hi": "आधिकारिक सूचना: प्रवेश केवल वैध टिकट से। सभी द्वार सामान्य रूप से कार्यरत हैं।",
         },
@@ -181,18 +180,18 @@ def broadcast_counter_narrative(
                 "ALL CLEAR: Structural integrity of all venue infrastructure is "
                 "confirmed. Please remain calm and follow staff directions."
             ),
-            "ta": "அனைத்தும் பாதுகாப்பானது: அனைத்து வசதிகள் பாதுகாப்பாக உள்ளன. அமைதியாக இருங்கள்.",
-            "kn": "ಸಂಪೂರ್ಣ ಸ್ಪಷ್ಟ: ಎಲ್ಲಾ ರಚನೆಗಳು ಸುರಕ್ಷಿತ. ದಯವಿಟ್ಟು ಸಿಬ್ಬಂದಿಯನ್ನು ಅನುಸರಿಸಿ.",
-            "hi": "संरचना सुरक्षित: सभी इन्फ्रास्ट्रक्चर सुरक्षित हैं। शांत रहें।",
+            "ta": "அனைத்தும் பாதுகாப்பானது: அனைத்து வசதிகளும் பாதுகாப்பாக உள்ளன. அமைதியாக இருங்கள்.",
+            "kn": "ಸಂಪೂರ್ಣ ಸ್ಪಷ್ಟ: ಎಲ್ಲಾ ರಚನೆಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ. ದಯವಿಟ್ಟು ಸಿಬ್ಬಂದಿ ಸೂಚನೆಗಳನ್ನು ಪಾಲಿಸಿ.",
+            "hi": "संरचना सुरक्षित: सभी इंफ्रास्ट्रक्चर सुरक्षित हैं। कृपया शांत रहें और निर्देशों का पालन करें।",
         },
         "PANIC_CONTAGION": {
             "en": (
                 "PLEASE STAND STILL. There is no emergency. Venue is operating "
                 "normally. Follow the green arrows for safe movement."
             ),
-            "ta": "நிறுத்துங்கள். அவசரகாலம் இல்லை. பச்சை அம்புகளை பின்பற்றுங்கள்.",
-            "kn": "ದಯವಿಟ್ಟು ನಿಲ್ಲಿ. ಯಾವುದೇ ತುರ್ತುಸ್ಥಿತಿ ಇಲ್ಲ.",
-            "hi": "कृपया रुकें। कोई आपात स्थिति नहीं है।",
+            "ta": "தயவுசெய்து நில்லுங்கள். அவசரகாலம் ஏதும் இல்லை. பச்சை அம்புக்குறிகளைப் பின்பற்றி பாதுகாப்பாக நகரவும்.",
+            "kn": "ದಯವಿಟ್ಟು ನಿಲ್ಲಿ. ಯಾವುದೇ ತುರ್ತುಪರಿಸ್ಥಿತಿ ಇಲ್ಲ. ಸುರಕ್ಷಿತ ಚಲನೆಗಾಗಿ ಹಸಿರು ಬಾಣಗಳನ್ನು ಅನುಸರಿಸಿ.",
+            "hi": "कृपया स्थिर रहें। कोई आपात स्थिति नहीं है। सुरक्षित आवाजाही के लिए हरे तीरों का पालन करें।",
         },
         "EMERGENCY_MISINFORMATION": {
             "en": (
@@ -200,16 +199,16 @@ def broadcast_counter_narrative(
                 "situation. Stay where you are. Follow green exit signs only on "
                 "staff instruction."
             ),
-            "ta": "அதிகாரப்பூர்வ பாதுகாப்பு: அவசரகாலம் இல்லை என்று உறுதி.",
-            "kn": "ಅಧಿಕೃತ ಸುರಕ್ಷತೆ: ತುರ್ತುಸ್ಥಿತಿ ಇಲ್ಲ.",
-            "hi": "आधिकारिक सुरक्षा: कोई आपात स्थिति नहीं।",
+            "ta": "அதிகாரப்பூர்வ பாதுகாப்பு புதுப்பிப்பு: அவசரகால சூழ்நிலை இல்லை. நீங்கள் இருக்கும் இடத்திலேயே இருக்கவும்.",
+            "kn": "ಅಧಿಕೃತ ಸುರಕ್ಷತಾ ಅಪ್‌ಡೇಟ್: ಯಾವುದೇ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಇಲ್ಲ. ನಿಮ್ಮ ಜಾಗದಲ್ಲೇ ಇರಿ.",
+            "hi": "आधिकारिक सुरक्षा अपडेट: कोई आपात स्थिति नहीं है। अपनी जगह पर बने रहें।",
         },
     }
 
     messages = COUNTER_MESSAGES.get(rumor_category, COUNTER_MESSAGES["PANIC_CONTAGION"])
     broadcast_messages = {lang: messages.get(lang, messages["en"]) for lang in languages}
     logger.critical(
-        f"[RumorControlAgent] COUNTER-BROADCAST — venue={venue_id} "
+        f"[RumorControlAgent] COUNTER-BROADCAST - venue={venue_id} "
         f"category={rumor_category} channels={channels}"
     )
     return {
@@ -240,7 +239,7 @@ def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
             "within 12 seconds. Prevents INFO_CASCADE crowd crush incidents."
         ),
         instruction=(
-            f"You are SpectaSyncAI's Rumor Control Agent (Flash — speed-optimized).\n"
+            f"You are SpectaSyncAI's Rumor Control Agent (Flash - speed-optimized).\n"
             f"INFO_CASCADE incidents in corpus: {corpus_incidents}\n\n"
             "Protocol:\n"
             "1. Call scan_social_media_for_rumors(venue_id).\n"
@@ -257,6 +256,9 @@ def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
 
 async def run_rumor_monitoring(venue_id: str) -> dict:
     """Runs the Rumor Control Agent for a venue."""
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     try:
         cache_name = await get_cached_model_flash("rumor_control")
         agent = build_rumor_control_agent(cache_name=cache_name)
@@ -269,7 +271,7 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
         app_name="spectasync_rumor", user_id="system"
     )
     prompt = (
-        f"RUMOR MONITOR — Venue: {venue_id}\n"
+        f"RUMOR MONITOR - Venue: {venue_id}\n"
         "Scan social media, classify risk, and broadcast counter-narrative if danger > 0.5."
     )
     result_text = ""
@@ -288,8 +290,11 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
 
     try:
         clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
+        parsed = json.loads(clean)
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
+        return parsed
     except json.JSONDecodeError:
+        fallback = True
         scan = scan_social_media_for_rumors(venue_id)
         broadcast = None
         if scan["max_danger_score"] > 0.5 and scan["rumors_detected"]:
@@ -305,7 +310,7 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
                 top_rumor["category"],
                 ["en", "ta", "kn", "hi"],
             )
-        return {
+        result = {
             "venue_id": venue_id,
             "rumors_detected_count": len(scan["rumors_detected"]),
             "max_danger_score": scan["max_danger_score"],
@@ -313,4 +318,15 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
             "broadcast_activated": broadcast is not None,
             "broadcast_details": broadcast,
             "analogous_incident_ids": scan.get("analogous_incidents", []),
-        }
+        }
+        output_size = len(json.dumps(result, ensure_ascii=False))
+        return result
+    finally:
+        observability_service.schedule_agent_run(
+            "rumor_control_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
+            output_size_bytes=output_size,
+        )

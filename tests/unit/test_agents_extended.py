@@ -21,6 +21,8 @@ from agents.vip_sync_agent import (
     run_vip_sync_monitoring
 )
 from agents.queue_agent import run_queue_analysis
+from agents.experience_agent import run_experience_recommendations
+from agents.vision_agent import archive_to_gcs
 
 @pytest.mark.asyncio
 async def test_failsafe_agent_tools():
@@ -169,3 +171,44 @@ async def test_queue_agent_fallback():
         MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
         res = await run_queue_analysis(["Z1"])
         assert isinstance(res, list)
+
+@pytest.mark.asyncio
+async def test_experience_agent_fallback():
+    with patch("agents.experience_agent.InMemoryRunner") as MockRunner:
+        mock_event = MagicMock()
+        mock_event.is_final_response.return_value = True
+        mock_event.content.parts = [MagicMock(text='MALFORMED_JSON')]
+        async def fake_run(*args, **kwargs): yield mock_event
+        MockRunner.return_value.run_async = fake_run
+        
+        # Mock session service creation which is nested in runner in this agent
+        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        
+        res = await run_experience_recommendations("ZONE_A")
+        assert "recommendations" in res
+        assert res["attendee_zone"] == "ZONE_A"
+
+@pytest.mark.asyncio
+async def test_rumor_control_agent_cache_failure():
+    # Covers lines 265-266 where get_cached_model_flash fails
+    with patch("agents.rumor_control_agent.get_cached_model_flash", side_effect=Exception("Cache down")), \
+         patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner, \
+         patch("agents.rumor_control_agent.InMemorySessionService") as MockSession:
+        
+        mock_event = MagicMock()
+        mock_event.is_final_response.return_value = True
+        mock_event.content.parts = [MagicMock(text='{"risk": "LOW"}')]
+        async def fake_run(*args, **kwargs): yield mock_event
+        MockRunner.return_value.run_async = fake_run
+        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        
+        res = await run_rumor_monitoring("V1")
+        assert res is not None
+
+def test_vision_agent_archive_gcs_failure():
+    # Covers lines 65-67 where storage.Client() or upload fails
+    with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "p1", "GCS_ENABLED": "1"}), \
+         patch("agents.vision_agent.storage.Client", side_effect=Exception("Auth error")):
+        res = archive_to_gcs("Z1", b"fake_image")
+        assert "mock_" in res
+        assert "(Local Sandbox)" in res

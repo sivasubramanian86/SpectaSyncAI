@@ -98,7 +98,7 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
 async def get_mock_pre_event():
     """Returns sample scenario data for the Pre-Event UI."""
     return {
-        "event_name": "SpectaSync Grand Opening — Tech City Arena",
+        "event_name": "SpectaSync Grand Opening - Tech City Arena",
         "total_reservations": 142000,
         "venue_capacity": 120000,
         "expected_peak_time": "18:00 - 20:00 (Sunset/Opening Ceremony)",

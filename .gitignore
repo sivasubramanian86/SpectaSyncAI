@@ -36,6 +36,7 @@ web/blob-report
 !.env.example
 *.env.local
 .firebase-config/
+.gcloud-config/
 firebase-debug.log
 tmpfile
 

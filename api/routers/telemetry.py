@@ -1,5 +1,5 @@
 """
-Telemetry router — ingests real-time density and triggers Vision Agent.
+Telemetry router - ingests real-time density and triggers Vision Agent.
 """
 import base64
 import logging
@@ -69,7 +69,7 @@ async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
     Accepts CCTV frame or manual score, runs Vision Agent (Flash),
     then triggers Core Orchestrator (Pro) for intervention decision.
     """
-    # Step 1: Vision Agent — analyse frame or use override
+    # Step 1: Vision Agent - analyse frame or use override
     if payload.image_b64:
         try:
             image_bytes = base64.b64decode(payload.image_b64)
@@ -101,7 +101,7 @@ async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
             detail="Either image_b64 or density_override must be provided.",
         )
 
-    # Step 2: Core Orchestrator — decision + MCP intervention
+    # Step 2: Core Orchestrator - decision + MCP intervention
     try:
         orchestration_result = await run_orchestration_cycle(density_report)
     except Exception as exc:

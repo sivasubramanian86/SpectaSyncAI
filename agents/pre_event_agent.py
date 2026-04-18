@@ -1,4 +1,4 @@
-"""
+﻿"""
 SpectaSyncAI: Pre-Event Strategic Analyst Agent
 Powered by Gemini 2.5 Pro
 Responsibility: Forecasting crowd risk based on bookings, weather, and scheduling.
@@ -6,9 +6,12 @@ Responsibility: Forecasting crowd risk based on bookings, weather, and schedulin
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+
+from api.services.observability_service import observability_service
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +50,10 @@ def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
 
 async def run_pre_event_analysis(pre_event_data: dict) -> dict:
     """Runs a strategic analysis of the upcoming event with resilient fallback."""
+    start = time.perf_counter()
+    fallback = False
+    status = "success"
+    output_size = 0
     try:
         agent = build_pre_event_agent()
         runner = InMemoryRunner(agent=agent, app_name="spectasync_pre_event")
@@ -74,31 +81,39 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
                     if part.text:
                         result_text += part.text
 
-        # Try to parse JSON if agent returned it
         clean_json = result_text.strip().lstrip("```json").rstrip("```").strip()
         parsed = json.loads(clean_json)
 
-        # Resiliency: Handle list response from models occasionally
         if isinstance(parsed, list) and len(parsed) > 0:
             parsed = parsed[0]
 
         if not isinstance(parsed, dict):
             raise ValueError(f"Agent returned invalid JSON structure: {type(parsed)}")
 
-        # Validation of required fields for frontend
         required_fields = [
-            'risk_level', 'expected_crowd_peak', 'weather_impact', 'pro_con_summary',
-            'precautionary_measures', 'strategic_recommendation'
+            "risk_level",
+            "expected_crowd_peak",
+            "weather_impact",
+            "pro_con_summary",
+            "precautionary_measures",
+            "strategic_recommendation",
         ]
         for field in required_fields:
             if field not in parsed:
-                parsed[field] = "Information not available" if field != 'precautionary_measures' else []
+                parsed[field] = (
+                    "Information not available"
+                    if field != "precautionary_measures"
+                    else []
+                )
+
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
 
     except Exception as exc:
+        fallback = True
+        status = "fallback"
         logger.error(f"Pre-Event Agent Error (Infrastructure or Parsing): {exc}")
-        # Return high-fidelity mock data so the hackathon demo remains "wow" even if offline
-        return {
+        result = {
             "risk_level": "CRITICAL",
             "expected_crowd_peak": "142,000 (Local Forecast)",
             "weather_impact": "Extreme Heat (38°C) detected. High risk of dehydration-induced panic.",
@@ -109,12 +124,23 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
             "precautionary_measures": [
                 "Stagger entry by 20-minute windows.",
                 "Deploy mobile hydration teams to Gate North.",
-                "Sync with VIPSyncAgent for high-profile arrival routing."
+                "Sync with VIPSyncAgent for high-profile arrival routing.",
             ],
             "strategic_recommendation": (
                 "FORCE-START: Activate all auxiliary gates and disable "
                 "automated turnstiles for faster egress."
             ),
             "is_fallback": True,
-            "status": "Offline Processing (Mock Enabled)"
+            "status": "Offline Processing (Mock Enabled)",
         }
+        output_size = len(json.dumps(result, ensure_ascii=False))
+        return result
+    finally:
+        observability_service.schedule_agent_run(
+            "pre_event_analyst",
+            (time.perf_counter() - start) * 1000,
+            status=status,
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

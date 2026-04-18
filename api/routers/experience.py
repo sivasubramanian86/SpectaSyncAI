@@ -1,5 +1,5 @@
 """
-Experience router — attendee recommendations via Experience Agent.
+Experience router - attendee recommendations via Experience Agent.
 """
 import logging
 from fastapi import APIRouter, Query

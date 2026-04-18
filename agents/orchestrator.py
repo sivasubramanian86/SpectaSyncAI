@@ -6,6 +6,7 @@ AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventio
 """
 import json
 import asyncio
+import time
 from api.services.pubsub_service import pubsub_service
 import logging
 import os
@@ -21,6 +22,7 @@ from google.genai import types as genai_types
 from google.adk.sessions import InMemorySessionService
 from agents.memory import AlloyDBMemory
 from agents.context_cache import get_cached_model_pro
+from api.services.observability_service import observability_service
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +39,7 @@ async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
     Returns:
         LlmAgent: Fully configured orchestrator with MCP tools loaded.
     """
-    # Load MCP Toolset — discovers tools from the running FastMCP server
+    # Load MCP Toolset - discovers tools from the running FastMCP server
     mcp_toolset = MCPToolset(
         connection_params=SseConnectionParams(url=MCP_SERVER_URL)
     )
@@ -79,65 +81,96 @@ async def run_orchestration_cycle(density_report: dict) -> dict:
     Returns:
         dict: Agent response with action taken and reasoning.
     """
-    # 1. Retrieve historical AlloyDB context (RAG)
-    memory = AlloyDBMemory()
-    history = await memory.get_historical_context(density_report.get("location_id", "UNKNOWN"))
-
-    # 2. Build the LlmAgent with live MCP tools
-    cache_name = await get_cached_model_pro("core_orchestrator")
-    agent = await build_orchestrator_agent(cache_name=cache_name)
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
-
-    session = await session_service.create_session(
-        app_name="spectasync_orchestrator", user_id="system"
-    )
-
-    # 3. Compose prompt with state + history
-    state_prompt = (
-        f"LIVE TELEMETRY:\n{json.dumps(density_report, indent=2)}\n\n"
-        f"HISTORICAL PATTERNS FROM ALLOYDB:\n{json.dumps(history, indent=2)}\n\n"
-        "Based on the above, assess the situation and invoke the correct MCP tool if required."
-    )
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
 
     result_text = ""
     tool_calls_made = []
 
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=state_prompt)],
-        ),
-    ):
-        # Track tool invocations for the audit log
-        if hasattr(event, "tool_call") and event.tool_call:
-            tool_calls_made.append({
-                "tool": event.tool_call.name,
-                "args": dict(event.tool_call.args),
-            })
+    try:
+        # 1. Retrieve historical AlloyDB context (RAG)
+        memory = AlloyDBMemory()
+        history = await memory.get_historical_context(density_report.get("location_id", "UNKNOWN"))
 
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
+        # 2. Build the LlmAgent with live MCP tools
+        cache_name = await get_cached_model_pro("core_orchestrator")
+        agent = await build_orchestrator_agent(cache_name=cache_name)
+        session_service = InMemorySessionService()
+        runner = InMemoryRunner(agent=agent, session_service=session_service)
 
-    logger.info(f"[Orchestrator] Final reasoning: {result_text}")
-    logger.info(f"[Orchestrator] Tools invoked: {tool_calls_made}")
+        session = await session_service.create_session(
+            app_name="spectasync_orchestrator", user_id="system"
+        )
 
-    # 5. High-Fidelity Signal Broadcast (Pub/Sub)
-    # Triggered automatically for risks > 70% threshold
-    if density_report.get("risk_confidence", 0) > 0.7:
-        asyncio.create_task(pubsub_service.broadcast_risk({
-            "incident_id": "LIVE-SIGNAL-STREAM",
-            "risk_score": density_report.get("risk_confidence"),
-            "domain": "CROWD_STABILITY",
-            "recommended_action": tool_calls_made[0]["name"] if tool_calls_made else "MONITOR"
-        }))
+        # 3. Compose prompt with state + history
+        state_prompt = (
+            f"LIVE TELEMETRY:\n{json.dumps(density_report, indent=2)}\n\n"
+            f"HISTORICAL PATTERNS FROM ALLOYDB:\n{json.dumps(history, indent=2)}\n\n"
+            "Based on the above, assess the situation and invoke the correct MCP tool if required."
+        )
 
-    return {
-        "action_taken": tool_calls_made,
-        "agent_reasoning": result_text,
-        "density_report": density_report,
-    }
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=state_prompt)],
+            ),
+        ):
+            # Track tool invocations for the audit log
+            if hasattr(event, "tool_call") and event.tool_call:
+                tool_calls_made.append({
+                    "tool": event.tool_call.name,
+                    "args": dict(event.tool_call.args),
+                })
+
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+        logger.info(f"[Orchestrator] Final reasoning: {result_text}")
+        logger.info(f"[Orchestrator] Tools invoked: {tool_calls_made}")
+
+        # 5. High-Fidelity Signal Broadcast (Pub/Sub)
+        # Triggered automatically for risks > 70% threshold
+        if density_report.get("risk_confidence", 0) > 0.7:
+            asyncio.create_task(pubsub_service.broadcast_risk({
+                "incident_id": "LIVE-SIGNAL-STREAM",
+                "risk_score": density_report.get("risk_confidence"),
+                "domain": "CROWD_STABILITY",
+                "recommended_action": tool_calls_made[0]["name"] if tool_calls_made else "MONITOR"
+            }))
+
+        result = {
+            "action_taken": tool_calls_made,
+            "agent_reasoning": result_text,
+            "density_report": density_report,
+        }
+        return result
+    except Exception as exc:
+        fallback = True
+        logger.error(f"[Orchestrator] Execution failed: {exc}")
+        return {
+            "action_taken": [],
+            "agent_reasoning": "Orchestrator encountered a technical error. Falling back to local safety rules.",
+            "density_report": density_report,
+            "error": str(exc),
+        }
+    finally:
+        result_payload = {
+            "action_taken": tool_calls_made,
+            "agent_reasoning": result_text,
+            "density_report": density_report,
+        }
+        output_size = len(json.dumps(result_payload, ensure_ascii=False))
+        fallback = fallback or not bool(result_text)
+        observability_service.schedule_agent_run(
+            "core_orchestrator",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

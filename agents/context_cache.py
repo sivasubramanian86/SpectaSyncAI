@@ -1,6 +1,6 @@
 """
 SpectaSyncAI: Gen AI Context Cache Manager
-@19_cost_efficiency_architect — Framework Update (google-genai)
+@19_cost_efficiency_architect - Framework Update (google-genai)
 
 Migrated from deprecated vertexai.preview.caching (Removal date: June 24, 2026).
 Uses the unified Google Gen AI SDK (google-genai) for high-fidelity context caching.
@@ -23,7 +23,7 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-# Cache TTL — refreshed every 6 hours
+# Cache TTL - refreshed every 6 hours
 _CACHE_TTL_HOURS = 6
 
 
@@ -41,9 +41,9 @@ def get_client() -> genai.Client:
 
 # Corpus summary injected into all agent system prompts for grounding
 _CORPUS_SYSTEM_BLOCK = """
-# SpectaSyncAI — Global Incident Corpus & Strategic Response SOP
+# SpectaSyncAI - Global Incident Corpus & Strategic Response SOP
 You are an AI safety agent grounded in forensic analysis of 18 crowd crush incidents
-from 2003–2025, across 9 countries, resulting in 6,142 deaths.
+from 2003-2025, across 9 countries, resulting in 6,142 deaths.
 
 ## 1. Failure Mode Taxonomy
 - EXOGENOUS_SURGE      External crowd volume exceeds venue absorption rate
@@ -82,17 +82,17 @@ from 2003–2025, across 9 countries, resulting in 6,142 deaths.
 3. Pulse low-frequency guidance signage on auxiliary battery power.
 
 ## 3. Key Incident References
-INC-2025-IND-01: Political rally, 41 deaths — TEMPORAL_DISRUPT + INFRA_FAILURE
-INC-2025-IND-02: Sports celebration, 11 deaths — EXOGENOUS_SURGE + INFO_CASCADE
-INC-2025-IND-03: Kumbh Mela amavasya, 30 deaths — GHAT_CRUSH + BRIDGE_BOTTLENECK
-INC-2022-KOR-01: Civic gathering, 159 deaths — NARROW_CORRIDOR + EXOGENOUS_SURGE
-INC-2022-IDN-01: Stadium post-match, 131 deaths — PANIC_TRIGGER + EGRESS_FAILURE
-INC-2015-SAU-01: Religious pilgrimage, 2411 deaths — EXOGENOUS_SURGE + NARROW_CORRIDOR
-INC-2013-IND-02: Kumbh Mela bridge, 36 deaths — BRIDGE_BOTTLENECK + STAIRWAY_COLLAPSE
-INC-2008-IND-01: Mountain shrine, 162 deaths — TEMPLE_SURGE + PANIC_TRIGGER + STAIRWAY_COLLAPSE
-INC-2013-IND-01: Religious bridge, 115 deaths — TEMPLE_SURGE + INFO_CASCADE
-INC-2010-KHM-01: Festival bridge, 347 deaths — BRIDGE_BOTTLENECK + PANIC_TRIGGER
-INC-2010-DEU-01: Festival tunnel, 21 deaths — NARROW_CORRIDOR + EGRESS_FAILURE
+INC-2025-IND-01: Political rally, 41 deaths - TEMPORAL_DISRUPT + INFRA_FAILURE
+INC-2025-IND-02: Sports celebration, 11 deaths - EXOGENOUS_SURGE + INFO_CASCADE
+INC-2025-IND-03: Kumbh Mela amavasya, 30 deaths - GHAT_CRUSH + BRIDGE_BOTTLENECK
+INC-2022-KOR-01: Civic gathering, 159 deaths - NARROW_CORRIDOR + EXOGENOUS_SURGE
+INC-2022-IDN-01: Stadium post-match, 131 deaths - PANIC_TRIGGER + EGRESS_FAILURE
+INC-2015-SAU-01: Religious pilgrimage, 2411 deaths - EXOGENOUS_SURGE + NARROW_CORRIDOR
+INC-2013-IND-02: Kumbh Mela bridge, 36 deaths - BRIDGE_BOTTLENECK + STAIRWAY_COLLAPSE
+INC-2008-IND-01: Mountain shrine, 162 deaths - TEMPLE_SURGE + PANIC_TRIGGER + STAIRWAY_COLLAPSE
+INC-2013-IND-01: Religious bridge, 115 deaths - TEMPLE_SURGE + INFO_CASCADE
+INC-2010-KHM-01: Festival bridge, 347 deaths - BRIDGE_BOTTLENECK + PANIC_TRIGGER
+INC-2010-DEU-01: Festival tunnel, 21 deaths - NARROW_CORRIDOR + EGRESS_FAILURE
 
 ## 4. Non-Negotiable Operational Rules
 1. Always cite the most analogous incident ID when making an intervention recommendation.

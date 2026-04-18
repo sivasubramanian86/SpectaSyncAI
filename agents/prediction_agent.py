@@ -1,17 +1,19 @@
 """
-SpectaSyncAI: Prediction Agent — @03 @05
+SpectaSyncAI: Prediction Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
-Responsibility: AI-driven surge forecasting 15–30 minutes ahead using
+Responsibility: AI-driven surge forecasting 15-30 minutes ahead using
 historical AlloyDB patterns + current telemetry trend analysis.
 Provides confidence scores and specific actionable recommendations.
 """
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +57,7 @@ def calculate_surge_trajectory(current_density: float, buildup_rate: float) -> d
     Projects crowd density forward for 10, 20 and 30 minute windows.
 
     Args:
-        current_density: Current density score (0.0–1.0).
+        current_density: Current density score (0.0-1.0).
         buildup_rate: Rate of density increase per minute.
 
     Returns:
@@ -96,11 +98,11 @@ def build_prediction_agent() -> LlmAgent:
         name="prediction_agent",
         description=(
             "Analyzes crowd density trends and historical surge patterns to "
-            "forecast crowd surges 10–30 minutes in advance with confidence "
+            "forecast crowd surges 10-30 minutes in advance with confidence "
             "scores and specific actionable interventions."
         ),
         instruction=(
-            "You are the SpectaSyncAI Prediction Agent — a proactive surge forecaster. "
+            "You are the SpectaSyncAI Prediction Agent - a proactive surge forecaster. "
             "Given current density telemetry and historical surge data, you must:\n"
             "1. Call get_historical_surge_data() to retrieve historical patterns.\n"
             "2. Call calculate_surge_trajectory() with the current density and buildup rate.\n"
@@ -121,11 +123,14 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
 
     Args:
         location_id: Venue zone identifier.
-        current_density: Current crowd density score (0.0–1.0).
+        current_density: Current crowd density score (0.0-1.0).
 
     Returns:
         dict: Surge forecast with confidence and recommendations.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_prediction_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -141,39 +146,54 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
     )
 
     result_text = ""
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=prompt)],
-        ),
-    ):
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
-
-    logger.info(f"[PredictionAgent] Forecast for {location_id}: {result_text}")
-
     try:
-        # Strip markdown code fences if present
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        # Fallback structured response using tool calculations
-        trajectory = calculate_surge_trajectory(current_density, 0.018)
-        return {
-            "location_id": location_id,
-            "current_density": current_density,
-            "predicted_peak_time_mins": int(trajectory.get("peak_expected_at_mins") or 20),
-            "confidence_score": 72,
-            "surge_level": trajectory["T+20_mins"]["level"],
-            "forecast": trajectory,
-            "actionable_recommendations": [
-                f"Pre-position 2 staff at {location_id} within 10 minutes.",
-                "Update digital signage to redirect flow via alternate route.",
-                "Alert Gate Supervisor for auxiliary gate pre-authorization.",
-            ],
-            "raw_response": result_text,
-        }
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=prompt)],
+            ),
+        ):
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+        logger.info(f"[PredictionAgent] Forecast for {location_id}: {result_text}")
+
+        try:
+            # Strip markdown code fences if present
+            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            result = json.loads(clean)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+        except json.JSONDecodeError:
+            fallback = True
+            # Fallback structured response using tool calculations
+            trajectory = calculate_surge_trajectory(current_density, 0.018)
+            result = {
+                "location_id": location_id,
+                "current_density": current_density,
+                "predicted_peak_time_mins": int(trajectory.get("peak_expected_at_mins") or 20),
+                "confidence_score": 72,
+                "surge_level": trajectory["T+20_mins"]["level"],
+                "forecast": trajectory,
+                "actionable_recommendations": [
+                    f"Pre-position 2 staff at {location_id} within 10 minutes.",
+                    "Update digital signage to redirect flow via alternate route.",
+                    "Alert Gate Supervisor for auxiliary gate pre-authorization.",
+                ],
+                "raw_response": result_text,
+            }
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+    finally:
+        observability_service.schedule_agent_run(
+            "prediction_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

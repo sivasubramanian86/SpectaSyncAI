@@ -1,5 +1,5 @@
 """
-Interventions router — reads and lists historical interventions from AlloyDB.
+Interventions router - reads and lists historical interventions from AlloyDB.
 """
 import logging
 from fastapi import APIRouter

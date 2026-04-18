@@ -1,16 +1,18 @@
 """
-SpectaSyncAI: Experience Agent — @03 @05
+SpectaSyncAI: Experience Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Generates real-time personalized recommendations for attendees
-to improve their event experience — optimal timing suggestions, food, seating,
+to improve their event experience - optimal timing suggestions, food, seating,
 and transport routing based on live venue state.
 """
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +95,9 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
     Returns:
         dict: Personalized recommendations with timing advice.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_experience_agent()
     runner = InMemoryRunner(agent=agent, app_name="spectasync_experience")
 
@@ -107,54 +112,69 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
     )
 
     result_text = ""
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=prompt)],
-        ),
-    ):
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
-
-    logger.info(f"[ExperienceAgent] Recommendations for {attendee_zone}: {result_text}")
-
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        return {
-            "attendee_zone": attendee_zone,
-            "recommendations": [
-                {
-                    "priority": 1, "category": "TIMING",
-                    "message": "Halftime in 18 mins — visit food stands NOW to avoid queues.",
-                    "timing": "Immediately"
-                },
-                {
-                    "priority": 2, "category": "FOOD",
-                    "message": "Food Stand C has only 2-min wait vs 18-min at Stand A.",
-                    "timing": "Next 10 mins"
-                },
-                {
-                    "priority": 3, "category": "RESTROOM",
-                    "message": "South Restroom is 80% less crowded than North.",
-                    "timing": "Before halftime"
-                },
-                {
-                    "priority": 4, "category": "ENTRY_EXIT",
-                    "message": "Gate East has 3-min wait vs 15-min at Gate North.",
-                    "timing": "Any time"
-                },
-                {
-                    "priority": 5, "category": "TIMING",
-                    "message": "Leave venue Gate East at FT+5 mins to avoid post-match surge.",
-                    "timing": "Full time"
-                },
-            ],
-            "best_time_to_move": "Now (before halftime surge in 18 mins)",
-            "avoid_zones": ["GATE_NORTH", "FOOD_STAND_A"],
-        }
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=prompt)],
+            ),
+        ):
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+        logger.info(f"[ExperienceAgent] Recommendations for {attendee_zone}: {result_text}")
+
+        try:
+            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            result = json.loads(clean)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+        except json.JSONDecodeError:
+            fallback = True
+            result = {
+                "attendee_zone": attendee_zone,
+                "recommendations": [
+                    {
+                        "priority": 1, "category": "TIMING",
+                        "message": "Halftime in 18 mins - visit food stands NOW to avoid queues.",
+                        "timing": "Immediately"
+                    },
+                    {
+                        "priority": 2, "category": "FOOD",
+                        "message": "Food Stand C has only 2-min wait vs 18-min at Stand A.",
+                        "timing": "Next 10 mins"
+                    },
+                    {
+                        "priority": 3, "category": "RESTROOM",
+                        "message": "South Restroom is 80% less crowded than North.",
+                        "timing": "Before halftime"
+                    },
+                    {
+                        "priority": 4, "category": "ENTRY_EXIT",
+                        "message": "Gate East has 3-min wait vs 15-min at Gate North.",
+                        "timing": "Any time"
+                    },
+                    {
+                        "priority": 5, "category": "TIMING",
+                        "message": "Leave venue Gate East at FT+5 mins to avoid post-match surge.",
+                        "timing": "Full time"
+                    },
+                ],
+                "best_time_to_move": "Now (before halftime surge in 18 mins)",
+                "avoid_zones": ["GATE_NORTH", "FOOD_STAND_A"],
+            }
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+    finally:
+        observability_service.schedule_agent_run(
+            "experience_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
+            output_size_bytes=output_size,
+        )

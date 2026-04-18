@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Incident RAG Agent — @03 @05 @12
+SpectaSyncAI: Incident RAG Agent - @03 @05 @12
 Powered by: google-adk + Gemini 2.5 Pro + pgvector (AlloyDB)
 
 Responsibility:
@@ -21,11 +21,13 @@ import os
 import json
 import logging
 import math
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
 
 from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +136,7 @@ def search_similar_incidents(
         deaths=0,
         injuries=0,
         failure_modes=active_failure_modes,
-        primary_trigger="Live event — queried for similarities",
+        primary_trigger="Live event - queried for similarities",
         key_precursor_signals=[],
         interventions_that_would_have_helped=[],
         time_of_day_category="during_event",
@@ -222,7 +224,7 @@ def build_incident_rag_agent() -> LlmAgent:
     """
     corpus_summary = (
         f"{len(INCIDENT_CORPUS)} incidents | "
-        f"Span: 2010–2025 | "
+        f"Span: 2010-2025 | "
         f"Countries: {len(set(r.country_iso2 for r in INCIDENT_CORPUS))} | "
         f"Total deaths: {sum(r.deaths for r in INCIDENT_CORPUS):,}"
     )
@@ -268,6 +270,9 @@ async def run_incident_rag_query(
     Returns:
         dict: Similar incidents, aggregated interventions, and prevention strategy.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_incident_rag_agent()
     runner = InMemoryRunner(agent=agent, app_name="spectasync_rag")
 
@@ -276,7 +281,7 @@ async def run_incident_rag_query(
     )
 
     prompt = (
-        "INCIDENT RAG QUERY — Live crowd scenario:\n"
+        "INCIDENT RAG QUERY - Live crowd scenario:\n"
         f"  Active failure modes: {active_failure_modes}\n"
         f"  Venue type: {venue_type}\n"
         f"  Event type: {event_type}\n"
@@ -306,8 +311,11 @@ async def run_incident_rag_query(
 
     try:
         clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
+        parsed = json.loads(clean)
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
+        return parsed
     except json.JSONDecodeError:
+        fallback = True
         similar = search_similar_incidents(
             active_failure_modes, venue_type, event_type, capacity_ratio,
             vip_delay, infra_failure, rumor_detected
@@ -315,7 +323,7 @@ async def run_incident_rag_query(
         ids = [i["incident_id"] for i in similar["similar_incidents"]]
         strategies = aggregate_intervention_strategies(ids)
 
-        return {
+        result = {
             "matched_incidents": [
                 {"incident_id": i["incident_id"], "similarity_score": i["similarity_score"]}
                 for i in similar["similar_incidents"]
@@ -331,4 +339,15 @@ async def run_incident_rag_query(
             "historical_lessons": strategies["consolidated_lessons"][:3],
             "prevention_confidence_pct": min(90, int((1 - max(0, capacity_ratio - 1) / 5) * 90)),
             "corpus_searched": len(INCIDENT_CORPUS),
-        }
+        }
+        output_size = len(json.dumps(result, ensure_ascii=False))
+        return result
+    finally:
+        observability_service.schedule_agent_run(
+            "incident_rag_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

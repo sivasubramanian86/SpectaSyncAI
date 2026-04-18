@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Queue Agent — @03 @05
+SpectaSyncAI: Queue Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Real-time wait time estimation across all venue service points
 (entry gates, food concessions, restrooms, merchandise stands).
@@ -8,10 +8,12 @@ Surfaces per-zone wait times for the Command Center dashboard.
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +128,9 @@ async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
     Returns:
         list[dict]: Wait time analysis per zone sorted by priority.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     targets = zone_ids or list(VENUE_ZONES.keys())
     agent = build_queue_agent()
     session_service = InMemorySessionService()
@@ -143,35 +148,50 @@ async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
     )
 
     result_text = ""
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=prompt)],
-        ),
-    ):
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
-
-    logger.info(f"[QueueAgent] Analysis complete for {len(targets)} zones.")
-
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        # Fallback: compute directly using tools
-        results = []
-        for zone_id in targets:
-            snapshot = get_zone_queue_snapshot(zone_id)
-            wait = calculate_wait_time(snapshot["queue_length"], snapshot["service_rate_per_min"])
-            results.append({
-                "zone_id": zone_id,
-                "queue_length": snapshot["queue_length"],
-                "estimated_wait_mins": wait["estimated_wait_mins"],
-                "priority": wait["priority"],
-                "recommendation": wait["recommendation"],
-            })
-        return sorted(results, key=lambda x: x["estimated_wait_mins"], reverse=True)
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=prompt)],
+            ),
+        ):
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
+
+        logger.info(f"[QueueAgent] Analysis complete for {len(targets)} zones.")
+
+        try:
+            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            result = json.loads(clean)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+        except json.JSONDecodeError:
+            fallback = True
+            # Fallback: compute directly using tools
+            results = []
+            for zone_id in targets:
+                snapshot = get_zone_queue_snapshot(zone_id)
+                wait = calculate_wait_time(snapshot["queue_length"], snapshot["service_rate_per_min"])
+                results.append({
+                    "zone_id": zone_id,
+                    "queue_length": snapshot["queue_length"],
+                    "estimated_wait_mins": wait["estimated_wait_mins"],
+                    "priority": wait["priority"],
+                    "recommendation": wait["recommendation"],
+                })
+            result = sorted(results, key=lambda x: x["estimated_wait_mins"], reverse=True)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+    finally:
+        observability_service.schedule_agent_run(
+            "queue_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
+            output_size_bytes=output_size,
+        )

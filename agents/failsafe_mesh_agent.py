@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Failsafe Mesh Agent — @03 @05
+SpectaSyncAI: Failsafe Mesh Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: INFRA_FAILURE
 
@@ -9,15 +9,15 @@ moment of peak crisis. PA systems and LED screens went offline simultaneously.
 All digital crowd guidance was lost at the worst possible moment. See incident_corpus.py.
 
 Also relevant:
-  INC-2017-IND-01 — Railway station crush where emergency lighting failure created
+  INC-2017-IND-01 - Railway station crush where emergency lighting failure created
       fatal bottleneck in stairway during storm surge.
-  INC-2010-KHM-01 — Bridge lighting failure on sole egress route triggered panic
+  INC-2010-KHM-01 - Bridge lighting failure on sole egress route triggered panic
       that killed 347 people.
 
 Responsibility:
   Continuously monitors venue infrastructure health (mains power, PA, LED
   network, emergency lighting). On failure detection: maintains crowd
-  communication capability through zero-grid-dependency mechanisms —
+  communication capability through zero-grid-dependency mechanisms -
   BLE 5.0 mesh network, offline-cached staff tablet routing, backup
   generator dispatch, and physical illuminated signage.
 
@@ -30,12 +30,14 @@ Graceful Degradation Tiers:
 import os
 import json
 import logging
+import time
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +52,7 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
       - BLE beacon heartbeat per zone
 
     Historical precedent (INC-2025-IND-01): Venue power load was at 140% capacity
-    45 minutes before the fatal power cut — a predictive signal that went unread.
+    45 minutes before the fatal power cut - a predictive signal that went unread.
     This monitor acts on that signal at T-45, not at the moment of failure.
 
     Args:
@@ -108,10 +110,10 @@ def activate_ble_mesh_broadcast(
     BLE mesh would have maintained guidance capability through both events.
 
     Message types:
-      SAFE_EGRESS_ROUTING — Navigate to nearest safe exit
-      CROWD_SLOW_DOWN     — Reduce movement velocity
-      STAY_IN_PLACE       — Hold position while situation resolves
-      EMERGENCY_SERVICES  — Clear corridor for emergency responders
+      SAFE_EGRESS_ROUTING - Navigate to nearest safe exit
+      CROWD_SLOW_DOWN     - Reduce movement velocity
+      STAY_IN_PLACE       - Hold position while situation resolves
+      EMERGENCY_SERVICES  - Clear corridor for emergency responders
 
     Args:
         venue_id: Target venue.
@@ -122,7 +124,7 @@ def activate_ble_mesh_broadcast(
         dict: BLE mesh broadcast confirmation.
     """
     logger.critical(
-        f"[FailsafeMeshAgent] BLE MESH ACTIVATED — venue={venue_id} "
+        f"[FailsafeMeshAgent] BLE MESH ACTIVATED - venue={venue_id} "
         f"zones={zones} message={message_type}"
     )
     return {
@@ -144,12 +146,12 @@ def dispatch_offline_staff_routing(
 ) -> dict:
     """
     Distributes pre-cached offline routing instructions to staff tablets.
-    Tablet apps cache crowd routing algorithms locally — no internet required.
+    Tablet apps cache crowd routing algorithms locally - no internet required.
     Uses last-known density state to generate routing recommendations.
 
     Args:
         venue_id: Target venue.
-        zone_density_map: Current density per zone (0.0–1.0).
+        zone_density_map: Current density per zone (0.0-1.0).
 
     Returns:
         dict: Staff positioning instructions for offline operation.
@@ -190,7 +192,7 @@ def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dic
         dict: Generator dispatch status and physical signage activation.
     """
     logger.critical(
-        f"[FailsafeMeshAgent] GENERATOR REQUESTED — venue={venue_id} zones={affected_zones}"
+        f"[FailsafeMeshAgent] GENERATOR REQUESTED - venue={venue_id} zones={affected_zones}"
     )
     return {
         "status": "GENERATOR_REQUESTED",
@@ -253,6 +255,9 @@ def build_failsafe_mesh_agent() -> LlmAgent:
 
 async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict:
     """Runs the Failsafe Mesh Agent for continuous infrastructure monitoring."""
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_failsafe_mesh_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -260,55 +265,70 @@ async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict:
         app_name="spectasync_failsafe", user_id="system"
     )
     prompt = (
-        f"INFRASTRUCTURE MONITOR — Venue: {venue_id}\n"
+        f"INFRASTRUCTURE MONITOR - Venue: {venue_id}\n"
         f"Zones: {', '.join(zones)}\n"
         "Monitor all infrastructure components. Activate failsafe mesh if any failure detected."
     )
     result_text = ""
-    async for event in runner.run_async(
-        user_id="system",
-        session_id=session.id,
-        new_message=genai_types.Content(
-            role="user",
-            parts=[genai_types.Part(text=prompt)],
-        ),
-    ):
-        if event.is_final_response() and event.content:
-            for part in event.content.parts:
-                if part.text:
-                    result_text += part.text
-
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        health = monitor_infrastructure_health(venue_id, zones)
-        failed_zones = [
-            c["zone"] for c in health["infrastructure_components"]
-            if c["pa_system_status"] == "FAILED" or c["mains_power_load_ratio"] > 1.2
-        ]
-        density_map = {c["zone"]: c["mains_power_load_ratio"] / 2.0 for c in health["infrastructure_components"]}
+        async for event in runner.run_async(
+            user_id="system",
+            session_id=session.id,
+            new_message=genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=prompt)],
+            ),
+        ):
+            if event.is_final_response() and event.content:
+                for part in event.content.parts:
+                    if part.text:
+                        result_text += part.text
 
-        ble, routing, gen = None, None, None
-        if failed_zones:
-            ble = activate_ble_mesh_broadcast(venue_id, failed_zones, "SAFE_EGRESS_ROUTING")
-            routing = dispatch_offline_staff_routing(venue_id, density_map)
-            gen = request_emergency_generator(venue_id, failed_zones)
+        try:
+            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            result = json.loads(clean)
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+        except json.JSONDecodeError:
+            fallback = True
+            health = monitor_infrastructure_health(venue_id, zones)
+            failed_zones = [
+                c["zone"] for c in health["infrastructure_components"]
+                if c["pa_system_status"] == "FAILED" or c["mains_power_load_ratio"] > 1.2
+            ]
+            density_map = {c["zone"]: c["mains_power_load_ratio"] / 2.0 for c in health["infrastructure_components"]}
 
-        tier = "T1_NORMAL"
-        if failed_zones:
-            tier = "T3_DEGRADED" if len(failed_zones) < len(zones) else "T4_BLACKOUT"
+            ble, routing, gen = None, None, None
+            if failed_zones:
+                ble = activate_ble_mesh_broadcast(venue_id, failed_zones, "SAFE_EGRESS_ROUTING")
+                routing = dispatch_offline_staff_routing(venue_id, density_map)
+                gen = request_emergency_generator(venue_id, failed_zones)
 
-        return {
-            "venue_id": venue_id,
-            "infra_status": health["overall_status"],
-            "degradation_tier": tier,
-            "degradation_description": FAILSAFE_DEGRADATION_TIERS[tier],
-            "failures_detected": len(failed_zones),
-            "failed_zones": failed_zones,
-            "ble_mesh_active": ble is not None,
-            "offline_routing_active": routing is not None,
-            "generator_requested": gen is not None,
-            "communications_maintained": True,
-            "analogous_incident_ids": health["analogous_incidents"],
-        }
+            tier = "T1_NORMAL"
+            if failed_zones:
+                tier = "T3_DEGRADED" if len(failed_zones) < len(zones) else "T4_BLACKOUT"
+
+            result = {
+                "venue_id": venue_id,
+                "infra_status": health["overall_status"],
+                "degradation_tier": tier,
+                "degradation_description": FAILSAFE_DEGRADATION_TIERS[tier],
+                "failures_detected": len(failed_zones),
+                "failed_zones": failed_zones,
+                "ble_mesh_active": ble is not None,
+                "offline_routing_active": routing is not None,
+                "generator_requested": gen is not None,
+                "communications_maintained": True,
+                "analogous_incident_ids": health["analogous_incidents"],
+            }
+            output_size = len(json.dumps(result, ensure_ascii=False))
+            return result
+    finally:
+        observability_service.schedule_agent_run(
+            "failsafe_mesh_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

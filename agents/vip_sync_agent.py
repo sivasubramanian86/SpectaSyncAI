@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: VIP Sync Agent — @03 @05
+SpectaSyncAI: VIP Sync Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: TEMPORAL_DISRUPTION
 
@@ -10,8 +10,8 @@ exponentially during this period. On arrival, the directional surge that
 released this energy was fatal. See agents/incident_corpus.py INC-2025-IND-01.
 
 Also relevant:
-  INC-2021-USA-01 — Concert headliner delay contributed to stage-front surge.
-  INC-2015-SAU-01 — Pilgrimage ritual timing mismatch caused convergence surge.
+  INC-2021-USA-01 - Concert headliner delay contributed to stage-front surge.
+  INC-2015-SAU-01 - Pilgrimage ritual timing mismatch caused convergence surge.
 
 Responsibility:
   Tracks live VIP/headline act/political figure convoy GPS against the
@@ -22,12 +22,14 @@ Responsibility:
 import os
 import json
 import logging
+import time
 from datetime import datetime, timedelta
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
+from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +45,7 @@ def get_convoy_gps_position(event_id: str) -> dict:
     convoy coordination system (anonymized, secure channel).
 
     Historical precedent (INC-2025-IND-01): The convoy's departure delay
-    was observable at T-5 hours via GPS telemetry — long before crowd surge.
+    was observable at T-5 hours via GPS telemetry - long before crowd surge.
 
     Args:
         event_id: Unique event identifier (no personal identifiers).
@@ -86,7 +88,7 @@ def calculate_crowd_kinetic_energy(
     Args:
         wait_duration_mins: Total accumulated delay in minutes.
         crowd_size: Current attendance estimate.
-        density_score: Current venue density (0.0–1.0).
+        density_score: Current venue density (0.0-1.0).
 
     Returns:
         dict: surge_coefficient, surge_prediction, analogous_incidents.
@@ -129,10 +131,10 @@ def activate_crowd_engagement_program(zone: str, program_type: str, duration_min
     This is the critical intervention absent in INC-2025-IND-01 and INC-2021-USA-01.
 
     Program types:
-      MUSIC_STREAM       — PA music broadcast
-      INTERACTIVE_SCREEN — Trivia/poll on venue screens
-      ADDRESS_BY_MC      — Master of Ceremonies holds crowd attention at stage
-      STAGGERED_ENTRY    — Meter crowd into inner zones by section
+      MUSIC_STREAM       - PA music broadcast
+      INTERACTIVE_SCREEN - Trivia/poll on venue screens
+      ADDRESS_BY_MC      - Master of Ceremonies holds crowd attention at stage
+      STAGGERED_ENTRY    - Meter crowd into inner zones by section
 
     Args:
         zone: Target venue zone.
@@ -165,7 +167,7 @@ def calculate_arrival_surge_vector(
 ) -> dict:
     """
     Computes WHERE the crowd surge will be most intense at headline act arrival,
-    enabling pre-positioning of staff BEFORE the event — not reactive deployment.
+    enabling pre-positioning of staff BEFORE the event - not reactive deployment.
 
     Args:
         venue_id: Venue identifier.
@@ -235,6 +237,9 @@ async def run_vip_sync_monitoring(
     event_id: str, venue_id: str, crowd_size: int, density_score: float
 ) -> dict:
     """Runs continuous VIP delay monitoring and pre-arrival surge mitigation."""
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_vip_sync_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -242,7 +247,7 @@ async def run_vip_sync_monitoring(
         app_name="spectasync_vipsync", user_id="system"
     )
     prompt = (
-        f"VIP SYNC MONITORING — Event: {event_id} | Venue: {venue_id}\n"
+        f"VIP SYNC MONITORING - Event: {event_id} | Venue: {venue_id}\n"
         f"Attendance: {crowd_size:,} | Density: {density_score}\n"
         "Get convoy position, model kinetic energy, activate engagement if delayed, "
         "calculate arrival surge vector."
@@ -263,8 +268,11 @@ async def run_vip_sync_monitoring(
 
     try:
         clean = result_text.strip().lstrip("```json").rstrip("```").strip()
-        return json.loads(clean)
+        parsed = json.loads(clean)
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
+        return parsed
     except json.JSONDecodeError:
+        fallback = True
         convoy = get_convoy_gps_position(event_id)
         delay = convoy["delay_mins"]
         engagement = None
@@ -275,7 +283,7 @@ async def run_vip_sync_monitoring(
             venue_id, int(convoy.get("distance_to_venue_km", 30)),
             kinetic["surge_coefficient"]
         )
-        return {
+        result = {
             "event_id": event_id,
             "delay_mins": delay,
             "delay_category": convoy["delay_category"],
@@ -284,4 +292,15 @@ async def run_vip_sync_monitoring(
             "surge_coefficient": kinetic["surge_coefficient"],
             "arrival_surge_vector": surge_vec,
             "analogous_incident_ids": kinetic["analogous_incidents"],
-        }
+        }
+        output_size = len(json.dumps(result, ensure_ascii=False))
+        return result
+    finally:
+        observability_service.schedule_agent_run(
+            "vip_sync_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
+            output_size_bytes=output_size,
+        )

@@ -1,5 +1,5 @@
 """
-SpectaSyncAI FastAPI entry point — 12-Agent Mesh, 8 versioned routers.
+SpectaSyncAI FastAPI entry point - 12-Agent Mesh, 8 versioned routers.
 @07_modern_polyglot_standards | @19_cost_efficiency_architect
 
 Startup sequence:
@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 import traceback
+from time import perf_counter
 from contextlib import asynccontextmanager
 
 try:
@@ -27,15 +28,16 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from api.services.observability_service import observability_service
 from api.routers import (
     health, telemetry, interventions,
-    predictions, queues, safety, experience, crisis, pre_event
+    predictions, queues, safety, experience, crisis, pre_event, observability
 )
 
 # Force override to ensure .env values take precedence
 load_dotenv(override=True)
 
-# Structured logging — stdout for Cloud Logging
+# Structured logging - stdout for Cloud Logging
 logging.basicConfig(
     level=getattr(logging, os.getenv("LOG_LEVEL", "INFO")),
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
@@ -62,7 +64,7 @@ async def lifespan(app: FastAPI):
     Cache warm-up runs as a background task.
     """
     logger.info(
-        "SpectaSyncAI v3.1.0 — 12-Agent Mesh starting "
+        "SpectaSyncAI v3.1.0 - 12-Agent Mesh starting "
         "(Tier 1: 6 Operational | Tier 2: 6 Crisis Prevention & RAG)."
     )
 
@@ -75,7 +77,7 @@ async def lifespan(app: FastAPI):
         except Exception as exc:
             logger.warning(f"Context cache warm-up skipped: {exc}")
     else:
-        logger.info("Vertex AI not configured — context caching disabled.")
+        logger.info("Vertex AI not configured - context caching disabled.")
 
     # ── 2. Pre-Event Analysis Pre-Computation ─────────────────────────────
     async def precompute_pre_event():
@@ -102,7 +104,7 @@ async def lifespan(app: FastAPI):
                 cloud_logging_client.close()
             except Exception as exc:
                 logger.debug(f"Cloud Logging client close skipped: {exc}")
-        logger.info("SpectaSyncAI — graceful shutdown complete.")
+        logger.info("SpectaSyncAI - graceful shutdown complete.")
 
 
 app = FastAPI(
@@ -136,11 +138,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Tier 1 — Operational Agents ──────────────────────────────────────────────
+# ── Tier 1 - Operational Agents ──────────────────────────────────────────────
 @app.middleware("http")
 async def add_auth_popup_headers(request: Request, call_next):
+    start = perf_counter()
     response = await call_next(request)
     response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin-allow-popups")
+    route = request.scope.get("route")
+    route_path = getattr(route, "path", request.url.path)
+    duration_ms = (perf_counter() - start) * 1000
+    logger.info(
+        "[HTTP] %s %s -> %s in %.1fms",
+        request.method,
+        route_path,
+        response.status_code,
+        duration_ms,
+    )
+    observability_service.schedule_http_request(
+        request.method,
+        route_path,
+        response.status_code,
+        duration_ms,
+    )
     return response
 
 app.include_router(health.router, prefix="/v1", tags=["Health"])
@@ -163,12 +182,15 @@ app.include_router(
     experience.router, prefix="/v1", tags=["Attendee Experience"]
 )
 
-# ── Tier 2 — Crisis Prevention Agents + Incident RAG ─────────────────────────
+# ── Tier 2 - Crisis Prevention Agents + Incident RAG ─────────────────────────
 app.include_router(
     crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"]
 )
 app.include_router(
     pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"]
+)
+app.include_router(
+    observability.router, prefix="/v1", tags=["Observability & Diagnostics"]
 )
 
 

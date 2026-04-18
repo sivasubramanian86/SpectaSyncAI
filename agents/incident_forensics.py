@@ -1,5 +1,5 @@
 """
-SpectaSyncAI: Incident Forensics — Failure Mode Analysis
+SpectaSyncAI: Incident Forensics - Failure Mode Analysis
 Maps crowd crush failure modes to the 4 Tier-2 Crisis Prevention Agents.
 All incident data is referenced via the INC-YYYY-ISO2-NN corpus identifier only.
 See agents/incident_corpus.py for the full anonymized 12-incident global corpus.
@@ -10,7 +10,7 @@ Root Cause Taxonomy:
   C. INFO_CASCADE         Unverified announcement or rumor triggers simultaneous mass movement
   D. INFRA_FAILURE        Power/comms collapse disables all digital crowd coordination
 
-Extended Failure Modes (corpus INC-2010–2023):
+Extended Failure Modes (corpus INC-2010-2023):
   E. EGRESS_FAILURE       Exits locked, blocked, or capacity-mismatched at peak
   F. NARROW_CORRIDOR      Physical geometry creates fatal bidirectional pressure
   G. PANIC_TRIGGER        External stimulus causes non-directional counter-surge

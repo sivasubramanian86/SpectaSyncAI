@@ -1,4 +1,4 @@
-"""
+﻿"""
 SpectaSyncAI: Vision Agent
 Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
@@ -6,11 +6,14 @@ Responsibility: Multimodal CCTV frame analysis for real-time crowd density estim
 import os
 import json
 import logging
+import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from google.cloud import storage
+
+from api.services.observability_service import observability_service
 
 
 logger = logging.getLogger(__name__)
@@ -100,6 +103,9 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
     Returns:
         dict: The agent's final density analysis output.
     """
+    start = time.perf_counter()
+    fallback = False
+    output_size = 0
     agent = build_vision_agent()
     session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, session_service=session_service)
@@ -130,10 +136,24 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
     logger.info(f"[VisionAgent] Result for {location_id}: {result_text}")
 
     try:
-        return json.loads(result_text)
+        parsed = json.loads(result_text)
+        output_size = len(json.dumps(parsed, ensure_ascii=False))
+        return parsed
     except json.JSONDecodeError:
-        return {
+        fallback = True
+        result = {
             "location_id": location_id,
             "density_score": 0.5,
             "bottleneck_detected": False,
         }
+        output_size = len(json.dumps(result, ensure_ascii=False))
+        return result
+    finally:
+        observability_service.schedule_agent_run(
+            "vision_agent",
+            (time.perf_counter() - start) * 1000,
+            status="fallback" if fallback else "success",
+            fallback=fallback,
+            model_name=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
+            output_size_bytes=output_size,
+        )

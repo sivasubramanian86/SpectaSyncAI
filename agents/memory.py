@@ -3,7 +3,7 @@ SpectaSyncAI: AlloyDB Memory Module
 @11_database_architect + @19_cost_efficiency_architect compliant
 
 Provides:
-  - Connection pool (asyncpg Pool — NOT per-call connect)
+  - Connection pool (asyncpg Pool - NOT per-call connect)
   - pgvector ANN semantic search over incident_registry
   - Real Vertex AI text-embedding-004 for query vectorization
   - Intervention storage with HITL flag
@@ -97,7 +97,7 @@ class AlloyDBMemory:
             list[dict]: Ranked historical incident records with resolution strategies.
         """
         if _USE_MOCK:
-            logger.warning("[Memory] Prototype mode — returning mock historical context.")
+            logger.warning("[Memory] Prototype mode - returning mock historical context.")
             return _mock_context(location_id)
 
         try:
@@ -153,7 +153,7 @@ class AlloyDBMemory:
         Records HITL flag for Responsible AI audit trail.
         """
         if _USE_MOCK:
-            logger.info(f"[Memory] MOCK STORE — {agent_name}:{action} @ {location_id} (HITL={hitl_required})")
+            logger.info(f"[Memory] MOCK STORE - {agent_name}:{action} @ {location_id} (HITL={hitl_required})")
             return
 
         try:
@@ -199,7 +199,7 @@ class AlloyDBMemory:
         """
         if _USE_MOCK:
             logger.debug(
-                f"[Memory] MOCK LOG — {agent_name} | "
+                f"[Memory] MOCK LOG - {agent_name} | "
                 f"tokens={input_tokens}+{output_tokens} cached={cached_tokens}"
             )
             return
@@ -234,7 +234,7 @@ def _mock_context(location_id: str) -> list[dict]:
     return [
         {
             "incident_id": "INC-2025-IND-02",
-            "description": f"Crowd surge at {location_id} — external volume 6x venue capacity.",
+            "description": f"Crowd surge at {location_id} - external volume 6x venue capacity.",
             "interventions": [
                 "Activate street diversion on approach corridors.",
                 "Broadcast capacity freeze on all official channels.",

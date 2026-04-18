@@ -1,4 +1,4 @@
-"""Queues router — surfaces real-time wait times via Queue Agent."""
+"""Queues router - surfaces real-time wait times via Queue Agent."""
 import logging
 from fastapi import APIRouter
 from agents.queue_agent import run_queue_analysis

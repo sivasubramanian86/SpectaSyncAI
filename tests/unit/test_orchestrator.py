@@ -54,3 +54,50 @@ async def test_run_orchestration_cycle_with_tool_calls():
         assert len(res["action_taken"]) == 1
         assert res["action_taken"][0]["tool"] == "test_tool"
         assert "Decision" in res["agent_reasoning"]
+
+@pytest.mark.asyncio
+async def test_run_orchestration_cycle_high_risk_broadcast():
+    with patch("agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock) as mock_build, \
+         patch("agents.orchestrator.AlloyDBMemory.get_historical_context", new_callable=AsyncMock) as mock_history, \
+         patch("agents.orchestrator.InMemoryRunner") as MockRunner, \
+         patch("agents.orchestrator.InMemorySessionService") as MockSession, \
+         patch("agents.orchestrator.pubsub_service.broadcast_risk", new_callable=AsyncMock) as mock_broadcast:
+        
+        mock_history.return_value = []
+        mock_build.return_value = MagicMock()
+        
+        # High-risk density report
+        density_report = {"location_id": "L1", "density_score": 0.98, "risk_confidence": 0.85}
+        
+        class MockEvent:
+            def __init__(self, final_text):
+                self.tool_call = None
+                self.content = MagicMock()
+                self.content.parts = [MagicMock(text=final_text)]
+            def is_final_response(self): return True
+
+        async def fake_run(*args, **kwargs):
+            yield MockEvent("High risk alert triggered.")
+                
+        MockRunner.return_value.run_async = fake_run
+        MockSession.return_value.create_session = AsyncMock(return_value=MagicMock(id="test"))
+        
+        await run_orchestration_cycle(density_report)
+        # Broadcast should have been called (via create_task, but we mock the method)
+        # Actually asyncio.create_task makes it hard to await here unless we mock the service itself nicely
+        # But since we patched it as AsyncMock, we can check if it was called (eventually)
+        # In unit tests, we can just check if it was awaited if we don't use create_task,
+        # but since we DO use it, we check .called
+        assert mock_broadcast.called
+
+@pytest.mark.asyncio
+async def test_run_orchestration_cycle_failure_exception():
+    with patch("agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock) as mock_build, \
+         patch("agents.orchestrator.AlloyDBMemory.get_historical_context", new_callable=AsyncMock) as mock_history, \
+         patch("agents.orchestrator.InMemoryRunner") as MockRunner:
+        
+        mock_history.side_effect = Exception("AlloyDB Down")
+        
+        res = await run_orchestration_cycle({"location_id": "L1"})
+        assert "technical error" in res["agent_reasoning"]
+        assert res["error"] == "AlloyDB Down"

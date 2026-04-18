@@ -1,4 +1,4 @@
-"""Safety router — detection and risk assessment via Safety Agent."""
+"""Safety router - detection and risk assessment via Safety Agent."""
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
