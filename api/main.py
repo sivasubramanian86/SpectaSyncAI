@@ -138,6 +138,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ── Tier 1 - Operational Agents ──────────────────────────────────────────────
 @app.middleware("http")
 async def add_auth_popup_headers(request: Request, call_next):

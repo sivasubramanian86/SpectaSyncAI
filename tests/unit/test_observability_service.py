@@ -1,7 +1,6 @@
 import pytest
 import os
-import asyncio
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from api.services.observability_service import ObservabilityService
 
 def test_observability_status():

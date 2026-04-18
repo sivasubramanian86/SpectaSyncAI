@@ -2,7 +2,6 @@
 SpectaSyncAI: Unit Tests for Context Cache Module (google-genai SDK)
 """
 import pytest
-import os
 from unittest.mock import MagicMock, patch, AsyncMock
 from agents.context_cache import (
     build_system_prompt,

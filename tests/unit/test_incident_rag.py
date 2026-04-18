@@ -2,13 +2,11 @@
 SpectaSyncAI: Unit Tests for Incident RAG Agent
 """
 import pytest
-import json
 from agents.incident_rag_agent import (
     _vectorize_incident,
     _cosine_similarity,
     search_similar_incidents,
     aggregate_intervention_strategies,
-    build_incident_rag_agent,
     run_incident_rag_query
 )
 from agents.incident_corpus import IncidentRecord, INCIDENT_CORPUS

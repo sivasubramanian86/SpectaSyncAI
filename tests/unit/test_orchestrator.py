@@ -2,7 +2,6 @@
 SpectaSyncAI: Unit Tests for Core Orchestrator
 """
 import pytest
-import json
 from unittest.mock import AsyncMock, patch, MagicMock
 from agents.orchestrator import build_orchestrator_agent, run_orchestration_cycle
 

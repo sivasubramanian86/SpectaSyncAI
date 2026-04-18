@@ -1,7 +1,6 @@
 """
 SpectaSyncAI: Unit Tests for Safety Agent
 """
-import os
 import pytest
 import json
 from unittest.mock import AsyncMock, MagicMock, patch

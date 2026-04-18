@@ -111,10 +111,10 @@ def deploy_service(svc_key: str, mcp_url: str = "") -> str:
     env_vars = ",".join([
         f"GOOGLE_CLOUD_PROJECT={PROJECT_ID}",
         f"GOOGLE_CLOUD_LOCATION={REGION}",
-        f"GOOGLE_GENAI_USE_VERTEXAI=1",
+        "GOOGLE_GENAI_USE_VERTEXAI=1",
         f"MODEL_PRO={MODEL_PRO}",
         f"MODEL_FLASH={MODEL_FLASH}",
-        f"LOG_LEVEL=INFO",
+        "LOG_LEVEL=INFO",
         *[
             f"{key}={value}"
             for key, value in {
@@ -154,7 +154,7 @@ def deploy_service(svc_key: str, mcp_url: str = "") -> str:
     # API service gets MCP URL
     if svc_key == "api" and mcp_url:
         env_vars += f",MCP_SERVER_URL={mcp_url}/sse"
-        env_vars += f",CORS_ORIGINS=http://localhost:5173"
+        env_vars += ",CORS_ORIGINS=http://localhost:5173"
 
     deploy_cmd += f" --set-env-vars {env_vars}"
 

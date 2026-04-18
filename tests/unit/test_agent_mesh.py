@@ -4,20 +4,15 @@ Tests build and run functions for all Tier-1 and Tier-2 agents.
 Normalized for Google ADK Async/Await patterns.
 """
 import pytest
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 from agents import (
-    build_vision_agent, run_vision_analysis,
-    build_orchestrator_agent, run_orchestration_cycle,
-    build_prediction_agent, run_surge_prediction,
-    build_queue_agent, run_queue_analysis,
-    build_safety_agent, run_safety_assessment,
-    build_experience_agent, run_experience_recommendations,
+    build_vision_agent, build_orchestrator_agent, build_prediction_agent, build_queue_agent, run_queue_analysis,
+    build_safety_agent, build_experience_agent, run_experience_recommendations,
     build_perimeter_macro_agent, run_perimeter_assessment,
     build_vip_sync_agent, run_vip_sync_monitoring,
     build_rumor_control_agent, run_rumor_monitoring,
     build_failsafe_mesh_agent, run_failsafe_monitoring,
-    build_incident_rag_agent, run_incident_rag_query
+    build_incident_rag_agent
 )
 
 @pytest.mark.parametrize("build_fn, expected_name", [
