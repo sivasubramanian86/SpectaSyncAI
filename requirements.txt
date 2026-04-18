@@ -8,7 +8,7 @@ google-genai>=1.10.0                  # replaces deprecated google-generativeai
 google-cloud-aiplatform>=1.93.0
 google-cloud-logging>=3.11.0
 google-cloud-monitoring>=2.20.0
-google-cloud-storage>=2.16.0
+google-cloud-storage>=3.0.0
 google-cloud-pubsub>=2.26.0
 firebase-admin>=6.5.0
 

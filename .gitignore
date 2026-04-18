@@ -35,6 +35,9 @@ web/blob-report
 .env.*
 !.env.example
 *.env.local
+.firebase-config/
+firebase-debug.log
+tmpfile
 
 # Test results and Reports
 test-results/

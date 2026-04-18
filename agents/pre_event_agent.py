@@ -9,7 +9,6 @@ import logging
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
-from .context_cache import get_cached_model_pro
 
 
 logger = logging.getLogger(__name__)
@@ -17,10 +16,6 @@ logger = logging.getLogger(__name__)
 
 def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
     """Constructs the Strategic Pre-Event Analyst."""
-    config = {}
-    if cache_name:
-        config["cached_content"] = cache_name
-
     instruction = (
         "You are the SpectaSyncAI Pre-Event Strategic Analyst. "
         "Your task is to analyze reservation bookings, weather forecasts, "
@@ -39,10 +34,13 @@ def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
         "model": model,
         "name": "pre_event_analyst",
         "description": "Strategic forecasting agent for SpectaSyncAI.",
-        "generate_content_config": config,
     }
-    if not cache_name:
-        agent_kwargs["instruction"] = instruction
+    # NOTE: Vertex cached content for this agent has been unstable in the
+    # current ADK flow because the live request can still include prompt state
+    # that conflicts with cached system/tool configuration. Keep the live
+    # request explicit and cache-free for stability.
+    _ = cache_name
+    agent_kwargs["instruction"] = instruction
 
     return LlmAgent(**agent_kwargs)
 
@@ -50,8 +48,7 @@ def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
 async def run_pre_event_analysis(pre_event_data: dict) -> dict:
     """Runs a strategic analysis of the upcoming event with resilient fallback."""
     try:
-        cache_name = await get_cached_model_pro("pre_event_analyst")
-        agent = build_pre_event_agent(cache_name=cache_name)
+        agent = build_pre_event_agent()
         runner = InMemoryRunner(agent=agent, app_name="spectasync_pre_event")
 
         session = await runner.session_service.create_session(

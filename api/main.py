@@ -9,15 +9,21 @@ Startup sequence:
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 import sys
 import traceback
 from contextlib import asynccontextmanager
 
+try:
+    import google.cloud.logging
+except ImportError:
+    google.cloud.logging = None
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -36,17 +42,17 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
+DEBUG_MODE = os.getenv("DEBUG", "false").lower() in {"1", "true", "yes", "on"}
+cloud_logging_client = None
 
 # ── Google Cloud Logging Integration ──────────────────────────────────────────
-if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "1":
+if google.cloud.logging and os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("K_SERVICE"):
     try:
-        import google.cloud.logging
-        client = google.cloud.logging.Client()
-        client.setup_logging()
+        cloud_logging_client = google.cloud.logging.Client()
+        cloud_logging_client.setup_logging()
         logger.info("Google Cloud Logging handler attached.")
     except Exception as exc:
         logger.warning(f"Google Cloud Logging initialization skipped: {exc}")
-
 
 
 @asynccontextmanager
@@ -88,8 +94,15 @@ async def lifespan(app: FastAPI):
     # Initialize Strategic Pre-Event Analysis in Background
     # Uses Agent 12: Pre-Event Strategic Analyst
     asyncio.create_task(precompute_pre_event())
-    yield
-    logger.info("SpectaSyncAI — graceful shutdown complete.")
+    try:
+        yield
+    finally:
+        if cloud_logging_client is not None:
+            try:
+                cloud_logging_client.close()
+            except Exception as exc:
+                logger.debug(f"Cloud Logging client close skipped: {exc}")
+        logger.info("SpectaSyncAI — graceful shutdown complete.")
 
 
 app = FastAPI(
@@ -103,7 +116,7 @@ app = FastAPI(
     ),
     version="3.1.0",
     lifespan=lifespan,
-    debug=True,
+    debug=DEBUG_MODE,
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -124,6 +137,12 @@ app.add_middleware(
 )
 
 # ── Tier 1 — Operational Agents ──────────────────────────────────────────────
+@app.middleware("http")
+async def add_auth_popup_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin-allow-popups")
+    return response
+
 app.include_router(health.router, prefix="/v1", tags=["Health"])
 app.include_router(
     telemetry.router, prefix="/v1", tags=["Telemetry & Vision"]
@@ -153,6 +172,48 @@ app.include_router(
 )
 
 
+def _runtime_firebase_config() -> dict[str, str | None]:
+    """
+    Return the public Firebase client config for the frontend.
+
+    Accept both FIREBASE_* and VITE_FIREBASE_* env vars so local Vite runs
+    and Cloud Run deployments can share the same runtime source of truth.
+    """
+    return {
+        "apiKey": os.getenv("FIREBASE_API_KEY") or os.getenv("VITE_FIREBASE_API_KEY"),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN") or os.getenv("VITE_FIREBASE_AUTH_DOMAIN"),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID") or os.getenv("VITE_FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET") or os.getenv("VITE_FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID") or os.getenv("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+        "appId": os.getenv("FIREBASE_APP_ID") or os.getenv("VITE_FIREBASE_APP_ID"),
+        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID") or os.getenv("VITE_FIREBASE_MEASUREMENT_ID"),
+        "databaseURL": os.getenv("FIREBASE_DATABASE_URL") or os.getenv("VITE_FIREBASE_DATABASE_URL"),
+    }
+
+
+@app.get("/v1/runtime-config.js", include_in_schema=False)
+async def runtime_config_js():
+    firebase_config = _runtime_firebase_config()
+    payload = {
+        "firebase": firebase_config,
+        "firebaseConfigured": bool(
+            firebase_config["apiKey"]
+            and firebase_config["authDomain"]
+            and firebase_config["projectId"]
+            and firebase_config["appId"]
+        ),
+    }
+    body = "window.__SPECTASYNC_RUNTIME__ = " + json.dumps(payload) + ";"
+    return Response(
+        content=body,
+        media_type="application/javascript",
+        headers={
+            "Cache-Control": "no-store, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
+
+
 if os.path.exists("static"):
     app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
@@ -166,13 +227,15 @@ async def favicon():
 async def global_exception_handler(request: Request, exc: Exception):
     tb = traceback.format_exc()
     logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
+    payload = {
+        "detail": "Internal Server Error",
+        "error": str(exc),
+    }
+    if DEBUG_MODE:
+        payload["traceback"] = tb
     return JSONResponse(
         status_code=500,
-        content={
-            "detail": "Internal Server Error",
-            "error": str(exc),
-            "traceback": tb
-        },
+        content=payload,
     )
 
 

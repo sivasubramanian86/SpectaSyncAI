@@ -40,17 +40,17 @@ def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
 def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
     """
     Archives a critical CCTV frame to Google Cloud Storage for forensic audit.
-    
+
     Args:
         location_id: Zone identifier.
         image_bytes: CCTV frame.
-        
+
     Returns:
         str: Public bucket URI (or mock URI if local).
     """
     bucket_name = os.getenv("GCS_ARCHIVE_BUCKET", "spectasync-incident-archive")
     filename = f"incident_{location_id}_{int(os.getpid())}.jpg"
-    
+
     # Try live upload if configured
     if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GCS_ENABLED") == "1":
         try:
@@ -61,9 +61,8 @@ def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
             return f"gs://{bucket_name}/{filename}"
         except Exception as exc:
             logger.warning(f"GCS Archival failed: {exc}")
-            
-    return f"gs://{bucket_name}/mock_{filename} (Local Sandbox)"
 
+    return f"gs://{bucket_name}/mock_{filename} (Local Sandbox)"
 
 
 def build_vision_agent() -> LlmAgent:
@@ -88,7 +87,6 @@ def build_vision_agent() -> LlmAgent:
         ),
         tools=[analyze_cctv_frame, archive_to_gcs],
     )
-
 
 
 async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
@@ -138,4 +136,4 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
             "location_id": location_id,
             "density_score": 0.5,
             "bottleneck_detected": False,
-        }
+        }

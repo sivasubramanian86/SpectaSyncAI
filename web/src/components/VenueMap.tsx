@@ -14,10 +14,10 @@ export function VenueMap({ className = '' }: VenueMapProps): React.ReactElement 
           <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Satellite Venue Watch (Google Maps API)</h3>
         </div>
         <div className="flex gap-2">
-           <button className="p-1.5 hover:bg-white/5 rounded transition-colors text-slate-500 hover:text-white">
+           <button type="button" aria-label="Toggle venue layers" className="p-1.5 hover:bg-white/5 rounded transition-colors text-slate-500 hover:text-white">
              <Layers size={14} />
            </button>
-           <button className="p-1.5 hover:bg-white/5 rounded transition-colors text-slate-500 hover:text-white">
+           <button type="button" aria-label="Maximize venue map" className="p-1.5 hover:bg-white/5 rounded transition-colors text-slate-500 hover:text-white">
              <Maximize2 size={14} />
            </button>
         </div>
@@ -49,9 +49,9 @@ export function VenueMap({ className = '' }: VenueMapProps): React.ReactElement 
         {/* Map UI Controls */}
         <div className="absolute bottom-4 right-4 flex flex-col gap-2">
            <div className="flex flex-col bg-navy-950/80 border border-white/10 rounded overflow-hidden">
-              <button className="p-2 hover:bg-white/5 text-slate-400 font-bold">+</button>
+              <button type="button" aria-label="Zoom in" className="p-2 hover:bg-white/5 text-slate-400 font-bold">+</button>
               <div className="h-[1px] bg-white/5" />
-              <button className="p-2 hover:bg-white/5 text-slate-400 font-bold">-</button>
+              <button type="button" aria-label="Zoom out" className="p-2 hover:bg-white/5 text-slate-400 font-bold">-</button>
            </div>
         </div>
       </div>

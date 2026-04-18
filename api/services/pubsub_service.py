@@ -14,6 +14,7 @@ from google.api_core import exceptions
 
 logger = logging.getLogger("spectasync.pubsub")
 
+
 class PubSubService:
     def __init__(self):
         self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "spectasyncai")
@@ -41,9 +42,9 @@ class PubSubService:
         try:
             message_json = json.dumps(risk_data)
             message_bytes = message_json.encode("utf-8")
-            
+
             future = self.publisher.publish(
-                self.topic_path, 
+                self.topic_path,
                 data=message_bytes,
                 origin="SpectaSyncAI-Mesh",
                 urgency="CRITICAL"
@@ -57,6 +58,7 @@ class PubSubService:
         except Exception as e:
             logger.error(f"Error publishing to Pub/Sub: {e}")
             return False
+
 
 # Global singleton
 pubsub_service = PubSubService()

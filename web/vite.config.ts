@@ -6,8 +6,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
     proxy: {
-      '/v1': { target: 'http://localhost:5174', changeOrigin: true },
+      '/v1': { target: 'http://localhost:8000', changeOrigin: true },
+    },
+  },
+  preview: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     },
   },
   test: {

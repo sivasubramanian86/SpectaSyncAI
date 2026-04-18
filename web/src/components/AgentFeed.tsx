@@ -57,9 +57,9 @@ export function AgentFeed({ events }: AgentFeedProps) {
             label: 'System' 
           };
           
-          const timeStr = event.timestamp instanceof Date 
-            ? event.timestamp.toLocaleTimeString() 
-            : new Date(event.timestamp as any).toLocaleTimeString();
+          const timeStr = event.timestamp instanceof Date
+            ? event.timestamp.toLocaleTimeString()
+            : new Date(String(event.timestamp)).toLocaleTimeString();
 
           return (
             <article key={event.id} className="flex items-start gap-2 p-2 rounded bg-white/5 border border-white/5 animate-fade-in">
@@ -82,4 +82,3 @@ export function AgentFeed({ events }: AgentFeedProps) {
     </section>
   );
 }
-

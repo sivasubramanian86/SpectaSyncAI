@@ -178,6 +178,19 @@ pip install -r requirements.txt
 python scripts/start_local.py
 ```
 
+### Firebase Google Sign-In
+
+The GUI now reads Firebase config at runtime, so Google login can work in both local dev and Cloud Run.
+
+1. Add your Firebase web app values to `.env` using the `FIREBASE_*` keys in `.env.example`.
+2. Optionally mirror the same values into `web/.env.local` with `VITE_FIREBASE_*` keys for Vite-only frontend runs.
+3. In the Firebase console, enable the Google sign-in provider.
+4. Add these authorized domains in Firebase Authentication:
+   - `localhost`
+   - your Cloud Run domain, for example `your-service-xyz-uc.a.run.app`
+
+If those values are present, the header button will switch from disabled mode to a live Google sign-in button.
+
 | Service | URL |
 |:--------|:----|
 | **Command Center** | http://localhost:5173 |

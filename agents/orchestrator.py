@@ -5,13 +5,17 @@ Responsibility: Spatial reasoning over venue telemetry, querying historical
 AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventions.
 """
 import json
+import asyncio
 from api.services.pubsub_service import pubsub_service
 import logging
 import os
 
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
+try:
+    from google.adk.tools.mcp_tool.mcp_toolset import McpToolset as MCPToolset, SseConnectionParams
+except ImportError:  # pragma: no cover - backward compatibility for older ADK builds
+    from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
 from google.genai import types as genai_types
 
 from google.adk.sessions import InMemorySessionService
@@ -125,7 +129,6 @@ async def run_orchestration_cycle(density_report: dict) -> dict:
     # 5. High-Fidelity Signal Broadcast (Pub/Sub)
     # Triggered automatically for risks > 70% threshold
     if density_report.get("risk_confidence", 0) > 0.7:
-        import asyncio
         asyncio.create_task(pubsub_service.broadcast_risk({
             "incident_id": "LIVE-SIGNAL-STREAM",
             "risk_score": density_report.get("risk_confidence"),

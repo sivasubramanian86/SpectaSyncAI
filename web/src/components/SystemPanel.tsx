@@ -26,8 +26,7 @@ const InfoSection = ({ title, children, icon }: InfoSectionProps) => (
 export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactElement {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in pb-10">
-      {/* Settings Panel — Shown ONLY in 'system' view */}
-      {/* Settings Panel — Shown ONLY in 'system' view */}
+      {/* Settings Panel — shown only in system view */}
       {view === 'system' && (
         <InfoSection title="System Settings" icon={<Settings size={24} />}>
           <div className="space-y-6">
@@ -40,10 +39,10 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 Access anonymized incident datasets for GNN (Graph Neural Network) training and Crowd Ethics research. 
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <button className="flex items-center justify-center gap-2 p-2 bg-white/5 hover:bg-white/10 rounded text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
+                <button type="button" className="flex items-center justify-center gap-2 p-2 bg-white/5 hover:bg-white/10 rounded text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
                   <Download size={12} /> Dataset V3.1
                 </button>
-                <button className="flex items-center justify-center gap-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded text-[10px] font-black uppercase text-blue-300 transition-all border border-blue-500/20">
+                <button type="button" className="flex items-center justify-center gap-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded text-[10px] font-black uppercase text-blue-300 transition-all border border-blue-500/20">
                    Join Sandbox
                 </button>
               </div>
@@ -56,9 +55,9 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                   <p className="text-sm font-medium text-white">Advanced RAG Augmentation</p>
                   <p className="text-[10px] text-slate-500">Enable Gemini reasoning over semantic incident history.</p>
                 </div>
-                <div className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                <button type="button" aria-pressed="true" aria-label="Advanced RAG Augmentation enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                   <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </div>
+                </button>
               </div>
 
               <div className="space-y-1">
@@ -75,15 +74,15 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Predictive Horizon</label>
-                  <select className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                  <select defaultValue="30 Minutes (Deep)" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
                     <option>15 Minutes (Turbo)</option>
-                    <option selected>30 Minutes (Deep)</option>
+                    <option>30 Minutes (Deep)</option>
                     <option>60 Minutes (Strategic)</option>
                   </select>
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Mesh Sensitivity</label>
-                  <select className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
+                  <select defaultValue="Standard (Safety First)" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
                     <option>Standard (Safety First)</option>
                     <option>High (Zero Latency)</option>
                     <option>Dynamic (Agentic)</option>
@@ -96,9 +95,9 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                   <p className="text-sm font-medium text-white">Agentic Auto-Intervention</p>
                   <p className="text-[10px] text-slate-500">Allow agents to trigger PA/Signage without human-in-the-loop.</p>
                 </div>
-                <div className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
+                <button type="button" aria-pressed="false" aria-label="Agentic Auto-Intervention disabled" className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
                   <div className="w-3 h-3 bg-slate-400 rounded-full shadow-sm" />
-                </div>
+                </button>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
@@ -106,9 +105,9 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                   <p className="text-sm font-medium text-white">Synthetic Crowd Twin</p>
                   <p className="text-[10px] text-slate-500">Run parallel Monte Carlo simulations to verify agent hypothesis.</p>
                 </div>
-                <div className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                <button type="button" aria-pressed="true" aria-label="Synthetic Crowd Twin enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                    <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </div>
+                </button>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
@@ -116,9 +115,9 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                   <p className="text-sm font-medium text-white">Mesh Self-Healing</p>
                   <p className="text-[10px] text-slate-500">Auto-respawn failed agent containers in GKE.</p>
                 </div>
-                <div className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                <button type="button" aria-pressed="true" aria-label="Mesh Self-Healing enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                    <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -184,7 +183,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
       {view === 'system' && (
         <InfoSection title="Contact & Resources" icon={<ShieldCheck size={24} />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="#" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
+            <a href="https://github.com/sivasubramanian86/SpectaSyncAI" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
               <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-slate-700 group-hover:scale-110 transition-all">
                 <Github className="text-slate-400 group-hover:text-white" size={20} />
               </div>
@@ -193,7 +192,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Public Repository</p>
               </div>
             </a>
-            <a href="#" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
+            <a href="mailto:support@spectasync.ai" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
               <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
                  <Mail className="text-blue-400 group-hover:text-blue-300" size={20} />
               </div>
@@ -345,28 +344,121 @@ function PreEventStrategicAudit() {
   const [data, setData] = React.useState<any>(null);
   const [analysis, setAnalysis] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+  const autoRunAttemptedRef = React.useRef(false);
+
+  const formatAuditValue = (value: unknown): string => {
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => formatAuditValue(item)).join('\n');
+    }
+
+    if (typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      const parts: string[] = [];
+
+      if (typeof record.description === 'string') {
+        parts.push(record.description);
+      }
+
+      if (record.peak_inside_venue !== undefined) {
+        parts.push(`Inside venue: ${formatAuditValue(record.peak_inside_venue)}`);
+      }
+
+      if (record.estimated_peak_outside_perimeter !== undefined) {
+        parts.push(`Outside perimeter: ${formatAuditValue(record.estimated_peak_outside_perimeter)}`);
+      }
+
+      const extraKeys = Object.keys(record).filter(
+        (key) => key !== 'description' && key !== 'peak_inside_venue' && key !== 'estimated_peak_outside_perimeter',
+      );
+
+      if (parts.length === 0 && extraKeys.length > 0) {
+        return extraKeys.map((key) => `${key}: ${formatAuditValue(record[key])}`).join('\n');
+      }
+
+      if (parts.length > 0) {
+        return parts.join('\n');
+      }
+    }
+
+    return JSON.stringify(value);
+  };
 
   React.useEffect(() => {
-    // 1. Fetch scenario data
-    fetch('/v1/pre-event/mock-data')
-      .then(res => res.ok ? res.json() : Promise.reject(`HTTP ${res.status}`))
-      .then(setData)
-      .catch(err => console.error("Scenario fetch failed:", err));
+    let isActive = true;
 
-    // 2. Fetch latest analysis (pre-loaded on server)
-    fetch('/v1/pre-event/analysis')
-      .then(res => res.ok ? res.json() : Promise.reject(`HTTP ${res.status}`))
-      .then(res => {
-        // Only set if it's not the 'pending' state
-        if (res.status !== 'pending_or_failed') {
-          setAnalysis(res);
+    const loadAudit = async () => {
+      try {
+        const [scenarioResponse, analysisResponse] = await Promise.all([
+          fetch('/v1/pre-event/mock-data'),
+          fetch('/v1/pre-event/analysis'),
+        ]);
+
+        if (!scenarioResponse.ok) {
+          throw new Error(`HTTP ${scenarioResponse.status}`);
         }
-      })
-      .catch(err => console.error("Initial analysis fetch failed:", err));
+
+        const scenario = await scenarioResponse.json();
+        if (isActive) {
+          setData(scenario);
+        }
+
+        if (analysisResponse.ok) {
+          const latestAnalysis = await analysisResponse.json();
+          if (isActive && latestAnalysis.status !== 'pending_or_failed') {
+            setAnalysis(latestAnalysis);
+            return;
+          }
+        } else {
+          console.error(`Initial analysis fetch failed: HTTP ${analysisResponse.status}`);
+        }
+
+        if (isActive && !autoRunAttemptedRef.current) {
+          autoRunAttemptedRef.current = true;
+          setLoading(true);
+          try {
+            const res = await fetch('/v1/pre-event/analysis', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(scenario),
+            });
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}`);
+            }
+            const result = await res.json();
+            if (isActive) {
+              setAnalysis(result);
+            }
+          } catch (err) {
+            console.error('Auto analysis failed:', err);
+          } finally {
+            if (isActive) {
+              setLoading(false);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Scenario fetch failed:', err);
+      }
+    };
+
+    void loadAudit();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   const runAnalysis = async () => {
     if (!data) return;
+    autoRunAttemptedRef.current = true;
     setLoading(true);
     setAnalysis(null);
     try {
@@ -431,7 +523,7 @@ function PreEventStrategicAudit() {
                className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
              >
                {loading ? <Loader2 className="animate-spin" size={16} /> : <Compass size={16} />}
-               {loading ? 'Agent Reasoning...' : 'Run Strategic Analysis'}
+               {loading ? 'Agent Reasoning...' : 'Refresh Strategic Analysis'}
              </button>
           </div>
         </InfoSection>
@@ -462,11 +554,15 @@ function PreEventStrategicAudit() {
                        <div className="space-y-3">
                           <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                              <p className="text-xs font-bold text-blue-400 mb-1">Peak Crowd Estimate</p>
-                             <p className="text-lg text-white font-black">{analysis.expected_crowd_peak}</p>
+                             <div className="text-lg text-white font-black whitespace-pre-line">
+                               {formatAuditValue(analysis.expected_crowd_peak)}
+                             </div>
                           </div>
                           <div className="p-4 bg-white/5 rounded-xl border border-white/5">
                              <p className="text-xs font-bold text-sky-400 mb-1">Environmental Impact</p>
-                             <p className="text-sm text-slate-300 leading-relaxed">{analysis.weather_impact}</p>
+                             <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">
+                               {formatAuditValue(analysis.weather_impact)}
+                             </p>
                           </div>
                        </div>
                     </div>
@@ -474,7 +570,7 @@ function PreEventStrategicAudit() {
                     <div className="space-y-4">
                        <h3 className="text-[10px] font-black uppercase text-slate-500 border-b border-white/5 pb-2">Pros & Cons of Attendance</h3>
                        <p className="text-xs text-slate-400 leading-relaxed bg-white/5 p-4 rounded-xl border border-white/5 whitespace-pre-wrap">
-                          {analysis.pro_con_summary}
+                          {formatAuditValue(analysis.pro_con_summary)}
                        </p>
                     </div>
                  </div>
@@ -487,7 +583,7 @@ function PreEventStrategicAudit() {
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                        {(Array.isArray(analysis.precautionary_measures) ? analysis.precautionary_measures : [analysis.precautionary_measures]).map((m: any, i: number) => (
                           <li key={i} className="text-xs text-slate-300 flex gap-2">
-                             <span className="text-red-500 font-bold">•</span> {m}
+                             <span className="text-red-500 font-bold">•</span> {formatAuditValue(m)}
                           </li>
                        ))}
                     </ul>
@@ -495,8 +591,8 @@ function PreEventStrategicAudit() {
 
                  <div className="mt-6 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
                     <h3 className="text-sm font-black text-emerald-400 uppercase mb-2">Final Strategic Recommendation</h3>
-                    <p className="text-sm text-white font-medium leading-relaxed italic">
-                       "{analysis.strategic_recommendation}"
+                    <p className="text-sm text-white font-medium leading-relaxed italic whitespace-pre-line">
+                       "{formatAuditValue(analysis.strategic_recommendation)}"
                     </p>
                  </div>
               </section>
