@@ -1,4 +1,4 @@
-﻿"""
+"""
 SpectaSyncAI: Vision Agent
 Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
@@ -108,7 +108,7 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
     output_size = 0
     agent = build_vision_agent()
     session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_vision")
 
     session = await session_service.create_session(
         app_name="spectasync_vision", user_id="system"
