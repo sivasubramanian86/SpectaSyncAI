@@ -15,7 +15,7 @@ Ground-truthed against an anonymized corpus of **18 global crowd incidents (2003
 [![Status: Production Ready](https://img.shields.io/badge/Status-100%25%20Ready-gold.svg)](AUDIT.md)
 
 
-![SpectaSyncAI Architecture](Architecture_Diagram.png)
+![SpectaSyncAI Architecture](https://storage.googleapis.com/spectasync-public-assets/Architecture_Diagram.png)
 
 ---
 
