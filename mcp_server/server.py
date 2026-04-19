@@ -250,6 +250,6 @@ if __name__ == "__main__":
 
     # Configure FastMCP instance settings for SSE Uvicorn transport
     mcp.settings.port = port
-    mcp.settings.host = "127.0.0.1"
+    mcp.settings.host = "0.0.0.0"
 
     mcp.run(transport="sse")

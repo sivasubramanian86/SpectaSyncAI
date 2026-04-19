@@ -244,19 +244,16 @@ async def runtime_config_js():
     )
 
 
-if os.path.exists("static"):
-    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
-
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    """Serves a blank favicon to suppress 404 logs in the browser."""
+    """Serves a blank favicon if not present in static."""
     return HTMLResponse(content="")
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """Global catch-all for unhandled exceptions, with structured observability logging."""
+    """Global catch-all for unhandled exceptions."""
     tb = traceback.format_exc()
     logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
     payload = {"detail": "Internal Server Error", "error": str(exc)}
@@ -265,11 +262,16 @@ async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(status_code=500, content=payload)
 
 
-@app.get("/", include_in_schema=False)
-async def serve_dashboard():
-    """Serves the static index.html from the Vite build directory."""
-    index_path = os.path.join("static", "index.html")
-    if os.path.exists(index_path):
-        with open(index_path, encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>")
+# ── Static Files (Last Resort) ──────────────────────────────────────────────
+if os.path.exists("static"):
+    # Priority 1: Hashed chunks in /assets
+    if os.path.isdir("static/assets"):
+        app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+    
+    # Priority 2: Root public files and the SPA index
+    # html=True enables serving index.html for the root path
+    app.mount("/", StaticFiles(directory="static", html=True), name="static-root")
+else:
+    @app.get("/", include_in_schema=False)
+    async def fallback_root():
+        return HTMLResponse(content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>")

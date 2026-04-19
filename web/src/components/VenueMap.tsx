@@ -33,7 +33,7 @@ export function VenueMap({ className = '' }: VenueMapProps): React.ReactElement 
       <div className="relative flex-grow min-h-[400px] bg-slate-900 overflow-hidden">
         {/* The generated satellite map */}
         <img 
-          src="/assets/venue_map.png" 
+          src="https://storage.googleapis.com/spectasync-public-assets/venue_map.png" 
           alt="Satellite Venue Map"
           className="w-full h-full object-cover opacity-80"
         />
