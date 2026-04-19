@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { MultiModalHub } from '../components/MultiModalHub';
 import { CrisisDashboard } from '../components/CrisisDashboard';
 import { PredictionPanel, densityFormatter } from '../components/PredictionPanel';
+import { AgentFeed } from '../components/AgentFeed';
 
 // Mocking ResponsiveContainer to render children
 vi.mock('recharts', async () => {
@@ -71,5 +72,20 @@ describe('Coverage Hardening Tests', () => {
     expect(label).toBe('Density');
 
     expect(screen.getByText(/AI Surge Forecast — GATE_NORTH/i)).toBeInTheDocument();
+  });
+
+  it('covers AgentFeed fallbacks', () => {
+    const unknownEvents = [
+      {
+        id: '1',
+        agent: 'unknown_agent',
+        event_type: 'unknown_type',
+        timestamp: new Date(),
+        message: 'Something happened'
+      }
+    ];
+    render(<AgentFeed events={unknownEvents as any} />);
+    expect(screen.getByText('System')).toBeInTheDocument(); // Fallback label
+    expect(screen.getByText('Something happened')).toBeInTheDocument();
   });
 });

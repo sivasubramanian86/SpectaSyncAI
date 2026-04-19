@@ -394,6 +394,7 @@ function PreEventStrategicAudit() {
   const [data, setData] = React.useState<any>(null);
   const [analysis, setAnalysis] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const autoRunAttemptedRef = React.useRef(false);
 
   const formatAuditValue = (value: unknown): string => {
@@ -441,70 +442,71 @@ function PreEventStrategicAudit() {
     return JSON.stringify(value);
   };
 
+  const loadAudit = React.useCallback(async (isActive = true) => {
+    try {
+      const [scenarioResponse, analysisResponse] = await Promise.all([
+        fetch('/v1/pre-event/mock-data'),
+        fetch('/v1/pre-event/analysis'),
+      ]);
+
+      if (!scenarioResponse.ok) {
+        throw new Error(`HTTP ${scenarioResponse.status}`);
+      }
+
+      const scenario = await scenarioResponse.json();
+      if (isActive) {
+        setData(scenario);
+      }
+
+      if (analysisResponse.ok) {
+        const latestAnalysis = await analysisResponse.json();
+        if (isActive && latestAnalysis.status !== 'pending_or_failed') {
+          setAnalysis(latestAnalysis);
+          return;
+        }
+      } else {
+        console.error(`Initial analysis fetch failed: HTTP ${analysisResponse.status}`);
+      }
+
+      if (isActive && !autoRunAttemptedRef.current) {
+        autoRunAttemptedRef.current = true;
+        setLoading(true);
+        try {
+          const res = await fetch('/v1/pre-event/analysis', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scenario),
+          });
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+          const result = await res.json();
+          if (isActive) {
+            setAnalysis(result);
+          }
+        } catch (err) {
+          console.error('Auto analysis failed:', err);
+        } finally {
+          if (isActive) {
+            setLoading(false);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Scenario fetch failed:', err);
+      if (isActive) {
+        setError('Agent communication timeout - retrying via mesh failsafe.');
+      }
+    }
+  }, []);
+
   React.useEffect(() => {
     let isActive = true;
-
-    const loadAudit = async () => {
-      try {
-        const [scenarioResponse, analysisResponse] = await Promise.all([
-          fetch('/v1/pre-event/mock-data'),
-          fetch('/v1/pre-event/analysis'),
-        ]);
-
-        if (!scenarioResponse.ok) {
-          throw new Error(`HTTP ${scenarioResponse.status}`);
-        }
-
-        const scenario = await scenarioResponse.json();
-        if (isActive) {
-          setData(scenario);
-        }
-
-        if (analysisResponse.ok) {
-          const latestAnalysis = await analysisResponse.json();
-          if (isActive && latestAnalysis.status !== 'pending_or_failed') {
-            setAnalysis(latestAnalysis);
-            return;
-          }
-        } else {
-          console.error(`Initial analysis fetch failed: HTTP ${analysisResponse.status}`);
-        }
-
-        if (isActive && !autoRunAttemptedRef.current) {
-          autoRunAttemptedRef.current = true;
-          setLoading(true);
-          try {
-            const res = await fetch('/v1/pre-event/analysis', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(scenario),
-            });
-            if (!res.ok) {
-              throw new Error(`HTTP ${res.status}`);
-            }
-            const result = await res.json();
-            if (isActive) {
-              setAnalysis(result);
-            }
-          } catch (err) {
-            console.error('Auto analysis failed:', err);
-          } finally {
-            if (isActive) {
-              setLoading(false);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Scenario fetch failed:', err);
-      }
-    };
-
-    void loadAudit();
-
+    void loadAudit(isActive);
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [loadAudit]);
 
   const runAnalysis = async () => {
     if (!data) return;
@@ -527,7 +529,25 @@ function PreEventStrategicAudit() {
     }
   };
 
-  if (!data) return <div className="p-10 text-center animate-pulse text-slate-500 font-mono uppercase tracking-widest">Loading Strategic Intel...</div>;
+  if (error) {
+    return (
+      <div className="lg:col-span-3 flex flex-col items-center justify-center min-h-[400px] gap-4 p-8 glass border-red-500/20 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-2">
+          <Compass size={32} className="animate-pulse" />
+        </div>
+        <h3 className="text-xl font-bold text-red-400 uppercase tracking-tight">Agent Link Severed</h3>
+        <p className="text-sm text-slate-400 max-w-md leading-relaxed">{error}</p>
+        <button 
+          onClick={() => { setError(null); void loadAudit(); }}
+          className="mt-4 px-6 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-xs font-bold uppercase tracking-widest text-red-300 transition-all"
+        >
+          Re-establish Mesh Connection
+        </button>
+      </div>
+    );
+  }
+
+  if (!data) return <div className="lg:col-span-3 p-10 text-center animate-pulse text-slate-500 font-mono uppercase tracking-widest">Loading Strategic Intel...</div>;
 
   return (
     <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
