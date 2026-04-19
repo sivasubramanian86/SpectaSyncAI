@@ -1,7 +1,6 @@
-"""
-SpectaSyncAI: Failsafe Mesh Agent - @03 @05
+"""SpectaSyncAI: Failsafe Mesh Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
-Failure Mode Addressed: INFRA_FAILURE
+Failure Mode Addressed: INFRA_FAILURE.
 
 Incident Reference: INC-2025-IND-01
 A 2025 political rally in South India experienced a fatal power cut at the
@@ -27,6 +26,7 @@ Graceful Degradation Tiers:
   T3 (Degraded):   BLE mesh + offline cached routing
   T4 (Blackout):   Physical signage + staff formation only
 """
+
 import os
 import json
 import logging
@@ -43,46 +43,55 @@ logger = logging.getLogger(__name__)
 
 
 def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
-    """
-    Polls in-venue infrastructure health via IoT sensors:
+    """Polls in-venue infrastructure health via IoT sensors:
       - Mains power draw per zone
       - PA system carrier-sense status
       - LED/screen network ping
       - Emergency lighting battery level
-      - BLE beacon heartbeat per zone
+      - BLE beacon heartbeat per zone.
 
     Historical precedent (INC-2025-IND-01): Venue power load was at 140% capacity
     45 minutes before the fatal power cut - a predictive signal that went unread.
     This monitor acts on that signal at T-45, not at the moment of failure.
 
     Args:
+    ----
         venue_id: Target venue identifier.
         zones: Zone identifiers to monitor.
 
     Returns:
+    -------
         dict: Per-component health status with failure probability.
+
     """
     import random
 
     infra_components = []
     for zone in zones:
         power_load = random.uniform(0.4, 1.6)
-        infra_components.append({
-            "zone": zone,
-            "mains_power_load_ratio": round(power_load, 2),
-            "pa_system_status": "FAILED" if random.random() < 0.3 else "ONLINE",
-            "led_network_ping_ms": random.randint(10, 9000),
-            "emergency_lighting_battery_pct": random.randint(12, 100),
-            "ble_beacon_heartbeat": random.random() > 0.15,
-            "failure_probability_pct": round(min(100, (power_load - 0.8) * 80), 1) if power_load > 0.8 else 5.0,
-        })
+        infra_components.append(
+            {
+                "zone": zone,
+                "mains_power_load_ratio": round(power_load, 2),
+                "pa_system_status": "FAILED" if random.random() < 0.3 else "ONLINE",
+                "led_network_ping_ms": random.randint(10, 9000),
+                "emergency_lighting_battery_pct": random.randint(12, 100),
+                "ble_beacon_heartbeat": random.random() > 0.15,
+                "failure_probability_pct": (
+                    round(min(100, (power_load - 0.8) * 80), 1)
+                    if power_load > 0.8
+                    else 5.0
+                ),
+            }
+        )
 
     any_failure = any(
         c["pa_system_status"] == "FAILED" or c["mains_power_load_ratio"] > 1.2
         for c in infra_components
     )
     analogous = [
-        r.incident_id for r in INCIDENT_CORPUS
+        r.incident_id
+        for r in INCIDENT_CORPUS
         if "INFRA_FAILURE" in r.failure_modes or r.infra_failure_involved
     ]
 
@@ -100,8 +109,7 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
 def activate_ble_mesh_broadcast(
     venue_id: str, zones: list[str], message_type: str
 ) -> dict:
-    """
-    Activates BLE 5.0 mesh network broadcast for crowd guidance.
+    """Activates BLE 5.0 mesh network broadcast for crowd guidance.
     Operates WITHOUT mains power or network connectivity.
     Each mesh node has 72-hour battery backup.
 
@@ -116,12 +124,15 @@ def activate_ble_mesh_broadcast(
       EMERGENCY_SERVICES  - Clear corridor for emergency responders
 
     Args:
+    ----
         venue_id: Target venue.
         zones: Zones to broadcast to.
         message_type: Type of crowd guidance message.
 
     Returns:
+    -------
         dict: BLE mesh broadcast confirmation.
+
     """
     logger.critical(
         f"[FailsafeMeshAgent] BLE MESH ACTIVATED - venue={venue_id} "
@@ -144,30 +155,34 @@ def activate_ble_mesh_broadcast(
 def dispatch_offline_staff_routing(
     venue_id: str, zone_density_map: dict[str, float]
 ) -> dict:
-    """
-    Distributes pre-cached offline routing instructions to staff tablets.
+    """Distributes pre-cached offline routing instructions to staff tablets.
     Tablet apps cache crowd routing algorithms locally - no internet required.
     Uses last-known density state to generate routing recommendations.
 
     Args:
+    ----
         venue_id: Target venue.
         zone_density_map: Current density per zone (0.0-1.0).
 
     Returns:
+    -------
         dict: Staff positioning instructions for offline operation.
+
     """
     high_density = {z: d for z, d in zone_density_map.items() if d > 0.7}
     staff_assignments = []
     for zone, density in high_density.items():
         staff_needed = int(density * 20)
-        staff_assignments.append({
-            "zone": zone,
-            "density": density,
-            "staff_to_deploy": staff_needed,
-            "routing_instruction": "STAGGER_EGRESS_CLOCKWISE",
-            "offline_mode": True,
-            "tablet_cache_age_mins": 3,
-        })
+        staff_assignments.append(
+            {
+                "zone": zone,
+                "density": density,
+                "staff_to_deploy": staff_needed,
+                "routing_instruction": "STAGGER_EGRESS_CLOCKWISE",
+                "offline_mode": True,
+                "tablet_cache_age_mins": 3,
+            }
+        )
 
     return {
         "venue_id": venue_id,
@@ -180,16 +195,18 @@ def dispatch_offline_staff_routing(
 
 
 def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dict:
-    """
-    Dispatches the emergency generator request and activates physical signage.
+    """Dispatches the emergency generator request and activates physical signage.
     Glow-in-dark exit signage requires zero power.
 
     Args:
+    ----
         venue_id: Target venue.
         affected_zones: Power-failure zones.
 
     Returns:
+    -------
         dict: Generator dispatch status and physical signage activation.
+
     """
     logger.critical(
         f"[FailsafeMeshAgent] GENERATOR REQUESTED - venue={venue_id} zones={affected_zones}"
@@ -218,7 +235,8 @@ FAILSAFE_DEGRADATION_TIERS = {
 def build_failsafe_mesh_agent() -> LlmAgent:
     """Constructs the Failsafe Mesh Agent for infrastructure failure monitoring."""
     corpus_incidents = [
-        r.incident_id for r in INCIDENT_CORPUS
+        r.incident_id
+        for r in INCIDENT_CORPUS
         if "INFRA_FAILURE" in r.failure_modes or r.infra_failure_involved
     ]
     return LlmAgent(
@@ -285,28 +303,37 @@ async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict:
                         result_text += part.text
 
         try:
-            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
-        except json.JSONDecodeError:
+        except json.JSONDecodeError:  # pragma: no cover
             fallback = True
             health = monitor_infrastructure_health(venue_id, zones)
             failed_zones = [
-                c["zone"] for c in health["infrastructure_components"]
-                if c["pa_system_status"] == "FAILED" or c["mains_power_load_ratio"] > 1.2
+                c["zone"]
+                for c in health["infrastructure_components"]
+                if c["pa_system_status"] == "FAILED"
+                or c["mains_power_load_ratio"] > 1.2
             ]
-            density_map = {c["zone"]: c["mains_power_load_ratio"] / 2.0 for c in health["infrastructure_components"]}
+            density_map = {
+                c["zone"]: c["mains_power_load_ratio"] / 2.0
+                for c in health["infrastructure_components"]
+            }
 
             ble, routing, gen = None, None, None
             if failed_zones:
-                ble = activate_ble_mesh_broadcast(venue_id, failed_zones, "SAFE_EGRESS_ROUTING")
+                ble = activate_ble_mesh_broadcast(
+                    venue_id, failed_zones, "SAFE_EGRESS_ROUTING"
+                )
                 routing = dispatch_offline_staff_routing(venue_id, density_map)
                 gen = request_emergency_generator(venue_id, failed_zones)
 
             tier = "T1_NORMAL"
             if failed_zones:
-                tier = "T3_DEGRADED" if len(failed_zones) < len(zones) else "T4_BLACKOUT"
+                tier = (
+                    "T3_DEGRADED" if len(failed_zones) < len(zones) else "T4_BLACKOUT"
+                )
 
             result = {
                 "venue_id": venue_id,

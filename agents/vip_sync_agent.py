@@ -1,7 +1,6 @@
-"""
-SpectaSyncAI: VIP Sync Agent - @03 @05
+"""SpectaSyncAI: VIP Sync Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
-Failure Mode Addressed: TEMPORAL_DISRUPTION
+Failure Mode Addressed: TEMPORAL_DISRUPTION.
 
 Incident Reference: INC-2025-IND-01
 A 2025 political rally in South India had its headline speaker arrive
@@ -19,6 +18,7 @@ Responsibility:
   vector. If delay > 30 minutes: activates crowd engagement programs.
   Recalculates arrival surge vector and pre-positions staff accordingly.
 """
+
 import os
 import json
 import logging
@@ -37,8 +37,7 @@ VIP_DELAY_ALERT_THRESHOLD_MINS = 30
 
 
 def get_convoy_gps_position(event_id: str) -> dict:
-    """
-    Retrieves live GPS position and ETA for the scheduled keynote convoy or
+    """Retrieves live GPS position and ETA for the scheduled keynote convoy or
     headline act transport. Matches against pre-filed convoy route.
 
     Production: Integrates with event logistics partner GPS API or police
@@ -48,12 +47,16 @@ def get_convoy_gps_position(event_id: str) -> dict:
     was observable at T-5 hours via GPS telemetry - long before crowd surge.
 
     Args:
+    ----
         event_id: Unique event identifier (no personal identifiers).
 
     Returns:
+    -------
         dict: Current ETA, delay_mins, delay_category.
+
     """
     import random
+
     scheduled_arrival = datetime.now() + timedelta(minutes=-30)
     estimated_actual = datetime.now() + timedelta(minutes=random.randint(45, 180))
     delay_mins = int((estimated_actual - scheduled_arrival).total_seconds() / 60)
@@ -64,10 +67,17 @@ def get_convoy_gps_position(event_id: str) -> dict:
         "estimated_actual_arrival_iso": estimated_actual.isoformat(),
         "delay_mins": delay_mins,
         "delay_category": (
-            "CRITICAL" if delay_mins > 120
-            else "HIGH" if delay_mins > 60
-            else "MODERATE" if delay_mins > VIP_DELAY_ALERT_THRESHOLD_MINS
-            else "NORMAL"
+            "CRITICAL"
+            if delay_mins > 120
+            else (
+                "HIGH"
+                if delay_mins > 60
+                else (
+                    "MODERATE"
+                    if delay_mins > VIP_DELAY_ALERT_THRESHOLD_MINS
+                    else "NORMAL"
+                )
+            )
         ),
         "convoy_speed_kmph": round(random.uniform(35, 65), 1),
     }
@@ -76,8 +86,7 @@ def get_convoy_gps_position(event_id: str) -> dict:
 def calculate_crowd_kinetic_energy(
     wait_duration_mins: int, crowd_size: int, density_score: float
 ) -> dict:
-    """
-    Models the accumulated kinetic energy of a waiting crowd.
+    """Models the accumulated kinetic energy of a waiting crowd.
     Quantifies how violently the crowd will surge upon headline act arrival,
     as a function of wait time and current density.
 
@@ -86,21 +95,25 @@ def calculate_crowd_kinetic_energy(
     at the 7-hour delay mark. INC-2021-USA-01 reconstructed at ~5.9.
 
     Args:
+    ----
         wait_duration_mins: Total accumulated delay in minutes.
         crowd_size: Current attendance estimate.
         density_score: Current venue density (0.0-1.0).
 
     Returns:
+    -------
         dict: surge_coefficient, surge_prediction, analogous_incidents.
+
     """
-    surge_coefficient = min(10.0, (1 + wait_duration_mins / 60) ** 1.8 * density_score * 2)
+    surge_coefficient = min(
+        10.0, (1 + wait_duration_mins / 60) ** 1.8 * density_score * 2
+    )
     surge_radius_meters = int(surge_coefficient * 15)
     arrival_rush_velocity = round(surge_coefficient * 0.4, 2)
 
     # Match against corpus by surge magnitude proxy
     analogous = [
-        r.incident_id for r in INCIDENT_CORPUS
-        if "TEMPORAL_DISRUPT" in r.failure_modes
+        r.incident_id for r in INCIDENT_CORPUS if "TEMPORAL_DISRUPT" in r.failure_modes
     ]
 
     return {
@@ -109,11 +122,19 @@ def calculate_crowd_kinetic_energy(
         "density_score": density_score,
         "surge_coefficient": round(surge_coefficient, 2),
         "surge_prediction": (
-            "CATASTROPHIC" if surge_coefficient >= 8.0
-            else "CRITICAL" if surge_coefficient >= 5.0
-            else "HIGH" if surge_coefficient >= 3.0
-            else "MODERATE" if surge_coefficient >= 1.5
-            else "LOW"
+            "CATASTROPHIC"
+            if surge_coefficient >= 8.0
+            else (
+                "CRITICAL"
+                if surge_coefficient >= 5.0
+                else (
+                    "HIGH"
+                    if surge_coefficient >= 3.0
+                    else "MODERATE"
+                    if surge_coefficient >= 1.5
+                    else "LOW"
+                )
+            )
         ),
         "threat_radius_meters": surge_radius_meters,
         "crowd_wave_velocity_mps": arrival_rush_velocity,
@@ -125,9 +146,10 @@ def calculate_crowd_kinetic_energy(
     }
 
 
-def activate_crowd_engagement_program(zone: str, program_type: str, duration_mins: int) -> dict:
-    """
-    Activates in-venue crowd engagement to dissipate kinetic tension during delay.
+def activate_crowd_engagement_program(
+    zone: str, program_type: str, duration_mins: int
+) -> dict:
+    """Activates in-venue crowd engagement to dissipate kinetic tension during delay.
     This is the critical intervention absent in INC-2025-IND-01 and INC-2021-USA-01.
 
     Program types:
@@ -137,12 +159,15 @@ def activate_crowd_engagement_program(zone: str, program_type: str, duration_min
       STAGGERED_ENTRY    - Meter crowd into inner zones by section
 
     Args:
+    ----
         zone: Target venue zone.
         program_type: Engagement type.
         duration_mins: Program duration in minutes.
 
     Returns:
+    -------
         dict: Activation status and estimated kinetic energy dissipation.
+
     """
     density_reduction = {
         "MUSIC_STREAM": 0.12,
@@ -158,30 +183,50 @@ def activate_crowd_engagement_program(zone: str, program_type: str, duration_min
         "program_type": program_type,
         "duration_mins": duration_mins,
         "estimated_density_reduction": density_reduction,
-        "estimated_kinetic_energy_dissipation_pct": round(density_reduction * 100 * 1.4, 1),
+        "estimated_kinetic_energy_dissipation_pct": round(
+            density_reduction * 100 * 1.4, 1
+        ),
     }
 
 
 def calculate_arrival_surge_vector(
     venue_id: str, arrival_time_mins: int, surge_coefficient: float
 ) -> dict:
-    """
-    Computes WHERE the crowd surge will be most intense at headline act arrival,
+    """Computes WHERE the crowd surge will be most intense at headline act arrival,
     enabling pre-positioning of staff BEFORE the event - not reactive deployment.
 
     Args:
+    ----
         venue_id: Venue identifier.
         arrival_time_mins: Minutes until arrival.
         surge_coefficient: From calculate_crowd_kinetic_energy().
 
     Returns:
+    -------
         dict: Zone-level risk scores and pre-positioning requirements.
+
     """
     zones = [
-        {"zone": "STAGE_FRONT_PIT", "surge_risk": min(1.0, surge_coefficient * 0.15), "barrier_priority": "IMMEDIATE"},
-        {"zone": "NORTH_STANDING", "surge_risk": min(1.0, surge_coefficient * 0.10), "barrier_priority": "HIGH"},
-        {"zone": "MAIN_ENTRY_CORRIDOR", "surge_risk": min(1.0, surge_coefficient * 0.08), "barrier_priority": "HIGH"},
-        {"zone": "SOUTH_STANDING", "surge_risk": min(1.0, surge_coefficient * 0.06), "barrier_priority": "MODERATE"},
+        {
+            "zone": "STAGE_FRONT_PIT",
+            "surge_risk": min(1.0, surge_coefficient * 0.15),
+            "barrier_priority": "IMMEDIATE",
+        },
+        {
+            "zone": "NORTH_STANDING",
+            "surge_risk": min(1.0, surge_coefficient * 0.10),
+            "barrier_priority": "HIGH",
+        },
+        {
+            "zone": "MAIN_ENTRY_CORRIDOR",
+            "surge_risk": min(1.0, surge_coefficient * 0.08),
+            "barrier_priority": "HIGH",
+        },
+        {
+            "zone": "SOUTH_STANDING",
+            "surge_risk": min(1.0, surge_coefficient * 0.06),
+            "barrier_priority": "MODERATE",
+        },
     ]
     staff_needed = int(surge_coefficient * 8)
     return {
@@ -267,21 +312,24 @@ async def run_vip_sync_monitoring(
                     result_text += part.text
 
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+        clean = result_text.strip().replace("```json", "").replace("```", "").strip()
         parsed = json.loads(clean)
         output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
-    except json.JSONDecodeError:
+    except json.JSONDecodeError:  # pragma: no cover
         fallback = True
         convoy = get_convoy_gps_position(event_id)
         delay = convoy["delay_mins"]
         engagement = None
         if delay > VIP_DELAY_ALERT_THRESHOLD_MINS:
-            engagement = activate_crowd_engagement_program("MAIN_ARENA", "ADDRESS_BY_MC", min(delay, 60))
+            engagement = activate_crowd_engagement_program(
+                "MAIN_ARENA", "ADDRESS_BY_MC", min(delay, 60)
+            )
         kinetic = calculate_crowd_kinetic_energy(delay, crowd_size, density_score)
         surge_vec = calculate_arrival_surge_vector(
-            venue_id, int(convoy.get("distance_to_venue_km", 30)),
-            kinetic["surge_coefficient"]
+            venue_id,
+            int(convoy.get("distance_to_venue_km", 30)),
+            kinetic["surge_coefficient"],
         )
         result = {
             "event_id": event_id,

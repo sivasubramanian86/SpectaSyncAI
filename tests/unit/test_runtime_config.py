@@ -1,14 +1,16 @@
+"""SpectaSyncAI tests."""
+
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
 from api.main import app
 
-
 client = TestClient(app)
 
 
 def test_runtime_config_js_uses_firebase_env():
+    """Test functionality for test_runtime_config_js_uses_firebase_env."""
     env = {
         "FIREBASE_API_KEY": "api-key",
         "FIREBASE_AUTH_DOMAIN": "project.firebaseapp.com",
@@ -30,6 +32,7 @@ def test_runtime_config_js_uses_firebase_env():
 
 
 def test_runtime_config_js_handles_missing_firebase_env():
+    """Test functionality for test_runtime_config_js_handles_missing_firebase_env."""
     with patch.dict("os.environ", {}, clear=True):
         response = client.get("/v1/runtime-config.js")
 

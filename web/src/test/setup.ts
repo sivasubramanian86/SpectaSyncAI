@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Vitest setup configuration.
+ * Initializes testing library jest-dom extensions and global polyfills.
+ */
 import '@testing-library/jest-dom';
 import { expect, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';

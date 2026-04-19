@@ -1,11 +1,19 @@
 import React from 'react';
 import { Users, AlertTriangle, Activity, Cpu, TrendingUp } from 'lucide-react';
 
+/**
+ * Props for the StatCards component.
+ */
 interface StatCardsProps {
+  /** Average crowd density percentage (0-1) across the venue. */
   avgDensity: number;
+  /** Number of zones currently in CRITICAL or EMERGENCY state. */
   criticalCount: number;
+  /** Total number of monitored venue zones. */
   totalZones: number;
+  /** Number of active AI-driven interventions in the field. */
   activeInterventions: number;
+  /** Total number of active agents in the Google ADK mesh. */
   agentCount: number;
 }
 

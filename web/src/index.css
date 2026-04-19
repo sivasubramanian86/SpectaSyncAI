@@ -4,18 +4,87 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #020617; /* navy-950 */
+  --text-primary: #f1f5f9; /* slate-100 */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+.theme-light {
+  --bg-primary: #f1f5f9; /* slate-100 */
+  --text-primary: #0f172a; /* slate-900 */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light body {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(0 0 0 / 0.02)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+.theme-light .text-slate-400,
+.theme-light .text-slate-500 {
+  color: #64748b; /* slate-500 */
+}
+
+.theme-light .text-slate-300 {
+  color: #334155; /* slate-700 */
+}
+
+.theme-light .text-white {
+  color: #0f172a; /* slate-900 */
+}
+
+.theme-light .glass {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .border-white\/5,
+.theme-light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .text-blue-400,
+.theme-light .text-blue-500 {
+  color: #2563eb; /* blue-600 */
+}
+
+.theme-light .text-emerald-400,
+.theme-light .text-emerald-500 {
+  color: #059669; /* emerald-600 */
+}
+
+.theme-light .bg-blue-500\/10,
+.theme-light .bg-blue-500\/5 {
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+.theme-light .bg-blue-600 {
+  @apply bg-blue-700;
+}
+
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    @apply bg-navy-950 text-slate-100 antialiased;
+    @apply antialiased transition-colors duration-300;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.03)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
   }
   .glass-dark {
     @apply bg-black/30 backdrop-blur-lg border border-white/10 rounded-xl;

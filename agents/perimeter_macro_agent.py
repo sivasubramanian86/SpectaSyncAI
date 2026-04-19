@@ -1,7 +1,6 @@
-"""
-SpectaSyncAI: Perimeter Macro Agent - @03 @05
+"""SpectaSyncAI: Perimeter Macro Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
-Failure Mode Addressed: EXOGENOUS_SURGE
+Failure Mode Addressed: EXOGENOUS_SURGE.
 
 Incident Reference: INC-2025-IND-02
 A 2025 sports celebration venue had its official capacity overwhelmed by an
@@ -18,6 +17,7 @@ Responsibility:
   metro/bus ridership anomalies, traffic density APIs - to detect dangerous
   crowd accumulation BEFORE it reaches the perimeter.
 """
+
 import os
 import json
 import logging
@@ -46,8 +46,7 @@ VENUE_CAPACITY_REGISTER: dict[str, int] = {
 
 
 def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
-    """
-    Queries mobile network congestion metrics for cell towers within `radius_km`
+    """Queries mobile network congestion metrics for cell towers within `radius_km`
     of the venue perimeter as a real-time crowd density proxy.
 
     Historical precedent (INC-2025-IND-02): Cell towers in the vicinity showed
@@ -58,13 +57,17 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
     Prototype: Returns calibrated simulation data.
 
     Args:
+    ----
         area_code: Postal/area code of the venue's surrounding district.
         radius_km: Radius in km to query cell towers.
 
     Returns:
+    -------
         dict: Network load ratio (1.0 = normal), estimated external crowd.
+
     """
     import random
+
     load_ratio = random.uniform(2.8, 6.5)
     estimated_people = int(load_ratio * 38_000)
     return {
@@ -80,8 +83,7 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
 
 
 def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
-    """
-    Checks metro/bus station ridership against historical baseline for event day.
+    """Checks metro/bus station ridership against historical baseline for event day.
     Anomalous ridership at adjacent stations signals incoming crowd volume.
 
     Historical precedent (INC-2025-IND-02): Transit stations adjacent to the
@@ -90,37 +92,44 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
     Production: Connects to city transit Open Data APIs (e.g. metro authority feeds).
 
     Args:
+    ----
         station_ids: List of transit station identifiers to query.
 
     Returns:
+    -------
         dict: Per-station ridership ratios and aggregate crowd estimate.
+
     """
     import random
+
     stations = []
     for sid in station_ids:
         ratio = random.uniform(1.5, 4.2)
-        stations.append({
-            "station_id": sid,
-            "ridership_vs_baseline": round(ratio, 2),
-            "crowd_contribution_estimate": int(ratio * 12_000),
-            "alert": ratio > 3.0,
-        })
+        stations.append(
+            {
+                "station_id": sid,
+                "ridership_vs_baseline": round(ratio, 2),
+                "crowd_contribution_estimate": int(ratio * 12_000),
+                "alert": ratio > 3.0,
+            }
+        )
     total_incoming = sum(s["crowd_contribution_estimate"] for s in stations)
     return {
         "queried_stations": len(station_ids),
         "stations": stations,
         "total_incoming_crowd_estimate": total_incoming,
         "aggregate_alert_level": (
-            "CRITICAL" if total_incoming > 80_000
-            else "HIGH" if total_incoming > 40_000
+            "CRITICAL"
+            if total_incoming > 80_000
+            else "HIGH"
+            if total_incoming > 40_000
             else "MODERATE"
         ),
     }
 
 
 def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) -> dict:
-    """
-    Computes capacity overage ratio and breach probability.
+    """Computes capacity overage ratio and breach probability.
     Draws comparison against known incident signatures from the corpus.
 
     Historical precedent:
@@ -130,21 +139,27 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
       INC-2010-DEU-01: 5.6x capacity via single access tunnel.
 
     Args:
+    ----
         venue_id: Venue identifier (from VENUE_CAPACITY_REGISTER).
         external_crowd_estimate: Estimated external crowd from telemetry.
 
     Returns:
+    -------
         dict: Capacity ratio, crush probability, time-to-critical estimate.
+
     """
     capacity = VENUE_CAPACITY_REGISTER.get(venue_id, VENUE_CAPACITY_REGISTER["default"])
     ratio = external_crowd_estimate / capacity
     crush_probability = min(1.0, (ratio - 1.0) / 5.0) if ratio > 1.0 else 0.0
     approach_rate_per_min = 5_000
-    time_to_critical = max(0, (capacity * 0.85 - external_crowd_estimate * 0.3) / approach_rate_per_min)
+    time_to_critical = max(
+        0, (capacity * 0.85 - external_crowd_estimate * 0.3) / approach_rate_per_min
+    )
 
     # Find analogous incidents from corpus
     analogous = [
-        r.incident_id for r in INCIDENT_CORPUS
+        r.incident_id
+        for r in INCIDENT_CORPUS
         if "EXOGENOUS_SURGE" in r.failure_modes
         and abs(r.estimated_attendance / max(1, r.venue_capacity) - ratio) < 1.5
     ]
@@ -157,11 +172,15 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
         "crush_probability_pct": round(crush_probability * 100, 1),
         "minutes_to_critical_gate_density": round(time_to_critical, 1),
         "risk_classification": (
-            "CATASTROPHIC" if ratio >= 5.0
-            else "CRITICAL" if ratio >= 3.0
-            else "HIGH" if ratio >= 2.0
-            else "MODERATE" if ratio >= 1.5
-            else "NORMAL"
+            "CATASTROPHIC"
+            if ratio >= 5.0
+            else (
+                "CRITICAL"
+                if ratio >= 3.0
+                else (
+                    "HIGH" if ratio >= 2.0 else "MODERATE" if ratio >= 1.5 else "NORMAL"
+                )
+            )
         ),
         "analogous_incidents_in_corpus": analogous[:3],
     }
@@ -170,18 +189,20 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
 def activate_street_diversion_protocol(
     venue_id: str, approach_corridors: list[str], diversion_routes: list[str]
 ) -> dict:
-    """
-    Triggers street-level crowd diversion BEFORE gate breach.
+    """Triggers street-level crowd diversion BEFORE gate breach.
     The critical intervention absent in INC-2025-IND-02, INC-2022-KOR-01,
     and INC-2010-DEU-01. Coordinates with traffic authority and city transit.
 
     Args:
+    ----
         venue_id: Target venue.
         approach_corridors: Current high-density approach paths to restrict.
         diversion_routes: Alternate routes to activate.
 
     Returns:
+    -------
         dict: Diversion activation confirmation.
+
     """
     logger.critical(
         f"[PerimeterMacroAgent] STREET DIVERSION ACTIVATED - "
@@ -201,7 +222,9 @@ def activate_street_diversion_protocol(
 
 def build_perimeter_macro_agent() -> LlmAgent:
     """Constructs the Perimeter Macro Agent for external crowd monitoring."""
-    corpus_incidents = [r.incident_id for r in INCIDENT_CORPUS if "EXOGENOUS_SURGE" in r.failure_modes]
+    corpus_incidents = [
+        r.incident_id for r in INCIDENT_CORPUS if "EXOGENOUS_SURGE" in r.failure_modes
+    ]
     return LlmAgent(
         model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
         name="perimeter_macro_agent",
@@ -265,19 +288,23 @@ async def run_perimeter_assessment(
                     result_text += part.text
 
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+        clean = result_text.strip().replace("```json", "").replace("```", "").strip()
         parsed = json.loads(clean)
         output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
-    except json.JSONDecodeError:
+    except json.JSONDecodeError:  # pragma: no cover
         fallback = True
         tower = query_cell_tower_load(area_code)
         transit = query_transit_ridership_anomalies(station_ids)
-        breach = calculate_capacity_breach_risk(venue_id, tower["estimated_external_crowd"])
+        breach = calculate_capacity_breach_risk(
+            venue_id, tower["estimated_external_crowd"]
+        )
         result = {**breach, "cell_tower_data": tower, "transit_data": transit}
         if breach["crush_probability_pct"] > 40.0:
             result["diversion"] = activate_street_diversion_protocol(
-                venue_id, ["MAIN_APPROACH_N", "MAIN_APPROACH_E"], ["ALT_ROUTE_S", "ALT_ROUTE_W"]
+                venue_id,
+                ["MAIN_APPROACH_N", "MAIN_APPROACH_E"],
+                ["ALT_ROUTE_S", "ALT_ROUTE_W"],
             )
             result["diversion_activated"] = True
         else:

@@ -1,11 +1,11 @@
-"""
-SpectaSyncAI: Safety Agent - @03 @05 @04
+"""SpectaSyncAI: Safety Agent - @03 @05 @04
 Powered by: google-adk + Gemini 2.5 Pro
 Responsibility: Emergency detection from sensor anomalies, triggering
 automated evacuation protocols and emergency service coordination.
 Implements responsible AI - all critical decisions require human confirmation
 in production. Prototype uses structured decision output only.
 """
+
 import os
 import json
 import logging
@@ -25,16 +25,18 @@ DENSITY_CRITICAL_THRESHOLD = 0.88
 
 
 def classify_safety_risk(density_score: float, rate_of_change: float) -> dict:
-    """
-    Classifies safety risk level using density + rate-of-change analysis.
+    """Classifies safety risk level using density + rate-of-change analysis.
     High rate-of-change signals stampede-like conditions.
 
     Args:
+    ----
         density_score: Current density (0.0-1.0).
         rate_of_change: Density increase per minute.
 
     Returns:
+    -------
         dict: Risk classification with recommended response.
+
     """
     if density_score >= DENSITY_EMERGENCY_THRESHOLD or rate_of_change > 0.05:
         return {
@@ -71,11 +73,12 @@ def classify_safety_risk(density_score: float, rate_of_change: float) -> dict:
 
 
 def get_emergency_contact_list() -> dict:
-    """
-    Returns the emergency contacts and escalation chain for the venue.
+    """Returns the emergency contacts and escalation chain for the venue.
 
-    Returns:
+    Returns
+    -------
         dict: Emergency contacts categorized by type.
+
     """
     return {
         "venue_security_radio": "CH-7",
@@ -88,11 +91,12 @@ def get_emergency_contact_list() -> dict:
 
 
 def build_safety_agent() -> LlmAgent:
-    """
-    Constructs the ADK Safety Agent using Gemini 2.5 Pro.
+    """Constructs the ADK Safety Agent using Gemini 2.5 Pro.
 
-    Returns:
+    Returns
+    -------
         LlmAgent: Configured safety monitoring agent.
+
     """
     return LlmAgent(
         model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
@@ -120,16 +124,18 @@ def build_safety_agent() -> LlmAgent:
 async def run_safety_assessment(
     location_id: str, density_score: float, rate_of_change: float = 0.02
 ) -> dict:
-    """
-    Executes the Safety Agent for a venue zone with anomalous metrics.
+    """Executes the Safety Agent for a venue zone with anomalous metrics.
 
     Args:
+    ----
         location_id: Venue zone identifier.
         density_score: Current density (0.0-1.0).
         rate_of_change: Density change per minute (positive = increasing).
 
     Returns:
+    -------
         dict: Safety assessment with risk level, protocol, and actions.
+
     """
     start = time.perf_counter()
     fallback = False
@@ -168,11 +174,11 @@ async def run_safety_assessment(
         logger.info(f"[SafetyAgent] Assessment for {location_id}: {result_text}")
 
         try:
-            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
-        except json.JSONDecodeError:
+        except json.JSONDecodeError:  # pragma: no cover
             fallback = True
             classification = classify_safety_risk(density_score, rate_of_change)
             result = {

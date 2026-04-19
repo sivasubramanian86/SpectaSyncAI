@@ -1,8 +1,8 @@
-﻿"""
-SpectaSyncAI: Pre-Event Strategic Analyst Agent
+"""SpectaSyncAI: Pre-Event Strategic Analyst Agent
 Powered by Gemini 2.5 Pro
 Responsibility: Forecasting crowd risk based on bookings, weather, and scheduling.
 """
+
 import os
 import json
 import logging
@@ -12,7 +12,6 @@ from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
 
 from api.services.observability_service import observability_service
-
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +80,7 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
                     if part.text:
                         result_text += part.text
 
-        clean_json = result_text.strip().lstrip("```json").rstrip("```").strip()
+        clean_json = result_text.strip().replace("```json", "").replace("```", "").strip()
         parsed = json.loads(clean_json)
 
         if isinstance(parsed, list) and len(parsed) > 0:
@@ -109,7 +108,7 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
         output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
 
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         fallback = True
         status = "fallback"
         logger.error(f"Pre-Event Agent Error (Infrastructure or Parsing): {exc}")

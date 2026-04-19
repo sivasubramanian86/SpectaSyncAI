@@ -1,4 +1,7 @@
-// Shared TypeScript interfaces for SpectaSyncAI Command Center
+/**
+ * @fileoverview Shared TypeScript interfaces for SpectaSyncAI Command Center.
+ * Defines the core data structures used across the React frontend dashboard.
+ */
 
 export type DensityLevel = 'NORMAL' | 'MODERATE' | 'HIGH' | 'CRITICAL' | 'EMERGENCY';
 export type AgentName =

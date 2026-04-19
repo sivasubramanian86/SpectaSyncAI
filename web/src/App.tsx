@@ -1,3 +1,8 @@
+/**
+ * @file App.tsx
+ * @description Main application entry point for SpectaSyncAI Command Center.
+ * Coordinates global state, routing (tabs), and real-time mesh telemetry.
+ */
 import React, { useState } from 'react';
 import { useDashboardData } from './hooks/useDashboardData';
 import { Header } from './components/Header';

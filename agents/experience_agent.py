@@ -1,10 +1,10 @@
-"""
-SpectaSyncAI: Experience Agent - @03 @05
+"""SpectaSyncAI: Experience Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Generates real-time personalized recommendations for attendees
 to improve their event experience - optimal timing suggestions, food, seating,
 and transport routing based on live venue state.
 """
+
 import os
 import json
 import logging
@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_low_density_zones() -> dict:
-    """
-    Returns the current list of low-density zones suitable for routing attendees.
+    """Returns the current list of low-density zones suitable for routing attendees.
     Production: queries the live crowd_densities table in AlloyDB.
 
-    Returns:
+    Returns
+    -------
         dict: Low-density zones with current density scores.
+
     """
     return {
         "low_density_zones": [
@@ -36,31 +37,42 @@ def get_low_density_zones() -> dict:
 
 
 def get_venue_event_schedule(next_n_events: int = 3) -> dict:
-    """
-    Returns upcoming venue schedule events to help attendees time their movements.
+    """Returns upcoming venue schedule events to help attendees time their movements.
     Production: integrates with venue ticketing / event management system.
 
     Args:
+    ----
         next_n_events: Number of upcoming events to retrieve.
 
     Returns:
+    -------
         dict: Upcoming events with timing relative to now.
+
     """
     return {
         "upcoming_events": [
             {"event": "Halftime", "starts_in_mins": 18, "expected_crowd_surge": "HIGH"},
-            {"event": "Halftime Ends", "starts_in_mins": 33, "expected_crowd_surge": "MODERATE"},
-            {"event": "Full Time", "starts_in_mins": 62, "expected_crowd_surge": "CRITICAL"},
+            {
+                "event": "Halftime Ends",
+                "starts_in_mins": 33,
+                "expected_crowd_surge": "MODERATE",
+            },
+            {
+                "event": "Full Time",
+                "starts_in_mins": 62,
+                "expected_crowd_surge": "CRITICAL",
+            },
         ]
     }
 
 
 def build_experience_agent() -> LlmAgent:
-    """
-    Constructs the ADK Experience Agent using Gemini 2.5 Flash.
+    """Constructs the ADK Experience Agent using Gemini 2.5 Flash.
 
-    Returns:
+    Returns
+    -------
         LlmAgent: Configured attendee experience agent.
+
     """
     return LlmAgent(
         model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
@@ -86,14 +98,16 @@ def build_experience_agent() -> LlmAgent:
 
 
 async def run_experience_recommendations(attendee_zone: str) -> dict:
-    """
-    Generates personalized recommendations for an attendee in a specific zone.
+    """Generates personalized recommendations for an attendee in a specific zone.
 
     Args:
+    ----
         attendee_zone: The current zone of the attendee (e.g. 'SECTION_101').
 
     Returns:
+    -------
         dict: Personalized recommendations with timing advice.
+
     """
     start = time.perf_counter()
     fallback = False
@@ -126,42 +140,49 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
                     if part.text:
                         result_text += part.text
 
-        logger.info(f"[ExperienceAgent] Recommendations for {attendee_zone}: {result_text}")
+        logger.info(
+            f"[ExperienceAgent] Recommendations for {attendee_zone}: {result_text}"
+        )
 
         try:
-            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
-        except json.JSONDecodeError:
+        except json.JSONDecodeError:  # pragma: no cover
             fallback = True
             result = {
                 "attendee_zone": attendee_zone,
                 "recommendations": [
                     {
-                        "priority": 1, "category": "TIMING",
+                        "priority": 1,
+                        "category": "TIMING",
                         "message": "Halftime in 18 mins - visit food stands NOW to avoid queues.",
-                        "timing": "Immediately"
+                        "timing": "Immediately",
                     },
                     {
-                        "priority": 2, "category": "FOOD",
+                        "priority": 2,
+                        "category": "FOOD",
                         "message": "Food Stand C has only 2-min wait vs 18-min at Stand A.",
-                        "timing": "Next 10 mins"
+                        "timing": "Next 10 mins",
                     },
                     {
-                        "priority": 3, "category": "RESTROOM",
+                        "priority": 3,
+                        "category": "RESTROOM",
                         "message": "South Restroom is 80% less crowded than North.",
-                        "timing": "Before halftime"
+                        "timing": "Before halftime",
                     },
                     {
-                        "priority": 4, "category": "ENTRY_EXIT",
+                        "priority": 4,
+                        "category": "ENTRY_EXIT",
                         "message": "Gate East has 3-min wait vs 15-min at Gate North.",
-                        "timing": "Any time"
+                        "timing": "Any time",
                     },
                     {
-                        "priority": 5, "category": "TIMING",
+                        "priority": 5,
+                        "category": "TIMING",
                         "message": "Leave venue Gate East at FT+5 mins to avoid post-match surge.",
-                        "timing": "Full time"
+                        "timing": "Full time",
                     },
                 ],
                 "best_time_to_move": "Now (before halftime surge in 18 mins)",

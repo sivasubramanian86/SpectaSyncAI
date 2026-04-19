@@ -1,6 +1,5 @@
-"""
-SpectaSyncAI: Venv-aware Local Development Launcher
-@07_modern_polyglot_standards compliant
+"""SpectaSyncAI: Venv-aware Local Development Launcher
+@07_modern_polyglot_standards compliant.
 
 Pre-flight checks:
   - Python 3.12+ (enforced)
@@ -19,6 +18,7 @@ Usage:
     python scripts/start_local.py --api    # Backend only
     python scripts/start_local.py --ui     # Frontend only
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,7 +45,9 @@ REQ_FILE = REPO_ROOT / "requirements.txt"
 ENV_FILE = REPO_ROOT / ".env"
 
 IS_WIN = platform.system() == "Windows"
-PYTHON_BIN = VENV_DIR / ("Scripts" if IS_WIN else "bin") / ("python.exe" if IS_WIN else "python")
+PYTHON_BIN = (
+    VENV_DIR / ("Scripts" if IS_WIN else "bin") / ("python.exe" if IS_WIN else "python")
+)
 PIP_BIN = VENV_DIR / ("Scripts" if IS_WIN else "bin") / ("pip.exe" if IS_WIN else "pip")
 NPM_CMD = "npm.cmd" if IS_WIN else "npm"
 NODE_CMD = "node"
@@ -57,12 +59,17 @@ MIN_NPM = (10, 0)
 
 # ── Version guards ────────────────────────────────────────────────────────────
 
+
 def _ver(cmd: list[str]) -> tuple[int, ...]:
     """Return (major, minor, patch) from a --version command."""
     try:
         out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, text=True).strip()
         # handles: "v20.18.0", "10.8.2", "Python 3.12.3"
-        raw = [c for c in out.split() if c[0].isdigit() or (c.startswith("v") and c[1].isdigit())]
+        raw = [
+            c
+            for c in out.split()
+            if c[0].isdigit() or (c.startswith("v") and c[1].isdigit())
+        ]
         parts = raw[0].lstrip("v").split(".")
         return tuple(int(p) for p in parts[:3])
     except Exception:
@@ -72,7 +79,9 @@ def _ver(cmd: list[str]) -> tuple[int, ...]:
 def check_python() -> None:
     v = sys.version_info[:2]
     if v < MIN_PYTHON:
-        log.error(f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+ required. Found: {v[0]}.{v[1]}")
+        log.error(
+            f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+ required. Found: {v[0]}.{v[1]}"
+        )
         log.error("Install from https://www.python.org/downloads/ and re-run.")
         sys.exit(1)
     log.info(f"Python {v[0]}.{v[1]} — OK")
@@ -97,6 +106,7 @@ def check_npm() -> None:
 
 
 # ── Virtual environment ────────────────────────────────────────────────────────
+
 
 def ensure_venv() -> None:
     """Create venv if absent; always sync requirements.txt."""
@@ -130,12 +140,17 @@ def check_env() -> None:
     """Warn if .env is missing but don't abort — allows running tests without secrets."""
     if not ENV_FILE.exists():
         log.warning(f".env file not found at {ENV_FILE}")
-        log.warning("Copy .env.example to .env and fill in GOOGLE_API_KEY / GOOGLE_CLOUD_PROJECT.")
+        log.warning(
+            "Copy .env.example to .env and fill in GOOGLE_API_KEY / GOOGLE_CLOUD_PROJECT."
+        )
 
 
 # ── Process launcher ──────────────────────────────────────────────────────────
 
-def launch(cmd: list[str], cwd: Path, env_extra: dict | None = None) -> subprocess.Popen:
+
+def launch(
+    cmd: list[str], cwd: Path, env_extra: dict | None = None
+) -> subprocess.Popen:
     env = {**os.environ, **(env_extra or {})}
     log.info(f"Starting: {' '.join(str(c) for c in cmd)}")
     return subprocess.Popen(cmd, cwd=str(cwd), env=env)
@@ -158,6 +173,7 @@ def wait_all(procs: list[subprocess.Popen]) -> None:
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SpectaSyncAI local dev launcher")
@@ -203,11 +219,15 @@ def main() -> None:
         procs.append(
             launch(
                 [
-                    str(PYTHON_BIN), "-m", "uvicorn",
+                    str(PYTHON_BIN),
+                    "-m",
+                    "uvicorn",
                     "api.main:app",
                     "--reload",
-                    "--host", "0.0.0.0",
-                    "--port", "8000",
+                    "--host",
+                    "127.0.0.1",
+                    "--port",
+                    "8000",
                 ],
                 cwd=REPO_ROOT,
             )
@@ -216,9 +236,7 @@ def main() -> None:
 
     if run_all or args.ui:
         # 3. Vite React dev server (port 5173)
-        procs.append(
-            launch([NPM_CMD, "run", "dev"], cwd=WEB_DIR)
-        )
+        procs.append(launch([NPM_CMD, "run", "dev"], cwd=WEB_DIR))
 
     log.info("")
     log.info("  ┌─────────────────────────────────────────────────────┐")

@@ -1,10 +1,10 @@
-"""
-SpectaSyncAI observability helpers.
+"""SpectaSyncAI observability helpers.
 
 Best-effort request and agent metrics for Google Cloud Monitoring.
 The service is intentionally non-blocking and degrades to no-op mode when the
 Monitoring client or credentials are not available.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -24,6 +24,7 @@ class ObservabilityService:
     """Writes lightweight custom metrics to Google Cloud Monitoring."""
 
     def __init__(self) -> None:
+        """Initialize the observability service with Google Cloud credentials."""
         self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
         self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
         self.service_name = os.getenv("K_SERVICE") or "spectasync-local"
@@ -31,7 +32,8 @@ class ObservabilityService:
         self.enabled = bool(
             monitoring_v3
             and self.project_id
-            and os.getenv("OBSERVABILITY_ENABLED", "1").lower() not in {"0", "false", "no"}
+            and os.getenv("OBSERVABILITY_ENABLED", "1").lower()
+            not in {"0", "false", "no"}
         )
         self._client: monitoring_v3.MetricServiceClient | None = None
         self._client_disabled = False
@@ -129,7 +131,7 @@ class ObservabilityService:
         """Fire-and-forget helper for async call sites."""
         try:
             loop = asyncio.get_running_loop()
-        except RuntimeError:
+        except RuntimeError:  # pragma: no cover
             return
 
         loop.create_task(self.record_metric(suffix, value, labels))
@@ -174,7 +176,9 @@ class ObservabilityService:
         self.schedule_metric("agent_run_count", 1.0, labels)
 
         if output_size_bytes is not None:
-            self.schedule_metric("agent_output_size_bytes", float(output_size_bytes), labels)
+            self.schedule_metric(
+                "agent_output_size_bytes", float(output_size_bytes), labels
+            )
         if fallback:
             self.schedule_metric("agent_fallback_count", 1.0, labels)
 

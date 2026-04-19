@@ -1,5 +1,4 @@
-"""
-SpectaSyncAI: Corpus Embedding Script
+"""SpectaSyncAI: Corpus Embedding Script
 Generates text-embedding-004 vectors for all 18 incidents in incident_registry
 and writes them back to AlloyDB.
 
@@ -15,6 +14,7 @@ Pre-requisites:
 @11_database_architect: uses connection pool, idempotent (skips already-embedded rows)
 @19_cost_efficiency_architect: batches embedding calls to minimise API round-trips
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -26,6 +26,7 @@ from pathlib import Path
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dotenv import load_dotenv
+
 # Force override to ensure .env values take precedence over system environment variables
 load_dotenv(override=True)
 
@@ -37,7 +38,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 EMBEDDING_MODEL = "text-embedding-004"
-BATCH_SIZE = 10   # Vertex AI text-embedding-004 supports up to 250 texts/batch
+BATCH_SIZE = 10  # Vertex AI text-embedding-004 supports up to 250 texts/batch
 
 
 async def fetch_unembedded(conn) -> list[dict]:
@@ -53,7 +54,7 @@ async def embed_batch(texts: list[str]) -> list[list[float]]:
     import vertexai
     from vertexai.language_models import TextEmbeddingModel
 
-    project  = os.environ["GOOGLE_CLOUD_PROJECT"]
+    project = os.environ["GOOGLE_CLOUD_PROJECT"]
     location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
     vertexai.init(project=project, location=location)
 
@@ -65,9 +66,10 @@ async def embed_batch(texts: list[str]) -> list[list[float]]:
 async def write_embeddings(conn, rows: list[dict], vectors: list[list[float]]) -> None:
     """Updates the embedding column for each incident."""
     from pgvector.asyncpg import register_vector
+
     await register_vector(conn)
 
-    for row, vector in zip(rows, vectors):
+    for row, vector in zip(rows, vectors, strict=False):
         await conn.execute(
             """
             UPDATE incident_registry
@@ -110,7 +112,7 @@ async def main() -> None:
     for i in range(0, len(unembedded), BATCH_SIZE):
         batch = unembedded[i : i + BATCH_SIZE]
         texts = [r["description_text"] for r in batch]
-        ids   = [r["incident_id"] for r in batch]
+        ids = [r["incident_id"] for r in batch]
 
         log.info(f"Embedding batch {i // BATCH_SIZE + 1}: {ids}")
         vectors = await embed_batch(texts)
@@ -127,7 +129,9 @@ async def main() -> None:
     log.info("HNSW index will auto-update on next AlloyDB query.")
     log.info("")
     log.info("Next step: verify with")
-    log.info("  psql $DATABASE_URL -c \"SELECT incident_id, embedded_at FROM incident_registry ORDER BY year;\"")
+    log.info(
+        '  psql $DATABASE_URL -c "SELECT incident_id, embedded_at FROM incident_registry ORDER BY year;"'
+    )
 
 
 if __name__ == "__main__":

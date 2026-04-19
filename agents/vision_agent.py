@@ -1,8 +1,8 @@
-"""
-SpectaSyncAI: Vision Agent
+"""SpectaSyncAI: Vision Agent
 Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
 """
+
 import os
 import json
 import logging
@@ -15,21 +15,22 @@ from google.cloud import storage
 
 from api.services.observability_service import observability_service
 
-
 logger = logging.getLogger(__name__)
 
 
 def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
-    """
-    Stub tool: Parses a pre-analyzed CCTV image frame result.
+    """Stub tool: Parses a pre-analyzed CCTV image frame result.
     In production, this calls a Vision API or local frame processor.
 
     Args:
+    ----
         location_id: The venue zone identifier (e.g. 'GATE_3').
         density_b64: Base64-encoded image data for the frame.
 
     Returns:
+    -------
         dict: Structured density analysis result.
+
     """
     # Production: replace with actual image analysis call
     return {
@@ -41,15 +42,17 @@ def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
 
 
 def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
-    """
-    Archives a critical CCTV frame to Google Cloud Storage for forensic audit.
+    """Archives a critical CCTV frame to Google Cloud Storage for forensic audit.
 
     Args:
+    ----
         location_id: Zone identifier.
         image_bytes: CCTV frame.
 
     Returns:
+    -------
         str: Public bucket URI (or mock URI if local).
+
     """
     bucket_name = os.getenv("GCS_ARCHIVE_BUCKET", "spectasync-incident-archive")
     filename = f"incident_{location_id}_{int(os.getpid())}.jpg"
@@ -62,19 +65,20 @@ def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
             blob = bucket.blob(filename)
             blob.upload_from_string(image_bytes, content_type="image/jpeg")
             return f"gs://{bucket_name}/{filename}"
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             logger.warning(f"GCS Archival failed: {exc}")
 
     return f"gs://{bucket_name}/mock_{filename} (Local Sandbox)"
 
 
 def build_vision_agent() -> LlmAgent:
-    """
-    Constructs the ADK Vision Agent using Gemini 2.5 Flash.
+    """Constructs the ADK Vision Agent using Gemini 2.5 Flash.
     This agent is optimized for high-speed, low-cost multimodal analysis.
 
-    Returns:
+    Returns
+    -------
         LlmAgent: The configured ADK Vision Agent instance.
+
     """
     return LlmAgent(
         model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
@@ -93,15 +97,17 @@ def build_vision_agent() -> LlmAgent:
 
 
 async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
-    """
-    Executes the Vision Agent for a given CCTV frame.
+    """Executes the Vision Agent for a given CCTV frame.
 
     Args:
+    ----
         location_id: Venue zone identifier.
         image_bytes: Raw JPEG bytes from the CCTV stream.
 
     Returns:
+    -------
         dict: The agent's final density analysis output.
+
     """
     start = time.perf_counter()
     fallback = False
@@ -139,7 +145,7 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
         parsed = json.loads(result_text)
         output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
-    except json.JSONDecodeError:
+    except json.JSONDecodeError:  # pragma: no cover
         fallback = True
         result = {
             "location_id": location_id,

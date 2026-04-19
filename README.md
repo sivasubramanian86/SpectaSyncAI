@@ -14,6 +14,9 @@ Ground-truthed against an anonymized corpus of **18 global crowd incidents (2003
 [![Analytics](https://img.shields.io/badge/Track-Analytics-blue.svg)](https://analytics.google.com)
 [![Status: Production Ready](https://img.shields.io/badge/Status-100%25%20Ready-gold.svg)](AUDIT.md)
 
+**PromptWars 2026 Hackathon Theme Alignment:**
+SpectaSyncAI addresses critical intersections of **HealthTech** (preventing mass-casualty crushing injuries and asymmetric fatalities) and **CivicTech** (intelligent crowd safety, predictive modeling, and frictionless urban flow optimization).
+
 
 ![SpectaSyncAI Architecture](Architecture_Diagram.png)
 

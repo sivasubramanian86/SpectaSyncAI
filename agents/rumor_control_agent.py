@@ -1,7 +1,6 @@
-"""
-SpectaSyncAI: Rumor Control Agent - @03 @05
+"""SpectaSyncAI: Rumor Control Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
-Failure Mode Addressed: INFO_CASCADE
+Failure Mode Addressed: INFO_CASCADE.
 
 Incident Reference: INC-2025-IND-02
 A 2025 sports venue crush was triggered by a last-minute public announcement
@@ -21,6 +20,7 @@ Responsibility:
   Classifies risk using Gemini Flash NLP. Broadcasts multi-channel, multilingual
   counter-narratives within 12 seconds of viral threshold detection.
 """
+
 import os
 import json
 import logging
@@ -41,21 +41,36 @@ logger = logging.getLogger(__name__)
 RUMOR_KEYWORD_PATTERNS = [
     # Unauthorized entry signals (corpus: INC-2025-IND-02, INC-2019-AGO-01)
     (r"\bfree\s*(?:entry|ticket|pass)\b", "UNAUTHORIZED_ENTRY", 0.8),
-    (r"\b(?:gates?\s+open(?:ed)?|everyone\s+(?:can\s+)?come\s+in)\b", "UNAUTHORIZED_ENTRY", 0.75),
+    (
+        r"\b(?:gates?\s+open(?:ed)?|everyone\s+(?:can\s+)?come\s+in)\b",
+        "UNAUTHORIZED_ENTRY",
+        0.75,
+    ),
     (r"\bno\s*ticket\s*(?:required|needed)\b", "UNAUTHORIZED_ENTRY", 0.85),
     # Structural/safety rumors (corpus: INC-2013-IND-01, INC-2010-KHM-01)
-    (r"\b(?:bridge|wall|gate|barrier)\s+(?:collapsed?|broke|broken|fail)\b", "STRUCTURAL_PANIC", 0.95),
+    (
+        r"\b(?:bridge|wall|gate|barrier)\s+(?:collapsed?|broke|broken|fail)\b",
+        "STRUCTURAL_PANIC",
+        0.95,
+    ),
     (r"\b(?:stampede|crush|people\s+dying)\b", "PANIC_CONTAGION", 0.90),
     # Capacity misinformation
-    (r"\b(?:crowd|venue)\s+is\s+(?:empty|half[\s-]?empty)\b", "CAPACITY_MISINFORMATION", 0.55),
+    (
+        r"\b(?:crowd|venue)\s+is\s+(?:empty|half[\s-]?empty)\b",
+        "CAPACITY_MISINFORMATION",
+        0.55,
+    ),
     # Emergency misinformation (corpus: INC-2013-IND-01)
-    (r"\b(?:run|evacuate|get\s+out|bomb|fire|shooting)\b", "EMERGENCY_MISINFORMATION", 0.92),
+    (
+        r"\b(?:run|evacuate|get\s+out|bomb|fire|shooting)\b",
+        "EMERGENCY_MISINFORMATION",
+        0.92,
+    ),
 ]
 
 
 def scan_social_media_for_rumors(venue_id: str) -> dict:
-    """
-    Scans social media channels for dangerous crowd-related rumors.
+    """Scans social media channels for dangerous crowd-related rumors.
     Detects keyword patterns mapped to known incident trigger signatures.
 
     Historical precedent (INC-2025-IND-02): 'free entry' keywords reached
@@ -66,10 +81,13 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
     and WhatsApp Business Cloud API.
 
     Args:
+    ----
         venue_id: Identifier of the currently monitored venue.
 
     Returns:
+    -------
         dict: Detected rumors with severity scores and viral velocity.
+
     """
     import random
 
@@ -85,13 +103,17 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
         lower = post.lower()
         for pattern, category, base_score in RUMOR_KEYWORD_PATTERNS:
             if re.search(pattern, lower, re.IGNORECASE):
-                rumors_detected.append({
-                    "category": category,
-                    "severity": round(base_score + random.uniform(-0.05, 0.10), 2),
-                    "viral_velocity_per_5min": random.randint(800, 8500),
-                    "sample_text_hash": hex(abs(hash(post)))[:10],
-                    "platform": random.choice(["platform_A", "platform_B", "messaging_app"]),
-                })
+                rumors_detected.append(
+                    {
+                        "category": category,
+                        "severity": round(base_score + random.uniform(-0.05, 0.10), 2),
+                        "viral_velocity_per_5min": random.randint(800, 8500),
+                        "sample_text_hash": hex(abs(hash(post)))[:10],
+                        "platform": random.choice(
+                            ["platform_A", "platform_B", "messaging_app"]
+                        ),
+                    }
+                )
                 break
 
     max_severity = max((r["severity"] for r in rumors_detected), default=0.0)
@@ -102,10 +124,15 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
         "rumors_detected": rumors_detected,
         "max_danger_score": round(max_severity, 2),
         "danger_level": (
-            "CRITICAL" if max_severity >= 0.85
-            else "HIGH" if max_severity >= 0.65
-            else "MODERATE" if max_severity >= 0.4
-            else "CLEAR"
+            "CRITICAL"
+            if max_severity >= 0.85
+            else (
+                "HIGH"
+                if max_severity >= 0.65
+                else "MODERATE"
+                if max_severity >= 0.4
+                else "CLEAR"
+            )
         ),
         "analogous_incidents": [
             r.incident_id for r in INCIDENT_CORPUS if "INFO_CASCADE" in r.failure_modes
@@ -114,17 +141,19 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
 
 
 def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> dict:
-    """
-    Classifies a detected rumor using Gemini Flash NLP.
+    """Classifies a detected rumor using Gemini Flash NLP.
     Determines the counter-narrative priority and broadcast channel mix.
 
     Args:
+    ----
         rumor_text: Hash/anonymized text content.
         category: Detected rumor category from scan.
         viral_velocity: Mentions per 5-minute window.
 
     Returns:
+    -------
         dict: Risk classification, required response speed, recommended channels.
+
     """
     is_viral = viral_velocity > 1000
     broadcast_channels = ["PA_SYSTEM_ALL_ZONES"]
@@ -135,7 +164,13 @@ def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> 
 
     return {
         "rumor_category": category,
-        "risk_level": "CRITICAL" if viral_velocity > 5000 else "HIGH" if viral_velocity > 1000 else "MODERATE",
+        "risk_level": (
+            "CRITICAL"
+            if viral_velocity > 5000
+            else "HIGH"
+            if viral_velocity > 1000
+            else "MODERATE"
+        ),
         "counter_broadcast_urgency_secs": 12 if viral_velocity > 1000 else 60,
         "required_channels": broadcast_channels,
         "require_multilingual": True,  # EN + TA + KN + HI minimum (South Asia default)
@@ -145,8 +180,7 @@ def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> 
 def broadcast_counter_narrative(
     venue_id: str, channels: list[str], rumor_category: str, languages: list[str]
 ) -> dict:
-    """
-    Broadcasts multilingual counter-narratives across all active channels.
+    """Broadcasts multilingual counter-narratives across all active channels.
     Target response time: < 12 seconds from viral threshold detection.
 
     Historical precedent: INC-2025-IND-02's 12-minute viral window was enough.
@@ -157,13 +191,16 @@ def broadcast_counter_narrative(
     and are flagged in the Responsible AI audit trail.
 
     Args:
+    ----
         venue_id: Target venue.
         channels: Broadcast channels list.
         rumor_category: Category of the rumor being countered.
         languages: ISO language codes for broadcast.
 
     Returns:
+    -------
         dict: Broadcast confirmation with message content.
+
     """
     COUNTER_MESSAGES = {
         "UNAUTHORIZED_ENTRY": {
@@ -206,7 +243,9 @@ def broadcast_counter_narrative(
     }
 
     messages = COUNTER_MESSAGES.get(rumor_category, COUNTER_MESSAGES["PANIC_CONTAGION"])
-    broadcast_messages = {lang: messages.get(lang, messages["en"]) for lang in languages}
+    broadcast_messages = {
+        lang: messages.get(lang, messages["en"]) for lang in languages
+    }
     logger.critical(
         f"[RumorControlAgent] COUNTER-BROADCAST - venue={venue_id} "
         f"category={rumor_category} channels={channels}"
@@ -226,7 +265,8 @@ def broadcast_counter_narrative(
 def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
     """Constructs the Rumor Control Agent using Gemini Flash for speed."""
     corpus_incidents = [
-        r.incident_id for r in INCIDENT_CORPUS
+        r.incident_id
+        for r in INCIDENT_CORPUS
         if "INFO_CASCADE" in r.failure_modes or r.rumor_involved
     ]
     # Caching disabled for agents with tools to avoid Vertex AI 400 error
@@ -250,7 +290,11 @@ def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
             "   response_time_ms, analogous_incident_ids.\n"
             "Do NOT reference any persons, brands, venues, or political entities by name."
         ),
-        tools=[scan_social_media_for_rumors, classify_rumor_risk, broadcast_counter_narrative]
+        tools=[
+            scan_social_media_for_rumors,
+            classify_rumor_risk,
+            broadcast_counter_narrative,
+        ],
     )
 
 
@@ -262,7 +306,7 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
     try:
         cache_name = await get_cached_model_flash("rumor_control")
         agent = build_rumor_control_agent(cache_name=cache_name)
-    except Exception:
+    except Exception:  # pragma: no cover
         agent = build_rumor_control_agent()
 
     session_service = InMemorySessionService()
@@ -289,11 +333,11 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
                     result_text += part.text
 
     try:
-        clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+        clean = result_text.strip().replace("```json", "").replace("```", "").strip()
         parsed = json.loads(clean)
         output_size = len(json.dumps(parsed, ensure_ascii=False))
         return parsed
-    except json.JSONDecodeError:
+    except json.JSONDecodeError:  # pragma: no cover
         fallback = True
         scan = scan_social_media_for_rumors(venue_id)
         broadcast = None

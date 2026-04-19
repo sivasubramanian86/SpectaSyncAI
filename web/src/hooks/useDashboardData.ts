@@ -95,6 +95,14 @@ const MOCK_ALERTS: SafetyAlert[] = [
   }
 ];
 
+/**
+ * useDashboardData — Custom hook that simulates and orchestrates real-time telemetry.
+ * 
+ * It manages the unified DashboardState, providing synchronized data for zones,
+ * AI agent logs, forecasts, and safety recommendations.
+ * 
+ * @returns {DashboardState} The current tactical state of the venue.
+ */
 export function useDashboardData() {
   const [state, setState] = useState<DashboardState>({
     zones: MOCK_ZONES,

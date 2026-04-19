@@ -17,6 +17,9 @@ env/
 *.egg-info/
 dist/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
 .coverage
 coverage.xml
 htmlcov/
@@ -67,6 +70,11 @@ db/seed_data/
 *.exe
 *.dll
 *.pyc
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDEs
 .vscode/

@@ -1,11 +1,11 @@
-"""
-SpectaSyncAI FastAPI entry point - 12-Agent Mesh, 8 versioned routers.
-@07_modern_polyglot_standards | @19_cost_efficiency_architect
+"""SpectaSyncAI FastAPI entry point - 12-Agent Mesh, 8 versioned routers.
+@07_modern_polyglot_standards | @19_cost_efficiency_architect.
 
 Startup sequence:
   1. Context cache warm-up   (Vertex AI CachedContent, 6-hour TTL)
   2. Router registration     (Tier 1 + Tier 2)
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -19,7 +19,7 @@ from contextlib import asynccontextmanager
 
 try:
     import google.cloud.logging
-except ImportError:
+except ImportError:  # pragma: no cover
     google.cloud.logging = None
 
 from dotenv import load_dotenv
@@ -30,8 +30,16 @@ from fastapi.staticfiles import StaticFiles
 
 from api.services.observability_service import observability_service
 from api.routers import (
-    health, telemetry, interventions,
-    predictions, queues, safety, experience, crisis, pre_event, observability
+    health,
+    telemetry,
+    interventions,
+    predictions,
+    queues,
+    safety,
+    experience,
+    crisis,
+    pre_event,
+    observability,
 )
 
 # Force override to ensure .env values take precedence
@@ -48,19 +56,22 @@ DEBUG_MODE = os.getenv("DEBUG", "false").lower() in {"1", "true", "yes", "on"}
 cloud_logging_client = None
 
 # ── Google Cloud Logging Integration ──────────────────────────────────────────
-if google.cloud.logging and os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("K_SERVICE"):
+if (
+    google.cloud.logging
+    and os.getenv("GOOGLE_CLOUD_PROJECT")
+    and os.getenv("K_SERVICE")
+):
     try:
         cloud_logging_client = google.cloud.logging.Client()
         cloud_logging_client.setup_logging()
         logger.info("Google Cloud Logging handler attached.")
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         logger.warning(f"Google Cloud Logging initialization skipped: {exc}")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Startup: warm Vertex AI context caches for all 5 Tier-2 agents.
+    """Startup: warm Vertex AI context caches for all 5 Tier-2 agents.
     Cache warm-up runs as a background task.
     """
     logger.info(
@@ -72,9 +83,10 @@ async def lifespan(app: FastAPI):
     if os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "1":
         try:
             from agents.context_cache import warm_all_caches
+
             asyncio.create_task(warm_all_caches())
             logger.info("Context cache warm-up task scheduled.")
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             logger.warning(f"Context cache warm-up skipped: {exc}")
     else:
         logger.info("Vertex AI not configured - context caching disabled.")
@@ -83,18 +95,21 @@ async def lifespan(app: FastAPI):
     async def precompute_pre_event():
         try:
             from api.routers.pre_event import (
-                get_mock_pre_event, trigger_pre_event_analysis, PreEventData
+                get_mock_pre_event,
+                trigger_pre_event_analysis,
+                PreEventData,
             )
+
             mock_data = await get_mock_pre_event()
+            # Ensure proper schema before trigger
             pydantic_data = PreEventData(**mock_data)
             logger.info("[Lifespan] Pre-computing Pre-Event Analysis...")
             await trigger_pre_event_analysis(pydantic_data)
             logger.info("[Lifespan] Pre-Event Analysis ready.")
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.warning(f"[Lifespan] Pre-event failed: {e}")
 
     # Initialize Strategic Pre-Event Analysis in Background
-    # Uses Agent 12: Pre-Event Strategic Analyst
     asyncio.create_task(precompute_pre_event())
     try:
         yield
@@ -102,7 +117,7 @@ async def lifespan(app: FastAPI):
         if cloud_logging_client is not None:
             try:
                 cloud_logging_client.close()
-            except Exception as exc:
+            except Exception as exc:  # pragma: no cover
                 logger.debug(f"Cloud Logging client close skipped: {exc}")
         logger.info("SpectaSyncAI - graceful shutdown complete.")
 
@@ -134,17 +149,20 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
 )
 
 
 # ── Tier 1 - Operational Agents ──────────────────────────────────────────────
 @app.middleware("http")
 async def add_auth_popup_headers(request: Request, call_next):
+    """Middleware for security headers and observability tracing."""
     start = perf_counter()
     response = await call_next(request)
-    response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin-allow-popups")
+    response.headers.setdefault(
+        "Cross-Origin-Opener-Policy", "same-origin-allow-popups"
+    )
     route = request.scope.get("route")
     route_path = getattr(route, "path", request.url.path)
     duration_ms = (perf_counter() - start) * 1000
@@ -163,30 +181,17 @@ async def add_auth_popup_headers(request: Request, call_next):
     )
     return response
 
+
 app.include_router(health.router, prefix="/v1", tags=["Health"])
-app.include_router(
-    telemetry.router, prefix="/v1", tags=["Telemetry & Vision"]
-)
-app.include_router(
-    interventions.router, prefix="/v1", tags=["Interventions"]
-)
-app.include_router(
-    predictions.router, prefix="/v1", tags=["AI Predictions"]
-)
-app.include_router(
-    queues.router, prefix="/v1", tags=["Queue Management"]
-)
-app.include_router(
-    safety.router, prefix="/v1", tags=["Safety & Emergency"]
-)
-app.include_router(
-    experience.router, prefix="/v1", tags=["Attendee Experience"]
-)
+app.include_router(telemetry.router, prefix="/v1", tags=["Telemetry & Vision"])
+app.include_router(interventions.router, prefix="/v1", tags=["Interventions"])
+app.include_router(predictions.router, prefix="/v1", tags=["AI Predictions"])
+app.include_router(queues.router, prefix="/v1", tags=["Queue Management"])
+app.include_router(safety.router, prefix="/v1", tags=["Safety & Emergency"])
+app.include_router(experience.router, prefix="/v1", tags=["Attendee Experience"])
 
 # ── Tier 2 - Crisis Prevention Agents + Incident RAG ─────────────────────────
-app.include_router(
-    crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"]
-)
+app.include_router(crisis.router, prefix="/v1", tags=["Crisis Prevention Mesh"])
 app.include_router(
     pre_event.router, prefix="/v1/pre-event", tags=["Pre-Event Forecasting"]
 )
@@ -196,26 +201,28 @@ app.include_router(
 
 
 def _runtime_firebase_config() -> dict[str, str | None]:
-    """
-    Return the public Firebase client config for the frontend.
-
-    Accept both FIREBASE_* and VITE_FIREBASE_* env vars so local Vite runs
-    and Cloud Run deployments can share the same runtime source of truth.
-    """
+    """Return the public Firebase client config for the frontend."""
     return {
         "apiKey": os.getenv("FIREBASE_API_KEY") or os.getenv("VITE_FIREBASE_API_KEY"),
-        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN") or os.getenv("VITE_FIREBASE_AUTH_DOMAIN"),
-        "projectId": os.getenv("FIREBASE_PROJECT_ID") or os.getenv("VITE_FIREBASE_PROJECT_ID"),
-        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET") or os.getenv("VITE_FIREBASE_STORAGE_BUCKET"),
-        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID") or os.getenv("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN")
+        or os.getenv("VITE_FIREBASE_AUTH_DOMAIN"),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID")
+        or os.getenv("VITE_FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET")
+        or os.getenv("VITE_FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID")
+        or os.getenv("VITE_FIREBASE_MESSAGING_SENDER_ID"),
         "appId": os.getenv("FIREBASE_APP_ID") or os.getenv("VITE_FIREBASE_APP_ID"),
-        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID") or os.getenv("VITE_FIREBASE_MEASUREMENT_ID"),
-        "databaseURL": os.getenv("FIREBASE_DATABASE_URL") or os.getenv("VITE_FIREBASE_DATABASE_URL"),
+        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID")
+        or os.getenv("VITE_FIREBASE_MEASUREMENT_ID"),
+        "databaseURL": os.getenv("FIREBASE_DATABASE_URL")
+        or os.getenv("VITE_FIREBASE_DATABASE_URL"),
     }
 
 
 @app.get("/v1/runtime-config.js", include_in_schema=False)
 async def runtime_config_js():
+    """Serves the dynamic Firebase and Environment config to the frontend."""
     firebase_config = _runtime_firebase_config()
     payload = {
         "firebase": firebase_config,
@@ -243,31 +250,26 @@ if os.path.exists("static"):
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
+    """Serves a blank favicon to suppress 404 logs in the browser."""
     return HTMLResponse(content="")
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    """Global catch-all for unhandled exceptions, with structured observability logging."""
     tb = traceback.format_exc()
     logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
-    payload = {
-        "detail": "Internal Server Error",
-        "error": str(exc),
-    }
+    payload = {"detail": "Internal Server Error", "error": str(exc)}
     if DEBUG_MODE:
         payload["traceback"] = tb
-    return JSONResponse(
-        status_code=500,
-        content=payload,
-    )
+    return JSONResponse(status_code=500, content=payload)
 
 
 @app.get("/", include_in_schema=False)
 async def serve_dashboard():
+    """Serves the static index.html from the Vite build directory."""
     index_path = os.path.join("static", "index.html")
     if os.path.exists(index_path):
-        with open(index_path, "r", encoding="utf-8") as f:
+        with open(index_path, encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(
-        content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
-    )
+    return HTMLResponse(content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>")

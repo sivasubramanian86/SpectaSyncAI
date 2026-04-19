@@ -3,6 +3,13 @@
   "private": true,
   "version": "3.0.0",
   "type": "module",
+  "keywords": [
+    "PromptWars",
+    "HealthTech",
+    "CivicTech",
+    "Agentic Mesh",
+    "Hackathon"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

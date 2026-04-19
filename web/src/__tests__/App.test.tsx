@@ -42,8 +42,8 @@ describe('App Component', () => {
     const tabButton = screen.getByText('Settings');
     fireEvent.click(tabButton);
     
-    expect(screen.getByText('System Settings')).toBeDefined();
-    expect(screen.getByText('Academic Research Track')).toBeDefined();
+    expect(screen.getByText('Tactical Mesh')).toBeDefined();
+    expect(screen.getByText('Research Hub')).toBeDefined();
   });
 
   it('shows critical alert banner when zones are critical', () => {

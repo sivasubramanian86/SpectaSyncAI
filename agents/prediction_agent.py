@@ -1,10 +1,10 @@
-"""
-SpectaSyncAI: Prediction Agent - @03 @05
+"""SpectaSyncAI: Prediction Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Pro
 Responsibility: AI-driven surge forecasting 15-30 minutes ahead using
 historical AlloyDB patterns + current telemetry trend analysis.
 Provides confidence scores and specific actionable recommendations.
 """
+
 import os
 import json
 import logging
@@ -19,16 +19,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_historical_surge_data(location_id: str, window_minutes: int = 60) -> dict:
-    """
-    Retrieves historical surge data for a venue zone over a time window.
+    """Retrieves historical surge data for a venue zone over a time window.
     Production: queries AlloyDB time-series crowd_densities table.
 
     Args:
+    ----
         location_id: The venue zone identifier.
         window_minutes: Historical window to analyze (default 60 mins).
 
     Returns:
+    -------
         dict: Historical surge patterns and peak times.
+
     """
     # Prototype: returns realistic mock surge data
     return {
@@ -53,16 +55,19 @@ def get_historical_surge_data(location_id: str, window_minutes: int = 60) -> dic
 
 
 def calculate_surge_trajectory(current_density: float, buildup_rate: float) -> dict:
-    """
-    Projects crowd density forward for 10, 20 and 30 minute windows.
+    """Projects crowd density forward for 10, 20 and 30 minute windows.
 
     Args:
+    ----
         current_density: Current density score (0.0-1.0).
         buildup_rate: Rate of density increase per minute.
 
     Returns:
+    -------
         dict: Projected density at T+10, T+20, T+30 with alert levels.
+
     """
+
     def classify(d: float) -> str:
         if d >= 0.90:
             return "CRITICAL"
@@ -80,18 +85,22 @@ def calculate_surge_trajectory(current_density: float, buildup_rate: float) -> d
         "T+10_mins": {"density": round(t10, 3), "level": classify(t10)},
         "T+20_mins": {"density": round(t20, 3), "level": classify(t20)},
         "T+30_mins": {"density": round(t30, 3), "level": classify(t30)},
-        "peak_expected_at_mins": round((0.9 - current_density) / buildup_rate, 1)
-        if buildup_rate > 0 else None,
+        "peak_expected_at_mins": (
+            round((0.9 - current_density) / buildup_rate, 1)
+            if buildup_rate > 0
+            else None
+        ),
     }
 
 
 def build_prediction_agent() -> LlmAgent:
-    """
-    Constructs the ADK Prediction Agent using Gemini 2.5 Pro.
+    """Constructs the ADK Prediction Agent using Gemini 2.5 Pro.
     Specialized for temporal pattern analysis and surge forecasting.
 
-    Returns:
+    Returns
+    -------
         LlmAgent: Configured prediction agent.
+
     """
     return LlmAgent(
         model=os.getenv("MODEL_PRO", "gemini-2.5-pro"),
@@ -118,15 +127,17 @@ def build_prediction_agent() -> LlmAgent:
 
 
 async def run_surge_prediction(location_id: str, current_density: float) -> dict:
-    """
-    Executes the Prediction Agent for a given venue zone.
+    """Executes the Prediction Agent for a given venue zone.
 
     Args:
+    ----
         location_id: Venue zone identifier.
         current_density: Current crowd density score (0.0-1.0).
 
     Returns:
+    -------
         dict: Surge forecast with confidence and recommendations.
+
     """
     start = time.perf_counter()
     fallback = False
@@ -164,18 +175,20 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
 
         try:
             # Strip markdown code fences if present
-            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
-        except json.JSONDecodeError:
+        except json.JSONDecodeError:  # pragma: no cover
             fallback = True
             # Fallback structured response using tool calculations
             trajectory = calculate_surge_trajectory(current_density, 0.018)
             result = {
                 "location_id": location_id,
                 "current_density": current_density,
-                "predicted_peak_time_mins": int(trajectory.get("peak_expected_at_mins") or 20),
+                "predicted_peak_time_mins": int(
+                    trajectory.get("peak_expected_at_mins") or 20
+                ),
                 "confidence_score": 72,
                 "surge_level": trajectory["T+20_mins"]["level"],
                 "forecast": trajectory,

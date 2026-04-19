@@ -1,6 +1,5 @@
-"""
-SpectaSyncAI: Global Incident Corpus - RAG Knowledge Base
-@12 @11 @03
+"""SpectaSyncAI: Global Incident Corpus - RAG Knowledge Base
+@12 @11 @03.
 
 Incident registry covering 18 crowd crush events from 2003-2025.
 All incidents are anonymized by incident code: INC-{YEAR}-{ISO2}-{SEQ}.
@@ -34,20 +33,21 @@ from dataclasses import dataclass
 @dataclass
 class IncidentRecord:
     """Structured representation of a historical crowd crush incident."""
+
     incident_id: str
     year: int
     country_iso2: str
-    event_type: str               # political_rally | concert | sports | festival | religious | civic
+    event_type: str  # political_rally | concert | sports | festival | religious | civic
     estimated_attendance: int
     venue_capacity: int
     deaths: int
     injuries: int
-    failure_modes: list[str]      # from taxonomy above
-    primary_trigger: str          # one-line description, no proper nouns
+    failure_modes: list[str]  # from taxonomy above
+    primary_trigger: str  # one-line description, no proper nouns
     key_precursor_signals: list[str]
     interventions_that_would_have_helped: list[str]
-    time_of_day_category: str     # pre_event | during_event | post_event
-    venue_type: str               # outdoor_ground | stadium | street | bridge | corridor | temple
+    time_of_day_category: str  # pre_event | during_event | post_event
+    venue_type: str  # outdoor_ground | stadium | street | bridge | corridor | temple
     vip_delay_involved: bool
     infra_failure_involved: bool
     rumor_involved: bool
@@ -92,7 +92,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Venue capacity limits must be enforced at the perimeter, not the gate",
         ],
     ),
-
     # ─── INC-2025-IND-02 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2025-IND-02",
@@ -130,7 +129,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Social media viral velocity is a leading crowd surge indicator",
         ],
     ),
-
     # ─── INC-2022-KOR-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2022-KOR-01",
@@ -169,7 +167,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Emergency services must be pre-positioned at T-60, not dispatched at T+5",
         ],
     ),
-
     # ─── INC-2022-IDN-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2022-IDN-01",
@@ -208,7 +205,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Zero-tolerance for locked exits during any crowd event",
         ],
     ),
-
     # ─── INC-2021-USA-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2021-USA-01",
@@ -246,7 +242,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Medical distress signal frequency is a leading density indicator",
         ],
     ),
-
     # ─── INC-2015-SAU-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2015-SAU-01",
@@ -284,7 +279,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Multilingual broadcast is mandatory for international gatherings",
         ],
     ),
-
     # ─── INC-2010-DEU-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2010-DEU-01",
@@ -322,7 +316,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Density caps must be enforced at the physical entry, not the venue perimeter",
         ],
     ),
-
     # ─── INC-2010-KHM-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2010-KHM-01",
@@ -360,7 +353,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Post-event egress is statistically the highest-risk crowd phase",
         ],
     ),
-
     # ─── INC-2013-IND-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2013-IND-01",
@@ -398,7 +390,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Bridges at religious sites need dedicated crowd flow AI monitoring",
         ],
     ),
-
     # ─── INC-2017-IND-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2017-IND-01",
@@ -435,7 +426,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Transport infrastructure must be included in crowd intelligence monitoring",
         ],
     ),
-
     # ─── INC-2019-AGO-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2019-AGO-01",
@@ -473,7 +463,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Ticketing fraud predictably causes simultaneous gate rush",
         ],
     ),
-
     # ─── INC-2023-MAR-01 ───────────────────────────────────────────────────────
     IncidentRecord(
         incident_id="INC-2023-MAR-01",
@@ -511,7 +500,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Section-by-section release is 40% faster than simultaneous exit",
         ],
     ),
-
     # ─── INC-2003-IND-01 ───────────────────────────────────────────────────────
     # Religious festival ghat crush: Maharashtra, August 2003
     IncidentRecord(
@@ -550,7 +538,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Time-slotted bathing access is the single highest-impact intervention for ghat safety",
         ],
     ),
-
     # ─── INC-2008-IND-01 ───────────────────────────────────────────────────────
     # Mountain shrine stampede: Himachal Pradesh, August 2008
     IncidentRecord(
@@ -562,7 +549,12 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         venue_capacity=8_000,
         deaths=162,
         injuries=115,
-        failure_modes=["TEMPLE_SURGE", "PANIC_TRIGGER", "STAIRWAY_COLLAPSE", "INFO_CASCADE"],
+        failure_modes=[
+            "TEMPLE_SURGE",
+            "PANIC_TRIGGER",
+            "STAIRWAY_COLLAPSE",
+            "INFO_CASCADE",
+        ],
         primary_trigger=(
             "A false rumor of a landslide near the approach stairs triggered a bidirectional panic surge; "
             "pilgrims fleeing downhill collided with pilgrims ascending; narrow mountain stairway had no counter-flow."
@@ -589,7 +581,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Bidirectional flow control on narrow stairs = most critical physical intervention",
         ],
     ),
-
     # ─── INC-2013-IND-02 ───────────────────────────────────────────────────────
     # Major pilgrimage festival railway bridge crush: North India, February 2013
     IncidentRecord(
@@ -628,7 +619,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Train system coordination is an integral part of pilgrimage crowd safety",
         ],
     ),
-
     # ─── INC-2022-IND-01 ───────────────────────────────────────────────────────
     # Himalayan shrine New Year stampede: Jammu region, January 2022
     IncidentRecord(
@@ -667,7 +657,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Single-stairway mountain shrines require structural redesign, not just crowd management",
         ],
     ),
-
     # ─── INC-2024-IND-01 ───────────────────────────────────────────────────────
     # South India pilgrimage token distribution crush: Tamil Nadu, January 2024
     IncidentRecord(
@@ -706,7 +695,6 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
             "Queue density is a leading indicator equally important to in-venue density",
         ],
     ),
-
     # ─── INC-2025-IND-03 ───────────────────────────────────────────────────────
     # Pilgrimage festival bathing amavasya crush: North India, January 2025
     IncidentRecord(
@@ -719,7 +707,10 @@ INCIDENT_CORPUS: list[IncidentRecord] = [
         deaths=30,
         injuries=60,
         failure_modes=[
-            "GHAT_CRUSH", "EXOGENOUS_SURGE", "BRIDGE_BOTTLENECK", "TEMPORAL_DISRUPT"
+            "GHAT_CRUSH",
+            "EXOGENOUS_SURGE",
+            "BRIDGE_BOTTLENECK",
+            "TEMPORAL_DISRUPT",
         ],
         primary_trigger=(
             "Peak amavasya bathing date at pilgrimage festival drew estimated 30 million pilgrims; catch-all "

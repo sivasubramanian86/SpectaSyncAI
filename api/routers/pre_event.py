@@ -1,7 +1,7 @@
-"""
-SpectaSyncAI: Pre-Event Analysis Router
+"""SpectaSyncAI: Pre-Event Analysis Router
 Exposes strategic forecasting capabilities to the Command Hub.
 """
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 from agents.pre_event_agent import run_pre_event_analysis
@@ -9,13 +9,12 @@ from agents.pre_event_agent import run_pre_event_analysis
 router = APIRouter()
 
 # Global in-memory cache for the latest strategic analysis
-_LATEST_ANALYSIS = {
-    "data": None,
-    "last_updated": None
-}
+_LATEST_ANALYSIS = {"data": None, "last_updated": None}
 
 
 class PreEventData(BaseModel):
+    """Data model representing the strategic context for pre-event analysis."""
+
     event_name: str
     total_reservations: int
     venue_capacity: int
@@ -48,14 +47,13 @@ async def get_latest_pre_event_analysis():
         "precautionary_measures": [],
         "strategic_recommendation": (
             "Click 'Run Strategic Analysis' to trigger agent reasoning."
-        )
+        ),
     }
 
 
 @router.post("/analysis")
 async def trigger_pre_event_analysis(data: PreEventData) -> dict:
     """Triggers the Agent 12: Pre-Event Strategic Analyst loop."""
-
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
         if not isinstance(analysis, dict):
@@ -64,12 +62,14 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
         # Update global cache
         _LATEST_ANALYSIS["data"] = analysis
         from datetime import datetime
+
         _LATEST_ANALYSIS["last_updated"] = datetime.now().isoformat()
 
         return analysis
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         import logging
         import traceback
+
         logging.error(f"Pre-Event Agent Error: {e}")
         logging.error(traceback.format_exc())
 
@@ -81,14 +81,14 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
             "precautionary_measures": [
                 "Deploy secondary steward mesh to Zone B",
                 "Activate staggered entry protocols",
-                "Verify backup power for real-time vision nodes"
+                "Verify backup power for real-time vision nodes",
             ],
             "strategic_recommendation": (
                 f"Proceed with event {data.event_name} under Enhanced Safety "
                 "Protocol V2.1. Monitor density closely."
             ),
             "is_fallback": True,
-            "error_detail": str(e)
+            "error_detail": str(e),
         }
         _LATEST_ANALYSIS["data"] = fallback
         return fallback
@@ -106,11 +106,11 @@ async def get_mock_pre_event():
             "temp_c": 38,
             "condition": "Extreme Heat / Clear Sky",
             "precipitation_prob": 0.05,
-            "humidity": 12
+            "humidity": 12,
         },
         "additional_context": (
             "Regional holiday conflict detected. "
             "Public transport strike scheduled for 16:00. "
             "Wait times at Gate North expected to exceed 90 mins."
-        )
+        ),
     }

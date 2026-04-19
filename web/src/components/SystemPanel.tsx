@@ -1,14 +1,23 @@
 import React from 'react';
-import { HelpCircle, Info, Settings, ShieldCheck, Mail, Github, GraduationCap, Download, Compass, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { HelpCircle, Info, Settings, ShieldCheck, Mail, Github, GraduationCap, Download, Compass, Loader2, AlertTriangle, CheckCircle2, Sun, Moon, Volume2 } from 'lucide-react';
 
 export type TabId = 'dashboard' | 'vision' | 'demographics' | 'crisis' | 'intelligence' | 'pre-event' | 'about' | 'faq' | 'system';
 
+/**
+ * Properties for the InfoSection layout component.
+ */
 interface InfoSectionProps {
+  /** The localized header title for the section. */
   title: string;
+  /** React children representing the configuration controls or text. */
   children: React.ReactNode;
+  /** Lucide icon element to display in the header. */
   icon: React.ReactNode;
 }
 
+/**
+ * A standard glass-morphism container for settings and informational blocks.
+ */
 const InfoSection = ({ title, children, icon }: InfoSectionProps) => (
   <section className="glass p-6 space-y-4">
     <div className="flex items-center gap-3 border-b border-white/10 pb-4 mb-4">
@@ -23,103 +32,126 @@ const InfoSection = ({ title, children, icon }: InfoSectionProps) => (
   </section>
 );
 
+/**
+ * SystemPanel: The primary configuration and research hub for SpectaSyncAI.
+ * 
+ * Features a dynamic grid layout that adapts based on the active view:
+ * - 'system': 3-column tactical grid (Tactical Mesh, UI Prefs, Research/Support)
+ * - Other views: 2-column informational layout (FAQ, About, Audit)
+ * 
+ * @param view - The current sub-tab within the Settings panel.
+ */
 export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactElement {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in pb-10">
+    <div className={`grid grid-cols-1 ${view === 'system' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-6 animate-fade-in pb-10`}>
       {/* Settings Panel — shown only in system view */}
       {view === 'system' && (
-        <InfoSection title="System Settings" icon={<Settings size={24} />}>
-          <div className="space-y-6">
-            <div className="p-4 bg-blue-500/5 rounded-xl border border-blue-500/20">
-              <div className="flex items-center gap-3 mb-3">
-                <GraduationCap className="text-blue-400" size={20} />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Academic Research Track</h3>
+        <InfoSection title="Tactical Mesh" icon={<ShieldCheck size={24} />}>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+              <div>
+                <p className="text-sm font-medium text-white">Advanced RAG Augmentation</p>
+                <p className="text-[10px] text-slate-500">Dual-stream Gemini reasoning.</p>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                Access anonymized incident datasets for GNN (Graph Neural Network) training and Crowd Ethics research. 
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <button type="button" className="flex items-center justify-center gap-2 p-2 bg-white/5 hover:bg-white/10 rounded text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
-                  <Download size={12} /> Dataset V3.1
-                </button>
-                <button type="button" className="flex items-center justify-center gap-2 p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded text-[10px] font-black uppercase text-blue-300 transition-all border border-blue-500/20">
-                   Join Sandbox
-                </button>
-              </div>
+              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+              </button>
             </div>
 
-            {/* Advanced Configuration Items */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-                <div>
-                  <p className="text-sm font-medium text-white">Advanced RAG Augmentation</p>
-                  <p className="text-[10px] text-slate-500">Enable Gemini reasoning over semantic incident history.</p>
-                </div>
-                <button type="button" aria-pressed="true" aria-label="Advanced RAG Augmentation enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
-                  <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </button>
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+              <div>
+                <p className="text-sm font-medium text-white">Agentic Auto-Intervention</p>
+                <p className="text-[10px] text-slate-500">Autonomous PA/Signage updates.</p>
               </div>
-
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Privacy Masking Level</label>
-                <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
-                   {['Blur', 'Obfuscate', 'Full Anonymize'].map((label, i) => (
-                     <button key={label} className={`flex-1 text-[10px] py-1.5 rounded transition-all ${i === 2 ? 'bg-blue-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}>
-                       {label}
-                     </button>
-                   ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Predictive Horizon</label>
-                  <select defaultValue="30 Minutes (Deep)" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
-                    <option>15 Minutes (Turbo)</option>
-                    <option>30 Minutes (Deep)</option>
-                    <option>60 Minutes (Strategic)</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Mesh Sensitivity</label>
-                  <select defaultValue="Standard (Safety First)" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/50">
-                    <option>Standard (Safety First)</option>
-                    <option>High (Zero Latency)</option>
-                    <option>Dynamic (Agentic)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-                <div>
-                  <p className="text-sm font-medium text-white">Agentic Auto-Intervention</p>
-                  <p className="text-[10px] text-slate-500">Allow agents to trigger PA/Signage without human-in-the-loop.</p>
-                </div>
-                <button type="button" aria-pressed="false" aria-label="Agentic Auto-Intervention disabled" className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
-                  <div className="w-3 h-3 bg-slate-400 rounded-full shadow-sm" />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-                <div>
-                  <p className="text-sm font-medium text-white">Synthetic Crowd Twin</p>
-                  <p className="text-[10px] text-slate-500">Run parallel Monte Carlo simulations to verify agent hypothesis.</p>
-                </div>
-                <button type="button" aria-pressed="true" aria-label="Synthetic Crowd Twin enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
-                   <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
-                <div>
-                  <p className="text-sm font-medium text-white">Mesh Self-Healing</p>
-                  <p className="text-[10px] text-slate-500">Auto-respawn failed agent containers in GKE.</p>
-                </div>
-                <button type="button" aria-pressed="true" aria-label="Mesh Self-Healing enabled" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
-                   <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
-                </button>
-              </div>
+              <button type="button" aria-pressed="false" className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
+                <div className="w-3 h-3 bg-slate-400 rounded-full shadow-sm" />
+              </button>
             </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+              <div>
+                <p className="text-sm font-medium text-white">Synthetic Crowd Twin</p>
+                <p className="text-[10px] text-slate-500">Parallel Monte Carlo verify.</p>
+              </div>
+              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                 <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+              <div>
+                <p className="text-sm font-medium text-white">Mesh Self-Healing</p>
+                <p className="text-[10px] text-slate-500">Auto-GKE container recovery.</p>
+              </div>
+              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+                 <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+              </button>
+            </div>
+            
+            <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl mt-2">
+               <p className="text-[10px] text-blue-400 font-bold uppercase mb-2">Node Status</p>
+               <div className="flex gap-1">
+                  {[1,2,3,4,5,6,7,8].map(i => (
+                    <div key={i} className="flex-1 h-1.5 bg-emerald-500/40 rounded-full" />
+                  ))}
+               </div>
+               <p className="text-[9px] text-slate-500 mt-2 italic">All 12 agents reporting healthy heartbeats.</p>
+            </div>
+          </div>
+        </InfoSection>
+      )}
+
+      {/* Column 2: Interface Configuration */}
+      {view === 'system' && (
+        <InfoSection title="UI Preferences" icon={<Settings size={24} />}>
+          <div className="space-y-4">
+             <div className="space-y-1">
+               <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Privacy Masking</label>
+               <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
+                  {['Blur', 'Full Anonymize'].map((label, i) => (
+                    <button key={label} className={`flex-1 text-[10px] py-1.5 rounded transition-all ${i === 1 ? 'bg-blue-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}>
+                      {label}
+                    </button>
+                  ))}
+               </div>
+             </div>
+
+             <div className="grid grid-cols-1 gap-3">
+               <div className="space-y-1">
+                 <label className="text-[10px] font-bold text-slate-500 uppercase px-1 font-mono">Telemetry Rate</label>
+                 <select defaultValue="15s" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none">
+                   <option value="5s">5s (Real-time)</option>
+                   <option value="15s">15s (Standard)</option>
+                   <option value="60s">60s (Efficiency)</option>
+                 </select>
+               </div>
+               <div className="space-y-1">
+                 <label className="text-[10px] font-bold text-slate-500 uppercase px-1 font-mono">Alert Volume</label>
+                 <div className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/5">
+                    <Volume2 size={12} className="text-blue-400" />
+                    <div className="flex-grow flex gap-1 transform scale-y-150 origin-left">
+                       {[1,2,3,4,5,6].map(v => <div key={v} className={`h-1 flex-1 rounded-full ${v <= 4 ? 'bg-blue-500' : 'bg-slate-700'}`} />)}
+                    </div>
+                 </div>
+               </div>
+             </div>
+
+             <div className="flex items-center justify-between p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+               <div>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider">Visual Theme</p>
+                  <p className="text-[10px] text-slate-500 italic">Toggle high-viz mode.</p>
+               </div>
+               <button 
+                onClick={() => {
+                  const isLight = document.body.classList.toggle('theme-light');
+                  localStorage.setItem('spectasync-theme', isLight ? 'light' : 'dark');
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-[10px] font-bold uppercase transition-all"
+               >
+                 <Sun size={12} className="text-amber-400" /> / <Moon size={12} className="text-blue-400" />
+               </button>
+             </div>
           </div>
         </InfoSection>
       )}
@@ -179,30 +211,48 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
       {/* Pre-Event Strategic Audit View */}
       {view === 'pre-event' && <PreEventStrategicAudit />}
 
-      {/* Support & Links — Shown in 'system' view */}
+      {/* Column 3: Contact & Resources (Combined) */}
       {view === 'system' && (
-        <InfoSection title="Contact & Resources" icon={<ShieldCheck size={24} />}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="https://github.com/sivasubramanian86/SpectaSyncAI" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
-              <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-slate-700 group-hover:scale-110 transition-all">
-                <Github className="text-slate-400 group-hover:text-white" size={20} />
+        <div className="space-y-6">
+           <InfoSection title="Research Hub" icon={<GraduationCap size={24} />}>
+              <div className="space-y-4">
+                 <p className="text-xs text-slate-500 leading-relaxed italic">
+                    Access anonymized incident datasets for GNN training and Crowd Ethics forensics.
+                 </p>
+                 <div className="flex flex-col gap-2">
+                    <button type="button" className="flex items-center justify-center gap-2 p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
+                      <Download size={12} /> Sync Dataset V3.4
+                    </button>
+                    <button type="button" className="flex items-center justify-center gap-2 p-2.5 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl text-[10px] font-black uppercase text-blue-400 transition-all border border-blue-500/20">
+                       Request GNN Node Access
+                    </button>
+                 </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-white">Source Code</p>
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Public Repository</p>
+           </InfoSection>
+
+           <InfoSection title="Developer Support" icon={<ShieldCheck size={24} />}>
+              <div className="space-y-4">
+                <a href="https://github.com/sivasubramanian86/SpectaSyncAI" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
+                  <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-slate-700 group-hover:scale-110 transition-all">
+                    <Github className="text-slate-400 group-hover:text-white" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">Source</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Public Repo</p>
+                  </div>
+                </a>
+                <a href="mailto:support@spectasync.ai" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
+                  <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
+                     <Mail className="text-blue-400 group-hover:text-blue-300" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">Email</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">HQ Support</p>
+                  </div>
+                </a>
               </div>
-            </a>
-            <a href="mailto:support@spectasync.ai" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
-              <div className="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 group-hover:scale-110 transition-all">
-                 <Mail className="text-blue-400 group-hover:text-blue-300" size={20} />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">Support</p>
-                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Architecture Team</p>
-              </div>
-            </a>
-          </div>
-        </InfoSection>
+           </InfoSection>
+        </div>
       )}
 
       {/* About Section — Expanded */}

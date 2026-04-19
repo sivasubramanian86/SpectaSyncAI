@@ -14,6 +14,12 @@ const meshData = [
   { subject: 'Staff', A: 85, fullMark: 150 },
 ];
 
+/**
+ * Component displaying the Mesh Performance Radar chart.
+ * Captures latency and responsiveness across multiple agents.
+ * 
+ * @returns {React.ReactElement} The radar chart widget.
+ */
 export const MeshPerformanceRadar = () => (
   <div className="h-[200px] w-full">
     <ResponsiveContainer width="100%" height="100%">
@@ -41,6 +47,12 @@ const occupancyData = [
   { name: 'Staff', count: 120 },
 ];
 
+/**
+ * Component displaying real-time Zone Occupancy Data as bar charts.
+ * Highly responsive to changes in physical density tracking.
+ *
+ * @returns {React.ReactElement} The bar chart widget.
+ */
 export const ZoneOccupancyBars = () => (
   <div className="h-[250px] w-full mt-4">
     <ResponsiveContainer width="100%" height="100%">
@@ -71,6 +83,12 @@ const riskData = [
   { time: '10:50', risk: 95 },
 ];
 
+/**
+ * Component mapping historical risk trends using an Area chart.
+ * Helps operator predict exponential hazard growth.
+ * 
+ * @returns {React.ReactElement} The risk area chart.
+ */
 export const RiskVelocityArea = () => (
   <div className="h-[200px] w-full mt-4">
     <ResponsiveContainer width="100%" height="100%">
@@ -97,6 +115,12 @@ const sentimentData = [
 
 const COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
 
+/**
+ * Component breaking down crowd sentiment based on social & video cues.
+ * Updates via Sentiment or Experience agent outputs.
+ * 
+ * @returns {React.ReactElement} The pie chart visualization.
+ */
 export const SentimentPie = () => (
   <div className="h-[200px] w-full flex items-center justify-center">
     <ResponsiveContainer width="100%" height="100%">

@@ -33,6 +33,13 @@ const EVENT_TYPE_COLOR: Record<string, string> = {
   alert: 'text-red-300',
 };
 
+/**
+ * Renders the live agent activity feed on the dashboard.
+ * Supports visual mapping of agent actions and severity tracking.
+ *
+ * @param {AgentFeedProps} props - Component properties containing the events feed array.
+ * @returns {React.ReactElement} The rendered agent feed section.
+ */
 export function AgentFeed({ events }: AgentFeedProps) {
   return (
     <section className="glass p-5 flex flex-col h-full overflow-hidden" aria-label="Live agent activity feed">

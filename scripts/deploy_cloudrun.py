@@ -1,5 +1,4 @@
-"""
-SpectaSyncAI: Cloud Run Deployment Script
+"""SpectaSyncAI: Cloud Run Deployment Script
 Deploys MCP Toolbox and FastAPI backend as separate Cloud Run services.
 
 Usage:
@@ -16,6 +15,7 @@ Pre-requisites:
 @17_devops_sre_deployer: source-deploy (no local Docker required)
 @07_modern_polyglot_standards: Cloud Run min=0, cpu_idle=true
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,6 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 try:
     from dotenv import load_dotenv
+
     load_dotenv(override=True)
 except ImportError:
     pass
@@ -41,36 +42,36 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Config ────────────────────────────────────────────────────────────────────
-PROJECT_ID  = os.environ.get("GOOGLE_CLOUD_PROJECT", "spectasyncai")
-REGION      = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
-AR_REPO     = "spectasync-docker"
-AR_HOST     = f"{REGION}-docker.pkg.dev"
-SA_EMAIL    = f"spectasync-runner@{PROJECT_ID}.iam.gserviceaccount.com"
-MODEL_PRO   = os.environ.get("MODEL_PRO",   "gemini-2.0-pro-exp-02-05")
+PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "spectasyncai")
+REGION = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
+AR_REPO = "spectasync-docker"
+AR_HOST = f"{REGION}-docker.pkg.dev"
+SA_EMAIL = f"spectasync-runner@{PROJECT_ID}.iam.gserviceaccount.com"
+MODEL_PRO = os.environ.get("MODEL_PRO", "gemini-2.0-pro-exp-02-05")
 MODEL_FLASH = os.environ.get("MODEL_FLASH", "gemini-2.0-flash-001")
 
 # Cloud Run service definitions
 SERVICES = {
     "mcp": {
-        "name":        "spectasync-mcp",
-        "dockerfile":  "Dockerfile.mcp",
-        "image_tag":   "spectasync-mcp",
-        "port":        8080,
-        "min_inst":    0,
-        "max_inst":    5,
-        "memory":      "512Mi",
-        "cpu":         "1",
+        "name": "spectasync-mcp",
+        "dockerfile": "Dockerfile.mcp",
+        "image_tag": "spectasync-mcp",
+        "port": 8080,
+        "min_inst": 0,
+        "max_inst": 5,
+        "memory": "512Mi",
+        "cpu": "1",
         "description": "FastMCP SSE Toolbox",
     },
     "api": {
-        "name":        "spectasync-api",
-        "dockerfile":  "Dockerfile",
-        "image_tag":   "spectasync-api",
-        "port":        8080,
-        "min_inst":    0,
-        "max_inst":    10,
-        "memory":      "1Gi",
-        "cpu":         "2",
+        "name": "spectasync-api",
+        "dockerfile": "Dockerfile",
+        "image_tag": "spectasync-api",
+        "port": 8080,
+        "min_inst": 0,
+        "max_inst": 10,
+        "memory": "1Gi",
+        "cpu": "2",
         "description": "FastAPI 12-Agent Mesh",
     },
 }
@@ -91,14 +92,15 @@ def get_service_url(service_name: str) -> str:
         f"gcloud run services describe {service_name} "
         f"--region {REGION} --project {PROJECT_ID} "
         f"--format value(status.url)",
-        shell=True, capture_output=True, text=True,
+        shell=True,
+        capture_output=True,
+        text=True,
     )
     return result.stdout.strip()
 
 
 def deploy_service(svc_key: str, mcp_url: str = "") -> str:
-    """
-    Deploys a Cloud Run service using Google Cloud Build source deploy.
+    """Deploys a Cloud Run service using Google Cloud Build source deploy.
     Returns the deployed service URL.
     """
     svc = SERVICES[svc_key]
@@ -108,28 +110,36 @@ def deploy_service(svc_key: str, mcp_url: str = "") -> str:
     log.info("─" * 55)
 
     # Base env vars for all services
-    env_vars = ",".join([
-        f"GOOGLE_CLOUD_PROJECT={PROJECT_ID}",
-        f"GOOGLE_CLOUD_LOCATION={REGION}",
-        "GOOGLE_GENAI_USE_VERTEXAI=1",
-        f"MODEL_PRO={MODEL_PRO}",
-        f"MODEL_FLASH={MODEL_FLASH}",
-        "LOG_LEVEL=INFO",
-        *[
-            f"{key}={value}"
-            for key, value in {
-                "FIREBASE_API_KEY": os.environ.get("FIREBASE_API_KEY"),
-                "FIREBASE_AUTH_DOMAIN": os.environ.get("FIREBASE_AUTH_DOMAIN"),
-                "FIREBASE_PROJECT_ID": os.environ.get("FIREBASE_PROJECT_ID"),
-                "FIREBASE_STORAGE_BUCKET": os.environ.get("FIREBASE_STORAGE_BUCKET"),
-                "FIREBASE_MESSAGING_SENDER_ID": os.environ.get("FIREBASE_MESSAGING_SENDER_ID"),
-                "FIREBASE_APP_ID": os.environ.get("FIREBASE_APP_ID"),
-                "FIREBASE_MEASUREMENT_ID": os.environ.get("FIREBASE_MEASUREMENT_ID"),
-                "FIREBASE_DATABASE_URL": os.environ.get("FIREBASE_DATABASE_URL"),
-            }.items()
-            if value
-        ],
-    ])
+    env_vars = ",".join(
+        [
+            f"GOOGLE_CLOUD_PROJECT={PROJECT_ID}",
+            f"GOOGLE_CLOUD_LOCATION={REGION}",
+            "GOOGLE_GENAI_USE_VERTEXAI=1",
+            f"MODEL_PRO={MODEL_PRO}",
+            f"MODEL_FLASH={MODEL_FLASH}",
+            "LOG_LEVEL=INFO",
+            *[
+                f"{key}={value}"
+                for key, value in {
+                    "FIREBASE_API_KEY": os.environ.get("FIREBASE_API_KEY"),
+                    "FIREBASE_AUTH_DOMAIN": os.environ.get("FIREBASE_AUTH_DOMAIN"),
+                    "FIREBASE_PROJECT_ID": os.environ.get("FIREBASE_PROJECT_ID"),
+                    "FIREBASE_STORAGE_BUCKET": os.environ.get(
+                        "FIREBASE_STORAGE_BUCKET"
+                    ),
+                    "FIREBASE_MESSAGING_SENDER_ID": os.environ.get(
+                        "FIREBASE_MESSAGING_SENDER_ID"
+                    ),
+                    "FIREBASE_APP_ID": os.environ.get("FIREBASE_APP_ID"),
+                    "FIREBASE_MEASUREMENT_ID": os.environ.get(
+                        "FIREBASE_MEASUREMENT_ID"
+                    ),
+                    "FIREBASE_DATABASE_URL": os.environ.get("FIREBASE_DATABASE_URL"),
+                }.items()
+                if value
+            ],
+        ]
+    )
 
     deploy_cmd = (
         f"gcloud run deploy {svc['name']} "
@@ -149,8 +159,8 @@ def deploy_service(svc_key: str, mcp_url: str = "") -> str:
 
     # If MCP, override the CMD of the single unified Dockerfile
     if svc_key == "mcp":
-        deploy_cmd += " --command=\"python\" --args=\"-m,mcp_server.server\""
-    
+        deploy_cmd += ' --command="python" --args="-m,mcp_server.server"'
+
     # API service gets MCP URL
     if svc_key == "api" and mcp_url:
         env_vars += f",MCP_SERVER_URL={mcp_url}/sse"
@@ -179,15 +189,16 @@ def print_urls() -> None:
                 log.info("  %-12s   SSE endpoint: %s/sse", "", url)
             if svc_key == "api":
                 log.info("  %-12s   API docs:     %s/docs", "", url)
-                log.info("  %-12s   Corpus list:  %s/v1/crisis/incident-corpus", "", url)
+                log.info(
+                    "  %-12s   Corpus list:  %s/v1/crisis/incident-corpus", "", url
+                )
         else:
             log.info("  %-12s → NOT DEPLOYED", svc["description"])
     log.info("")
 
 
 def update_cors(api_url: str, ui_url: str = "") -> None:
-    """
-    Updates the API service's CORS_ORIGINS env var after both services are deployed.
+    """Updates the API service's CORS_ORIGINS env var after both services are deployed.
     Call this after the frontend URL is known.
     """
     origins = ",".join(filter(None, ["http://localhost:5173", ui_url]))

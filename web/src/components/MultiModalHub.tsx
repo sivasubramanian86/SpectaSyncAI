@@ -36,6 +36,12 @@ const SAMPLE_MEDIA: MediaSource[] = [
   { id: '3', name: 'Drone Patrol - North Plaza (VEO)', url: 'https://storage.googleapis.com/spectasync-public-assets/crowd_surge.mp4', type: 'video', timestamp: '10:41:55', status: 'SAFE' },
 ];
 
+/**
+ * Core multi-modal intelligence hub rendering CCTV and drone feeds with live reasoning traces.
+ * Demonstrates Gemini 2.5 Flash Multi-Modal capabilities in analyzing visuals and acoustics.
+ * 
+ * @returns {React.ReactElement} The multi-modal analysis hub.
+ */
 export function MultiModalHub() {
   const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
   const [language, setLanguage] = useState('EN');
@@ -91,6 +97,7 @@ export function MultiModalHub() {
           <select 
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
+            aria-label="Select Language"
             className="bg-navy-900 border border-white/10 rounded px-3 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
           >
             <option value="EN">English</option>

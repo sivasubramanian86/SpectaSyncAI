@@ -5,6 +5,13 @@ interface VenueMapProps {
   className?: string;
 }
 
+/**
+ * Renders a satellite venue map overlaid with critical incident beacons.
+ * Simulates physical tracking and situational awareness.
+ * 
+ * @param {VenueMapProps} props - Properties including css strings.
+ * @returns {React.ReactElement} The constructed venue map visual context.
+ */
 export function VenueMap({ className = '' }: VenueMapProps): React.ReactElement {
   return (
     <div className={`glass overflow-hidden flex flex-col ${className}`}>
@@ -26,7 +33,7 @@ export function VenueMap({ className = '' }: VenueMapProps): React.ReactElement 
       <div className="relative flex-grow min-h-[400px] bg-slate-900 overflow-hidden">
         {/* The generated satellite map */}
         <img 
-          src="/assets/google_satellite_venue_map_1776449711784.png" 
+          src="/assets/venue_map.png" 
           alt="Satellite Venue Map"
           className="w-full h-full object-cover opacity-80"
         />

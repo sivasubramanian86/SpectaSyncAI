@@ -1,10 +1,10 @@
-"""
-SpectaSyncAI: Test Runner Script
+"""SpectaSyncAI: Test Runner Script
 Runs the full pytest suite with coverage reporting.
 
 Usage:
     python scripts/run_tests.py
 """
+
 import subprocess
 import sys
 import os
@@ -13,13 +13,13 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def main() -> None:
-    print("=" * 50)
-    print("  SpectaSyncAI — Running Test Suite")
-    print("=" * 50)
+    """Test functionality for main."""
 
     result = subprocess.run(
         [
-            sys.executable, "-m", "pytest",
+            sys.executable,
+            "-m",
+            "pytest",
             "tests/",
             "-v",
             "--tb=short",

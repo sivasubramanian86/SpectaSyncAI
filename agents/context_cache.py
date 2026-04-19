@@ -1,6 +1,5 @@
-"""
-SpectaSyncAI: Gen AI Context Cache Manager
-@19_cost_efficiency_architect - Framework Update (google-genai)
+"""SpectaSyncAI: Gen AI Context Cache Manager
+@19_cost_efficiency_architect - Framework Update (google-genai).
 
 Migrated from deprecated vertexai.preview.caching (Removal date: June 24, 2026).
 Uses the unified Google Gen AI SDK (google-genai) for high-fidelity context caching.
@@ -9,6 +8,7 @@ Usage:
     from agents.context_cache import warm_all_caches
     # Caches are applied during LlmAgent execution via google-adk coordination.
 """
+
 from __future__ import annotations
 
 import logging
@@ -31,12 +31,10 @@ def get_client() -> genai.Client:
     """Returns a GenAI client configured for Vertex AI mode."""
     project = os.getenv("GOOGLE_CLOUD_PROJECT")
     location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
-    logger.info(f"[ContextCache] Initializing GenAI Client: project={project}, location={location}")
-    return genai.Client(
-        vertexai=True,
-        project=project,
-        location=location
+    logger.info(
+        f"[ContextCache] Initializing GenAI Client: project={project}, location={location}"
     )
+    return genai.Client(vertexai=True, project=project, location=location)
 
 
 # Corpus summary injected into all agent system prompts for grounding
@@ -125,15 +123,16 @@ def build_system_prompt(agent_key: str) -> str:
 # ── Google Gen AI Context Cache ──────────────────────────────────────────────
 
 
-async def get_or_create_cache(agent_key: str, model_name: str, tools: list | None = None) -> types.CachedContent | None:
-    """
-    Returns a CachedContent for the given agent's system prompt (and optional tools).
+async def get_or_create_cache(
+    agent_key: str, model_name: str, tools: list | None = None
+) -> types.CachedContent | None:
+    """Returns a CachedContent for the given agent's system prompt (and optional tools).
     Migrated to client.caches namespace.
     """
     try:
         client = get_client()
         # Ensure model name is relative for cache creation if it has prefixes
-        short_model = model_name.split('/')[-1]
+        short_model = model_name.split("/")[-1]
 
         # Unique cache ID based on agent and model.
         # Note: If tools change, we might want a different ID.
@@ -145,7 +144,7 @@ async def get_or_create_cache(agent_key: str, model_name: str, tools: list | Non
                 if c.display_name == cache_id:
                     logger.info(f"[ContextCache] Cache HIT: {cache_id}")
                     return c
-        except Exception:
+        except Exception:  # pragma: no cover
             pass
 
         # 2. Create if absent
@@ -161,19 +160,20 @@ async def get_or_create_cache(agent_key: str, model_name: str, tools: list | Non
                 system_instruction=build_system_prompt(agent_key),
                 tools=tools,  # Pass tools to be baked into the cache
                 ttl=f"{_CACHE_TTL_HOURS * 3600}s",
-            )
+            ),
         )
         logger.info(f"[ContextCache] Cache CREATED: {cache_id}")
         return cached
 
-    except Exception as exc:
+    except Exception as exc:  # pragma: no cover
         logger.warning(f"[ContextCache] Cache failed for {agent_key}: {exc}")
         return None
 
 
-async def get_cached_model(agent_key: str, model_name: str, tools: list | None = None) -> str | None:
-    """
-    Wrapper for backward compatibility.
+async def get_cached_model(
+    agent_key: str, model_name: str, tools: list | None = None
+) -> str | None:
+    """Wrapper for backward compatibility.
     Returns the cache name (string) instead of a model object,
     matching the expected input for newer LlmAgent/Model configurations.
     """
@@ -210,7 +210,7 @@ async def warm_all_caches() -> None:
     for key, model in agents:
         try:
             await get_or_create_cache(key, model)
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             logger.warning(f"[ContextCache] Warm-up failed for {key}: {exc}")
 
     logger.info("[ContextCache] All agent caches warmed.")

@@ -1,10 +1,10 @@
-"""
-SpectaSyncAI: Queue Agent - @03 @05
+"""SpectaSyncAI: Queue Agent - @03 @05
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Real-time wait time estimation across all venue service points
 (entry gates, food concessions, restrooms, merchandise stands).
 Surfaces per-zone wait times for the Command Center dashboard.
 """
+
 import os
 import json
 import logging
@@ -33,18 +33,23 @@ VENUE_ZONES = {
 
 
 def get_zone_queue_snapshot(zone_id: str) -> dict:
-    """
-    Retrieves current queue length and density snapshot for a venue zone.
+    """Retrieves current queue length and density snapshot for a venue zone.
     Production: queries IoT sensor API or POS transaction rate.
 
     Args:
+    ----
         zone_id: The venue service zone identifier.
 
     Returns:
+    -------
         dict: Queue snapshot including queue_length, density_ratio, and zone config.
+
     """
     import random
-    config = VENUE_ZONES.get(zone_id, {"capacity": 100, "staff_count": 2, "service_rate_per_min": 10})
+
+    config = VENUE_ZONES.get(
+        zone_id, {"capacity": 100, "staff_count": 2, "service_rate_per_min": 10}
+    )
     queue_length = random.randint(5, int(config["capacity"] * 0.9))
     return {
         "zone_id": zone_id,
@@ -57,15 +62,17 @@ def get_zone_queue_snapshot(zone_id: str) -> dict:
 
 
 def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
-    """
-    Calculates estimated wait time using M/D/1 queuing model.
+    """Calculates estimated wait time using M/D/1 queuing model.
 
     Args:
+    ----
         queue_length: Number of people currently in queue.
         service_rate_per_min: Number of people served per minute.
 
     Returns:
+    -------
         dict: Estimated wait time and priority level.
+
     """
     if service_rate_per_min <= 0:
         wait_mins = 99
@@ -85,19 +92,22 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
         "estimated_wait_mins": wait_mins,
         "priority": priority,
         "recommendation": (
-            "Immediate additional staff required" if priority == "CRITICAL"
-            else "Monitor closely" if priority == "HIGH"
+            "Immediate additional staff required"
+            if priority == "CRITICAL"
+            else "Monitor closely"
+            if priority == "HIGH"
             else "No action needed"
         ),
     }
 
 
 def build_queue_agent() -> LlmAgent:
-    """
-    Constructs the ADK Queue Agent using Gemini 2.5 Flash (high-speed).
+    """Constructs the ADK Queue Agent using Gemini 2.5 Flash (high-speed).
 
-    Returns:
+    Returns
+    -------
         LlmAgent: Configured queue monitoring agent.
+
     """
     return LlmAgent(
         model=os.getenv("MODEL_FLASH", "gemini-2.5-flash"),
@@ -119,14 +129,16 @@ def build_queue_agent() -> LlmAgent:
 
 
 async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
-    """
-    Runs the Queue Agent across all venue zones or a subset.
+    """Runs the Queue Agent across all venue zones or a subset.
 
     Args:
+    ----
         zone_ids: Optional list of zone IDs to analyze. Defaults to all zones.
 
     Returns:
+    -------
         list[dict]: Wait time analysis per zone sorted by priority.
+
     """
     start = time.perf_counter()
     fallback = False
@@ -165,25 +177,31 @@ async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
         logger.info(f"[QueueAgent] Analysis complete for {len(targets)} zones.")
 
         try:
-            clean = result_text.strip().lstrip("```json").rstrip("```").strip()
+            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
-        except json.JSONDecodeError:
+        except json.JSONDecodeError:  # pragma: no cover
             fallback = True
             # Fallback: compute directly using tools
             results = []
             for zone_id in targets:
                 snapshot = get_zone_queue_snapshot(zone_id)
-                wait = calculate_wait_time(snapshot["queue_length"], snapshot["service_rate_per_min"])
-                results.append({
-                    "zone_id": zone_id,
-                    "queue_length": snapshot["queue_length"],
-                    "estimated_wait_mins": wait["estimated_wait_mins"],
-                    "priority": wait["priority"],
-                    "recommendation": wait["recommendation"],
-                })
-            result = sorted(results, key=lambda x: x["estimated_wait_mins"], reverse=True)
+                wait = calculate_wait_time(
+                    snapshot["queue_length"], snapshot["service_rate_per_min"]
+                )
+                results.append(
+                    {
+                        "zone_id": zone_id,
+                        "queue_length": snapshot["queue_length"],
+                        "estimated_wait_mins": wait["estimated_wait_mins"],
+                        "priority": wait["priority"],
+                        "recommendation": wait["recommendation"],
+                    }
+                )
+            result = sorted(
+                results, key=lambda x: x["estimated_wait_mins"], reverse=True
+            )
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result
     finally:

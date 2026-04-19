@@ -1,5 +1,4 @@
-"""
-SpectaSyncAI: Incident Forensics - Failure Mode Analysis
+"""SpectaSyncAI: Incident Forensics - Failure Mode Analysis
 Maps crowd crush failure modes to the 4 Tier-2 Crisis Prevention Agents.
 All incident data is referenced via the INC-YYYY-ISO2-NN corpus identifier only.
 See agents/incident_corpus.py for the full anonymized 12-incident global corpus.
