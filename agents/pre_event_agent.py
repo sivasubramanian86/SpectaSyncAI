@@ -80,7 +80,9 @@ async def run_pre_event_analysis(pre_event_data: dict) -> dict:
                     if part.text:
                         result_text += part.text
 
-        clean_json = result_text.strip().replace("```json", "").replace("```", "").strip()
+        clean_json = (
+            result_text.strip().replace("```json", "").replace("```", "").strip()
+        )
         parsed = json.loads(clean_json)
 
         if isinstance(parsed, list) and len(parsed) > 0:

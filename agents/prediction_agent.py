@@ -175,7 +175,9 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
 
         try:
             # Strip markdown code fences if present
-            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
+            clean = (
+                result_text.strip().replace("```json", "").replace("```", "").strip()
+            )
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result

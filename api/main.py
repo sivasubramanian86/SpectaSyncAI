@@ -244,7 +244,6 @@ async def runtime_config_js():
     )
 
 
-
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     """Serves a blank favicon if not present in static."""
@@ -267,11 +266,14 @@ if os.path.exists("static"):
     # Priority 1: Hashed chunks in /assets
     if os.path.isdir("static/assets"):
         app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
-    
+
     # Priority 2: Root public files and the SPA index
     # html=True enables serving index.html for the root path
     app.mount("/", StaticFiles(directory="static", html=True), name="static-root")
 else:
+
     @app.get("/", include_in_schema=False)
     async def fallback_root():
-        return HTMLResponse(content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>")
+        return HTMLResponse(
+            content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
+        )

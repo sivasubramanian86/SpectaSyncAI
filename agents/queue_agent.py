@@ -94,9 +94,7 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
         "recommendation": (
             "Immediate additional staff required"
             if priority == "CRITICAL"
-            else "Monitor closely"
-            if priority == "HIGH"
-            else "No action needed"
+            else "Monitor closely" if priority == "HIGH" else "No action needed"
         ),
     }
 
@@ -177,7 +175,9 @@ async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
         logger.info(f"[QueueAgent] Analysis complete for {len(targets)} zones.")
 
         try:
-            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
+            clean = (
+                result_text.strip().replace("```json", "").replace("```", "").strip()
+            )
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result

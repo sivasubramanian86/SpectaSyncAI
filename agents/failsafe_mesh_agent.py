@@ -303,7 +303,9 @@ async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict:
                         result_text += part.text
 
         try:
-            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
+            clean = (
+                result_text.strip().replace("```json", "").replace("```", "").strip()
+            )
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result

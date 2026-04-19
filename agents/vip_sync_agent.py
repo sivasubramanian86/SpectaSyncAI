@@ -130,9 +130,7 @@ def calculate_crowd_kinetic_energy(
                 else (
                     "HIGH"
                     if surge_coefficient >= 3.0
-                    else "MODERATE"
-                    if surge_coefficient >= 1.5
-                    else "LOW"
+                    else "MODERATE" if surge_coefficient >= 1.5 else "LOW"
                 )
             )
         ),

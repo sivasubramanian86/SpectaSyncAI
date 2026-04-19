@@ -129,9 +129,7 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
             else (
                 "HIGH"
                 if max_severity >= 0.65
-                else "MODERATE"
-                if max_severity >= 0.4
-                else "CLEAR"
+                else "MODERATE" if max_severity >= 0.4 else "CLEAR"
             )
         ),
         "analogous_incidents": [
@@ -167,9 +165,7 @@ def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> 
         "risk_level": (
             "CRITICAL"
             if viral_velocity > 5000
-            else "HIGH"
-            if viral_velocity > 1000
-            else "MODERATE"
+            else "HIGH" if viral_velocity > 1000 else "MODERATE"
         ),
         "counter_broadcast_urgency_secs": 12 if viral_velocity > 1000 else 60,
         "required_channels": broadcast_channels,

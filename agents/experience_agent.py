@@ -145,7 +145,9 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
         )
 
         try:
-            clean = result_text.strip().replace("```json", "").replace("```", "").strip()
+            clean = (
+                result_text.strip().replace("```json", "").replace("```", "").strip()
+            )
             result = json.loads(clean)
             output_size = len(json.dumps(result, ensure_ascii=False))
             return result

@@ -121,9 +121,7 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
         "aggregate_alert_level": (
             "CRITICAL"
             if total_incoming > 80_000
-            else "HIGH"
-            if total_incoming > 40_000
-            else "MODERATE"
+            else "HIGH" if total_incoming > 40_000 else "MODERATE"
         ),
     }
 
