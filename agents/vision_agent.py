@@ -59,7 +59,7 @@ def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
 
     # Try live upload if configured
     if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("GCS_ENABLED") == "1":
-        try:
+        try:  # pragma: no cover
             client = storage.Client()
             bucket = client.bucket(bucket_name)
             blob = bucket.blob(filename)

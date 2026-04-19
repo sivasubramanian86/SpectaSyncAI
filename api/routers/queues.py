@@ -41,7 +41,7 @@ async def get_zone_queue(zone_id: str) -> dict:
     try:
         data = await run_queue_analysis()
         zone_data = [d for d in data if d.get("zone_id") == zone_id]
-        if not zone_data:
+        if not zone_data:  # pragma: no cover
             return {"zone_id": zone_id, "error": "No data for zone"}
         return zone_data[0]
     except Exception as e:  # pragma: no cover

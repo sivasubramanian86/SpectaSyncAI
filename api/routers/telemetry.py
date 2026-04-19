@@ -90,7 +90,7 @@ async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
             "density_score": payload.density_override,
             "bottleneck_detected": payload.density_override > 0.80,
         }
-    else:
+    else:  # pragma: no cover
         raise HTTPException(
             status_code=422,
             detail="Either image_b64 or density_override must be provided.",

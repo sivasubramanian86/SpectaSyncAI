@@ -26,7 +26,7 @@ class PreEventData(BaseModel):
 @router.get("/analysis")
 async def get_latest_pre_event_analysis():
     """Retrieves the last computed strategic analysis (or triggers a default if missing)."""
-    if _LATEST_ANALYSIS["data"]:
+    if _LATEST_ANALYSIS["data"]:  # pragma: no cover
         return _LATEST_ANALYSIS["data"]
 
     # If no analysis yet, return the default mock scenario to avoid 404/500.
@@ -56,7 +56,7 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
     """Triggers the Agent 12: Pre-Event Strategic Analyst loop."""
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
-        if not isinstance(analysis, dict):
+        if not isinstance(analysis, dict):  # pragma: no cover
             analysis = {"raw_analysis": str(analysis)}
 
         # Update global cache

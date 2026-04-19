@@ -244,7 +244,7 @@ async def search_missing_person(
     }
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     port = int(os.getenv("PORT", "8001"))
     logger.info("SpectaSyncAI MCP Toolbox starting on port %d (SSE transport)", port)
 

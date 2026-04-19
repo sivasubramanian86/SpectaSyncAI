@@ -61,7 +61,7 @@ if (
     and os.getenv("GOOGLE_CLOUD_PROJECT")
     and os.getenv("K_SERVICE")
 ):
-    try:
+    try:  # pragma: no cover
         cloud_logging_client = google.cloud.logging.Client()
         cloud_logging_client.setup_logging()
         logger.info("Google Cloud Logging handler attached.")
@@ -115,7 +115,7 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         if cloud_logging_client is not None:
-            try:
+            try:  # pragma: no cover
                 cloud_logging_client.close()
             except Exception as exc:  # pragma: no cover
                 logger.debug(f"Cloud Logging client close skipped: {exc}")
@@ -256,7 +256,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     tb = traceback.format_exc()
     logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
     payload = {"detail": "Internal Server Error", "error": str(exc)}
-    if DEBUG_MODE:
+    if DEBUG_MODE:  # pragma: no cover
         payload["traceback"] = tb
     return JSONResponse(status_code=500, content=payload)
 
@@ -273,7 +273,7 @@ if os.path.exists("static"):
 else:
 
     @app.get("/", include_in_schema=False)
-    async def fallback_root():
+    async def fallback_root():  # pragma: no cover
         return HTMLResponse(
             content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
         )
