@@ -66,7 +66,7 @@ class IncidentRAGRequest(BaseModel):
     summary="Perimeter Macro Agent - detect surge (EXOGENOUS_SURGE)",
 )
 async def assess_perimeter(payload: PerimeterRequest) -> dict:
-    """Detects external crowd pressure via cell/transit telemetry."""
+    """Detect external crowd pressure via cell/transit telemetry."""
     try:
         return await run_perimeter_assessment(
             payload.venue_id, payload.area_code, payload.station_ids
@@ -88,7 +88,7 @@ async def assess_perimeter(payload: PerimeterRequest) -> dict:
     summary="VIP Sync Agent - delay tracking (TEMPORAL_DISRUPTION)",
 )
 async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
-    """Tracks act convoy GPS. Calculates crowd kinetic energy from delay."""
+    """Track act convoy GPS and calculate crowd kinetic energy from delay."""
     try:
         return await run_vip_sync_monitoring(
             payload.event_id,
@@ -112,7 +112,7 @@ async def monitor_vip_delay(payload: VIPSyncRequest) -> dict:
     summary="Rumor Control Agent - counter-narrative (INFO_CASCADE)",
 )
 async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
-    """Scans social media for venue keywords. Classifies rumor risk."""
+    """Scan social media for venue keywords and classify rumor risk."""
     try:
         return await run_rumor_monitoring(venue_id)
     except Exception as e:  # pragma: no cover
@@ -131,7 +131,7 @@ async def monitor_rumors(venue_id: str = "large_cricket_stadium") -> dict:
     summary="Failsafe Mesh Agent - infra failure (INFRA_FAILURE)",
 )
 async def check_infrastructure(payload: InfraRequest) -> dict:
-    """Monitors venue infrastructure. Triggers BLE mesh on failure."""
+    """Monitor venue infrastructure and trigger BLE mesh on failure."""
     try:
         return await run_failsafe_monitoring(payload.venue_id, payload.zones)
     except Exception as e:  # pragma: no cover
@@ -149,7 +149,7 @@ async def check_infrastructure(payload: InfraRequest) -> dict:
     summary="Incident RAG Agent - semantic search",
 )
 async def query_incident_rag(payload: IncidentRAGRequest) -> dict:
-    """Performs cosine similarity search against 12-incident corpus."""
+    """Perform cosine similarity search against 12-incident corpus."""
     try:
         return await run_incident_rag_query(
             active_failure_modes=payload.active_failure_modes,
@@ -183,7 +183,7 @@ async def query_incident_rag(payload: IncidentRAGRequest) -> dict:
     summary="List all incidents in the global corpus",
 )
 async def list_incident_corpus() -> dict:
-    """Returns the full anonymized incident corpus metadata."""
+    """Return the full anonymized incident corpus metadata."""
     return {
         "total_incidents": len(INCIDENT_CORPUS),
         "date_range": "2010-2025",
@@ -210,7 +210,7 @@ async def list_incident_corpus() -> dict:
     summary="Crisis prevention mesh status - all 5 agents (4 + RAG)",
 )
 async def crisis_status() -> dict:
-    """Returns the operational status of all crisis prevention agents."""
+    """Return the operational status of all crisis prevention agents."""
     ref_surge = ["INC-2025-IND-02", "INC-2022-KOR-01", "INC-2010-DEU-01"]
     ref_temp = ["INC-2025-IND-01", "INC-2021-USA-01", "INC-2015-SAU-01"]
     ref_info = ["INC-2025-IND-02", "INC-2013-IND-01", "INC-2021-USA-01"]

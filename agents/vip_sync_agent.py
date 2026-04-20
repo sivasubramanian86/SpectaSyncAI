@@ -1,4 +1,5 @@
-"""SpectaSyncAI: VIP Sync Agent - @03 @05
+"""Manage VIP synchronization and temporal disruption prevention.
+
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: TEMPORAL_DISRUPTION.
 
@@ -37,8 +38,9 @@ VIP_DELAY_ALERT_THRESHOLD_MINS = 30
 
 
 def get_convoy_gps_position(event_id: str) -> dict:
-    """Retrieves live GPS position and ETA for the scheduled keynote convoy or
-    headline act transport. Matches against pre-filed convoy route.
+    """Retrieve live GPS position and ETA for the scheduled keynote convoy.
+
+    Matches against pre-filed convoy route.
 
     Production: Integrates with event logistics partner GPS API or police
     convoy coordination system (anonymized, secure channel).
@@ -86,7 +88,8 @@ def get_convoy_gps_position(event_id: str) -> dict:
 def calculate_crowd_kinetic_energy(
     wait_duration_mins: int, crowd_size: int, density_score: float
 ) -> dict:
-    """Models the accumulated kinetic energy of a waiting crowd.
+    """Model the accumulated kinetic energy of a waiting crowd.
+
     Quantifies how violently the crowd will surge upon headline act arrival,
     as a function of wait time and current density.
 
@@ -149,7 +152,8 @@ def calculate_crowd_kinetic_energy(
 def activate_crowd_engagement_program(
     zone: str, program_type: str, duration_mins: int
 ) -> dict:
-    """Activates in-venue crowd engagement to dissipate kinetic tension during delay.
+    """Activate in-venue crowd engagement to dissipate kinetic tension.
+
     This is the critical intervention absent in INC-2025-IND-01 and INC-2021-USA-01.
 
     Program types:
@@ -192,8 +196,9 @@ def activate_crowd_engagement_program(
 def calculate_arrival_surge_vector(
     venue_id: str, arrival_time_mins: int, surge_coefficient: float
 ) -> dict:
-    """Computes WHERE the crowd surge will be most intense at headline act arrival,
-    enabling pre-positioning of staff BEFORE the event - not reactive deployment.
+    """Compute WHERE the crowd surge will be most intense at headline act arrival.
+
+    Enables pre-positioning of staff BEFORE the event - not reactive deployment.
 
     Args:
     ----
@@ -281,7 +286,7 @@ def build_vip_sync_agent() -> LlmAgent:
 async def run_vip_sync_monitoring(
     event_id: str, venue_id: str, crowd_size: int, density_score: float
 ) -> dict:
-    """Runs continuous VIP delay monitoring and pre-arrival surge mitigation."""
+    """Run continuous VIP delay monitoring and pre-arrival surge mitigation."""
     start = time.perf_counter()
     fallback = False
     output_size = 0

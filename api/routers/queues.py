@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.get("/queues", summary="Get wait times for all venue service zones")
 async def get_all_queues() -> list[dict]:
-    """Runs Queue Agent across all venue zones."""
+    """Run Queue Agent across all venue zones."""
     try:
         data = await run_queue_analysis()
         return data
@@ -37,7 +37,7 @@ async def get_all_queues() -> list[dict]:
 
 @router.get("/queues/{zone_id}", summary="Get wait time for a specific zone")
 async def get_zone_queue(zone_id: str) -> dict:
-    """Runs Queue Agent for a single venue zone."""
+    """Run Queue Agent for a single venue zone."""
     try:
         data = await run_queue_analysis()
         zone_data = [d for d in data if d.get("zone_id") == zone_id]

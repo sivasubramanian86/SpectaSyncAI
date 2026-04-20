@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Vision Agent
+"""Provide the Vision Agent for crowd density estimation.
+
 Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
 """
@@ -19,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
-    """Stub tool: Parses a pre-analyzed CCTV image frame result.
+    """Parse a pre-analyzed CCTV image frame result.
+
     In production, this calls a Vision API or local frame processor.
 
     Args:
@@ -72,7 +74,8 @@ def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
 
 
 def build_vision_agent() -> LlmAgent:
-    """Constructs the ADK Vision Agent using Gemini 2.5 Flash.
+    """Construct the ADK Vision Agent using Gemini 2.5 Flash.
+
     This agent is optimized for high-speed, low-cost multimodal analysis.
 
     Returns

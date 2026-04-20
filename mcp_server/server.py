@@ -1,4 +1,5 @@
-"""MCP Toolbox — 7 venue intervention tools (SSE transport).
+"""Provide 7 venue intervention tools for integrated preventative safety.
+
 @07_modern_polyglot_standards: PORT from env, structured logging,
 Cloud Run compatible.
 """
@@ -41,7 +42,8 @@ mcp = FastMCP(
 
 @mcp.tool()
 async def update_digital_signage(location_id: str, message: str) -> dict:
-    """Updates a venue digital sign to display a crowd redirection message.
+    """Update a venue digital sign to display a crowd redirection message.
+
     Addresses failure modes: EXOGENOUS_SURGE, NARROW_CORRIDOR, EGRESS_FAILURE.
     """
     logger.info(
@@ -59,7 +61,8 @@ async def update_digital_signage(location_id: str, message: str) -> dict:
 async def dispatch_staff(
     location_id: str, priority: str = "medium", count: int = 2
 ) -> dict:
-    """Deploys venue staff to a specified zone.
+    """Deploy venue staff to a specified zone.
+
     priority: low | medium | high | emergency.
     count: number of staff to dispatch (default 2).
     Addresses failure modes: EXOGENOUS_SURGE, TEMPORAL_DISRUPT, TEMPLE_SURGE.
@@ -90,7 +93,8 @@ async def dispatch_staff(
 
 @mcp.tool()
 async def open_auxiliary_gate(gate_id: str, direction: str = "both") -> dict:
-    """Opens an auxiliary entry/exit gate to relieve crowd pressure.
+    """Open an auxiliary entry/exit gate to relieve crowd pressure.
+
     direction: entry | exit | both.
     Addresses failure modes: EGRESS_FAILURE, EXOGENOUS_SURGE, TICKETING_CHAOS.
     """
@@ -108,7 +112,8 @@ async def open_auxiliary_gate(gate_id: str, direction: str = "both") -> dict:
 async def trigger_pa_announcement(
     zone: str, message: str, language_codes: list[str] | None = None
 ) -> dict:
-    """Broadcasts a multilingual PA announcement in a venue zone.
+    """Broadcast a multilingual PA announcement in a venue zone.
+
     language_codes: list of BCP-47 codes e.g. ['en', 'ta', 'kn', 'hi'].
     Addresses failure modes: INFO_CASCADE, PANIC_TRIGGER, INFRA_FAILURE.
     """
@@ -127,7 +132,8 @@ async def trigger_pa_announcement(
 
 @mcp.tool()
 async def trigger_evacuation_protocol(zone: str, severity: str = "partial") -> dict:
-    """Initiates venue evacuation protocol.
+    """Initiate venue evacuation protocol.
+
     REQUIRES human operator (HITL) confirmation before physical execution.
     severity: partial (zone-only) | full (entire venue).
     Addresses failure modes: ALL — last resort intervention.
@@ -162,8 +168,8 @@ async def send_attendee_push_notification(
     urgency: str = "info",
     language_codes: list[str] | None = None,
 ) -> dict:
-    """Sends a push notification to attendees in a specified zone
-    via the venue app.
+    """Send a push notification to attendees in a specified zone via the venue app.
+
     urgency: info | warning | alert.
     language_codes: BCP-47 list for multilingual broadcast.
     Addresses failure modes: INFO_CASCADE, RUMOR spread, EXOGENOUS_SURGE.
@@ -188,8 +194,8 @@ async def send_attendee_push_notification(
 
 @mcp.tool()
 async def adjust_concession_staffing(stand_id: str, action: str) -> dict:
-    """Adjusts staffing at a food/merchandise concession stand
-    to distribute crowd dwell time.
+    """Adjust staffing at a food/merchandise concession stand to distribute crowd dwell time.
+
     action: increase | decrease | emergency_boost.
     Addresses failure modes: EXOGENOUS_SURGE
     (crowd distribution via dwell-time extension).
@@ -216,7 +222,8 @@ async def adjust_concession_staffing(stand_id: str, action: str) -> dict:
 async def search_missing_person(
     photo_reference: str, last_known_zone: str, target_class: str = "general"
 ) -> dict:
-    """Scans venue CCTV feeds for a person matching a photo/description.
+    """Scan venue CCTV feeds for a person matching a photo/description.
+
     target_class: child | elderly | woman | general.
     Optimizes for vulnerability identification
     (Computer Vision API integration).

@@ -1,4 +1,5 @@
-"""SpectaSyncAI FastAPI entry point - 12-Agent Mesh, 8 versioned routers.
+"""Provide the FastAPI entry point for the 12-Agent real-time crowd intelligence mesh.
+
 @07_modern_polyglot_standards | @19_cost_efficiency_architect.
 
 Startup sequence:
@@ -71,7 +72,8 @@ if (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: warm Vertex AI context caches for all 5 Tier-2 agents.
+    """Warm Vertex AI context caches for all 5 Tier-2 agents during startup.
+
     Cache warm-up runs as a background task.
     """
     logger.info(
@@ -222,7 +224,7 @@ def _runtime_firebase_config() -> dict[str, str | None]:
 
 @app.get("/v1/runtime-config.js", include_in_schema=False)
 async def runtime_config_js():
-    """Serves the dynamic Firebase and Environment config to the frontend."""
+    """Serve the dynamic Firebase and Environment config to the frontend."""
     firebase_config = _runtime_firebase_config()
     payload = {
         "firebase": firebase_config,
@@ -246,7 +248,7 @@ async def runtime_config_js():
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    """Serves a blank favicon if not present in static."""
+    """Serve a blank favicon if not present in static."""
     return HTMLResponse(content="")
 
 
@@ -274,6 +276,7 @@ else:
 
     @app.get("/", include_in_schema=False)
     async def fallback_root():  # pragma: no cover
+        """Deliver a fallback message when static assets are missing."""
         return HTMLResponse(
             content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
         )

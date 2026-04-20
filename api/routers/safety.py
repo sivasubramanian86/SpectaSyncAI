@@ -19,7 +19,7 @@ class SafetyAssessmentRequest(BaseModel):
 
 @router.post("/safety/assess", summary="Run safety risk assessment for a venue zone")
 async def assess_safety(payload: SafetyAssessmentRequest) -> dict:
-    """Invokes Safety Agent (Pro) for emergency risk classification."""
+    """Invoke Safety Agent (Pro) for emergency risk classification."""
     return await run_safety_assessment(
         payload.location_id, payload.density_score, payload.rate_of_change
     )

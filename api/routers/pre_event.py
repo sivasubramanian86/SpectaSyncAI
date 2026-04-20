@@ -25,7 +25,7 @@ class PreEventData(BaseModel):
 
 @router.get("/analysis")
 async def get_latest_pre_event_analysis():
-    """Retrieves the last computed strategic analysis (or triggers a default if missing)."""
+    """Retrieve the last computed strategic analysis (or triggers a default if missing)."""
     if _LATEST_ANALYSIS["data"]:  # pragma: no cover
         return _LATEST_ANALYSIS["data"]
 
@@ -53,7 +53,7 @@ async def get_latest_pre_event_analysis():
 
 @router.post("/analysis")
 async def trigger_pre_event_analysis(data: PreEventData) -> dict:
-    """Triggers the Agent 12: Pre-Event Strategic Analyst loop."""
+    """Trigger the Agent 12: Pre-Event Strategic Analyst loop."""
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
         if not isinstance(analysis, dict):  # pragma: no cover
@@ -96,7 +96,7 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
 
 @router.get("/mock-data")
 async def get_mock_pre_event():
-    """Returns sample scenario data for the Pre-Event UI."""
+    """Return sample scenario data for the Pre-Event UI."""
     return {
         "event_name": "SpectaSync Grand Opening - Tech City Arena",
         "total_reservations": 142000,

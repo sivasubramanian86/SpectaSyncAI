@@ -16,7 +16,7 @@ router = APIRouter()
     "/telemetry/{location_id}", summary="Get latest telemetry metadata for a zone"
 )
 async def get_telemetry_meta(location_id: str) -> dict:
-    """Surfaces telemetry ingestion capabilities for the zone."""
+    """Surface telemetry ingestion capabilities for the zone."""
     try:
         # Integrated check for active sensors / vision capabilities
         return {

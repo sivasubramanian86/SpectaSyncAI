@@ -13,15 +13,16 @@ router = APIRouter()
     response_description="A structured JSON detailing active diagnostic connections.",
 )
 async def observability_status() -> dict:
-    """
-    Retrieves the global runtime observability constraints and diagnostic metadata.
+    """Retrieves the global runtime observability constraints and diagnostic metadata.
 
     This endpoint surfaces live monitoring and logging configurations bridging the local
     mesh with Google Cloud Observability, essential for hackathon smoke-tests and CI verifications.
 
-    Returns:
+    Returns
+    -------
         dict: A dictionary mapping active configuration blocks (Cloud Monitoring, Cloud Logging)
               along with project-bound execution identifiers.
+
     """
     return {
         "cloud_monitoring": observability_service.status(),

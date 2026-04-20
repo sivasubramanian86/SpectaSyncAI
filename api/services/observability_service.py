@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class ObservabilityService:
-    """Writes lightweight custom metrics to Google Cloud Monitoring."""
+    """Write lightweight custom metrics to Google Cloud Monitoring."""
 
     def __init__(self) -> None:
         """Initialize the observability service with Google Cloud credentials."""
