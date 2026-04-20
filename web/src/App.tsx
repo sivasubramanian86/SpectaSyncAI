@@ -70,7 +70,12 @@ export default function App(): React.ReactElement {
         <div className="max-w-[1800px] w-full mx-auto px-4 sm:px-6 py-4 space-y-6">
           <main className="mt-2">
             {activeTab === 'dashboard' && (
-              <div className="space-y-6 animate-fade-in flex flex-col h-full">
+              <div 
+                id="panel-dashboard"
+                role="tabpanel"
+                aria-labelledby="tab-dashboard"
+                className="space-y-6 animate-fade-in flex flex-col h-full"
+              >
                 <StatCards
                   avgDensity={avgDensity}
                   criticalCount={criticalZones.length}
@@ -113,7 +118,12 @@ export default function App(): React.ReactElement {
             )}
 
             {activeTab === 'vision' && (
-              <div className="space-y-6 animate-fade-in">
+              <div 
+                id="panel-vision"
+                role="tabpanel"
+                aria-labelledby="tab-vision"
+                className="space-y-6 animate-fade-in"
+              >
                 <MultiModalHub />
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   <div className="lg:col-span-3 space-y-6">
@@ -170,7 +180,12 @@ export default function App(): React.ReactElement {
             )}
 
             {activeTab === 'crisis' && (
-               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in">
+               <div 
+                 id="panel-crisis"
+                 role="tabpanel"
+                 aria-labelledby="tab-crisis"
+                 className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in"
+               >
                   <div className="lg:col-span-3">
                      <CrisisDashboard />
                   </div>

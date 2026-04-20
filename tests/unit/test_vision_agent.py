@@ -28,7 +28,9 @@ async def test_run_vision_analysis_with_mock_runner():
     with patch("agents.vision_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-001"
-        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(
+            return_value=mock_session
+        )
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""
@@ -59,7 +61,9 @@ async def test_run_vision_analysis_malformed_json_fallback():
     with patch("agents.vision_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-002"
-        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(
+            return_value=mock_session
+        )
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""

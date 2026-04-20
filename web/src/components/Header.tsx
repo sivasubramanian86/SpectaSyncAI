@@ -93,10 +93,14 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
             </div>
           </div>
 
-          <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 py-1">
+          <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 py-1" role="tablist" aria-label="Main Navigation">
             {tabs.slice(0, 5).map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`panel-${tab.id}`}
+                id={`tab-${tab.id}`}
                 onClick={() => onTabChange(tab.id)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] 2xl:text-xs font-bold uppercase tracking-widest transition-all flex-shrink-0 ${
                   activeTab === tab.id
@@ -115,6 +119,9 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
             <div className="relative ml-2">
               <button
                 onClick={() => setShowMore(!showMore)}
+                aria-expanded={showMore}
+                aria-haspopup="true"
+                aria-label="More navigation options"
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] 2xl:text-xs font-bold uppercase tracking-widest transition-all border border-transparent ${
                   ['demographics', 'system', 'about', 'faq'].includes(activeTab)
                     ? 'bg-blue-600/10 text-blue-400'
@@ -127,10 +134,14 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
               </button>
               
               {showMore && (
-                <div className="absolute top-full left-0 mt-2 w-48 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[60] animate-in fade-in zoom-in-95 duration-200">
+                <div 
+                  className="absolute top-full left-0 mt-2 w-48 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[60] animate-in fade-in zoom-in-95 duration-200"
+                  role="menu"
+                >
                    {tabs.slice(5).map((tab) => (
                     <button
                       key={tab.id}
+                      role="menuitem"
                       onClick={() => {
                         onTabChange(tab.id);
                         setShowMore(false);

@@ -239,6 +239,9 @@ class AlloyDBMemory:
 
 
 def _mock_context(location_id: str) -> list[dict]:
+    """Generates synthetic historical context for prototype/CI mode.
+    Used when AlloyDB is not reachable.
+    """
     return [
         {
             "incident_id": "INC-2025-IND-02",

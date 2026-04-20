@@ -27,16 +27,17 @@ function StatCard({
   color: string;
   sublabel?: string;
 }) {
+  const labelId = `stat-label-${label.replace(/\s+/g, '-').toLowerCase()}`;
   return (
-    <article className="stat-card" aria-label={`${label}: ${value}${unit ?? ''}`}>
+    <article className="stat-card" aria-labelledby={labelId}>
       <div className={`flex items-center justify-center w-9 h-9 rounded-lg ${color} mb-1`}>
         {icon}
       </div>
-      <div className="flex items-baseline gap-1">
+      <div className="flex items-baseline gap-1" aria-live="polite">
         <span className="text-2xl font-bold text-white">{value}</span>
         {unit && <span className="text-sm text-slate-400">{unit}</span>}
       </div>
-      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{label}</p>
+      <p id={labelId} className="text-xs text-slate-500 font-medium uppercase tracking-wider">{label}</p>
       {sublabel && <p className="text-xs text-slate-600">{sublabel}</p>}
     </article>
   );

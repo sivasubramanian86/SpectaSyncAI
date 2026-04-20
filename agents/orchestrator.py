@@ -13,14 +13,11 @@ import os
 
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-
-try:
-    from google.adk.tools.mcp_tool.mcp_toolset import (
-        McpToolset as MCPToolset,
-        SseConnectionParams,
-    )
-except ImportError:  # pragma: no cover - backward compatibility for older ADK builds
-    from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
+from typing import TypedDict, Any
+from google.adk.tools.mcp_tool.mcp_toolset import (
+    McpToolset as MCPToolset,
+    SseConnectionParams,
+)
 from google.genai import types as genai_types
 
 from agents.memory import AlloyDBMemory
@@ -31,6 +28,16 @@ logger = logging.getLogger(__name__)
 
 
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8001/sse")
+
+
+class DensityReport(TypedDict):
+    """Schema for venue crowd density telemetry."""
+
+    location_id: str
+    density_score: float
+    bottleneck_detected: bool
+    risk_confidence: float
+    metadata: dict[str, Any]
 
 
 async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
@@ -70,7 +77,7 @@ async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
     )
 
 
-async def run_orchestration_cycle(density_report: dict) -> dict:
+async def run_orchestration_cycle(density_report: DensityReport) -> dict[str, Any]:
     """Single orchestration cycle: takes a density report, retrieves historical
     context, and runs the ADK orchestrator agent to decide and act.
 

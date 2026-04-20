@@ -68,7 +68,9 @@ async def test_run_surge_prediction_success():
     with patch("agents.prediction_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session"
-        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(
+            return_value=mock_session
+        )
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""
@@ -92,7 +94,9 @@ async def test_run_surge_prediction_fallback():
     with patch("agents.prediction_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-fallback"
-        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(
+            return_value=mock_session
+        )
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""

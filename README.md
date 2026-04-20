@@ -251,6 +251,31 @@ SpectaSyncAI/
 
 ---
 
+## ⚖️ Responsible AI & Fairness
+
+SpectaSyncAI is built on **Responsible AI principles**, ensuring that crowd safety remains the singular objective without compromising individual privacy or introducing algorithmic bias:
+
+*   **Kinetic Physics vs. Demographics**: All crowd density and bottleneck detection algorithms are grounded purely in spatial kinetics (thermal/IR silhouette analysis). The system **does not** collect, process, or store biometric markers, ethnic identifiers, or sensitive personal attributes.
+*   **Human-In-The-Loop (HITL)**: While the system recommends interventions, high-stakes actions like `trigger_evacuation_protocol` **require explicit confirmation** from a human safety officer.
+*   **Auditability**: Every agent decision and tool invocation is logged with sub-second precision to Google Cloud Logging, creating a verifiable forensic audit trail for post-event analysis.
+*   **Bias Mitigation**: The 18-incident corpus is curated from diverse global geographies (IN, US, KR, ID, SA, AO, etc.) to ensure that the RAG engine understands varied venue architectures and cultural movement patterns.
+
+## ♿ Accessibility & Inclusive Design
+
+The SpectaSyncAI Command Center is designed for high-fidelity accessibility, ensuring critical safety information is available to all operators:
+
+*   **ARIA 1.2 Compliance**: Every UI component (StatCards, AgentFeed, Navigation) is tagged with semantic ARIA roles, landmarks, and live regions (`aria-live="polite"`) to support screen readers.
+*   **Visual Hierarchy**: Uses a high-contrast dark-mode palette with color-safe indicators (icons + labels) so that density alerts are distinguishable regardless of color-vision deficiencies.
+*   **Keyboard Navigation**: The entire dashboard is navigable via standard keyboard focus management, with visible focus rings and logical tab order.
+*   **Multi-Lingual Support**: (Beta) Integrated i18next for real-time translation of the UI, supporting international event management teams.
+
+## 🔒 Security & Governance
+
+*   **Least Privilege**: API keys and service accounts are scoped specifically to the required Google Cloud services (Vertex AI, AlloyDB, Cloud Logging).
+*   **Secret Management**: Zero hardcoded secrets. Uses environment variable injection and is ready for Google Secret Manager integration.
+*   **Sanitization**: All telemetry inputs are validated via Pydantic models to prevent injection attacks into the agentic reasoning loops.
+*   **Standardization**: No personal data, venue names, or celebrities. References exclusively use the `INC-YYYY-ISO2-NN` anonymized corpus schema.
+
 ---
 
 *Submitted for PromptWars Virtual Event 2026.*
