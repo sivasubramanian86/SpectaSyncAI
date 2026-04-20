@@ -30,7 +30,6 @@ import secrets
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
 from .context_cache import get_cached_model_flash
@@ -306,10 +305,9 @@ async def run_rumor_monitoring(venue_id: str) -> dict:
     except Exception:  # pragma: no cover
         agent = build_rumor_control_agent()
 
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
-    session = await session_service.create_session(
-        app_name="spectasync_rumor", user_id="system"
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_rumor_control")
+    session = await runner.session_service.create_session(
+        app_name="spectasync_rumor_control", user_id="system"
     )
     prompt = (
         f"RUMOR MONITOR - Venue: {venue_id}\n"

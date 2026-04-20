@@ -2,7 +2,7 @@
 
 import pytest
 import os
-from unittest.mock import MagicMock, patch, AsyncMock, PropertyMock
+from unittest.mock import MagicMock, patch, AsyncMock
 from agents.failsafe_mesh_agent import (
     monitor_infrastructure_health,
     activate_ble_mesh_broadcast,
@@ -61,10 +61,7 @@ async def test_failsafe_agent_tools():
 @pytest.mark.asyncio
 async def test_failsafe_agent_fallback():
     """Test functionality for test_failsafe_agent_fallback."""
-    with (
-        patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner,
-        patch("agents.failsafe_mesh_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="MALFORMED")]
@@ -74,7 +71,7 @@ async def test_failsafe_agent_fallback():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
 
@@ -106,10 +103,7 @@ async def test_perimeter_agent_tools():
 @pytest.mark.asyncio
 async def test_perimeter_agent_fallback():
     """Test functionality for test_perimeter_agent_fallback."""
-    with (
-        patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner,
-        patch("agents.perimeter_macro_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="INVALID")]
@@ -119,7 +113,7 @@ async def test_perimeter_agent_fallback():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
         res = await run_perimeter_assessment("G1", "12345", ["S1"])
@@ -145,10 +139,7 @@ async def test_rumor_control_agent_tools():
 @pytest.mark.asyncio
 async def test_rumor_control_agent_fallback():
     """Test functionality for test_rumor_control_agent_fallback."""
-    with (
-        patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner,
-        patch("agents.rumor_control_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="INVALID")]
@@ -158,7 +149,7 @@ async def test_rumor_control_agent_fallback():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
         res = await run_rumor_monitoring("V1")
@@ -188,10 +179,7 @@ async def test_vip_sync_agent_tools():
 @pytest.mark.asyncio
 async def test_vip_sync_agent_fallback():
     """Test functionality for test_vip_sync_agent_fallback."""
-    with (
-        patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner,
-        patch("agents.vip_sync_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="INVALID")]
@@ -201,7 +189,7 @@ async def test_vip_sync_agent_fallback():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
         res = await run_vip_sync_monitoring("E1", "V1", 50000, 0.7)
@@ -227,10 +215,7 @@ async def test_queue_agent_tools():
 @pytest.mark.asyncio
 async def test_queue_agent_fallback():
     """Test functionality for test_queue_agent_fallback."""
-    with (
-        patch("agents.queue_agent.InMemoryRunner") as MockRunner,
-        patch("agents.queue_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.queue_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
         mock_event.content.parts = [MagicMock(text="INVALID")]
@@ -240,7 +225,7 @@ async def test_queue_agent_fallback():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
         res = await run_queue_analysis(["Z1"])
@@ -281,7 +266,6 @@ async def test_rumor_control_agent_cache_failure():
             side_effect=Exception("Cache down"),
         ),
         patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner,
-        patch("agents.rumor_control_agent.InMemorySessionService") as MockSession,
     ):
         mock_event = MagicMock()
         mock_event.is_final_response.return_value = True
@@ -292,7 +276,7 @@ async def test_rumor_control_agent_cache_failure():
             yield mock_event
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
 

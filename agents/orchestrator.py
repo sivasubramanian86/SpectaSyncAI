@@ -23,7 +23,6 @@ except ImportError:  # pragma: no cover - backward compatibility for older ADK b
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, SseConnectionParams
 from google.genai import types as genai_types
 
-from google.adk.sessions import InMemorySessionService
 from agents.memory import AlloyDBMemory
 from agents.context_cache import get_cached_model_pro
 from api.services.observability_service import observability_service
@@ -102,10 +101,9 @@ async def run_orchestration_cycle(density_report: dict) -> dict:
         # 2. Build the LlmAgent with live MCP tools
         cache_name = await get_cached_model_pro("core_orchestrator")
         agent = await build_orchestrator_agent(cache_name=cache_name)
-        session_service = InMemorySessionService()
-        runner = InMemoryRunner(agent=agent, session_service=session_service)
+        runner = InMemoryRunner(agent=agent, app_name="spectasync_orchestrator")
 
-        session = await session_service.create_session(
+        session = await runner.session_service.create_session(
             app_name="spectasync_orchestrator", user_id="system"
         )
 

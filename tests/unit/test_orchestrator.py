@@ -28,7 +28,6 @@ async def test_run_orchestration_cycle_with_tool_calls():
             new_callable=AsyncMock,
         ) as mock_history,
         patch("agents.orchestrator.InMemoryRunner") as MockRunner,
-        patch("agents.orchestrator.InMemorySessionService") as MockSession,
     ):
         mock_history.return_value = [{"incident": "test"}]
         mock_build.return_value = MagicMock()
@@ -62,7 +61,7 @@ async def test_run_orchestration_cycle_with_tool_calls():
                 yield e
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
 
@@ -84,7 +83,6 @@ async def test_run_orchestration_cycle_high_risk_broadcast():
             new_callable=AsyncMock,
         ) as mock_history,
         patch("agents.orchestrator.InMemoryRunner") as MockRunner,
-        patch("agents.orchestrator.InMemorySessionService") as MockSession,
         patch(
             "agents.orchestrator.pubsub_service.broadcast_risk", new_callable=AsyncMock
         ) as mock_broadcast,
@@ -117,7 +115,7 @@ async def test_run_orchestration_cycle_high_risk_broadcast():
             yield MockEvent("High risk alert triggered.")
 
         MockRunner.return_value.run_async = fake_run
-        MockSession.return_value.create_session = AsyncMock(
+        MockRunner.return_value.session_service.create_session = AsyncMock(
             return_value=MagicMock(id="test")
         )
 

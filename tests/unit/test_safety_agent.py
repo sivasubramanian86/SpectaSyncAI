@@ -63,13 +63,10 @@ async def test_run_safety_assessment_success():
     }
     mock_event.content.parts = [MagicMock(text=json.dumps(response_data))]
 
-    with (
-        patch("agents.safety_agent.InMemoryRunner") as MockRunner,
-        patch("agents.safety_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.safety_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session"
-        MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""
@@ -89,13 +86,10 @@ async def test_run_safety_assessment_fallback():
     mock_event.is_final_response.return_value = True
     mock_event.content.parts = [MagicMock(text="Bad JSON")]
 
-    with (
-        patch("agents.safety_agent.InMemoryRunner") as MockRunner,
-        patch("agents.safety_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.safety_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-fallback"
-        MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""

@@ -12,7 +12,6 @@ import logging
 import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from api.services.observability_service import observability_service
 
@@ -141,10 +140,9 @@ async def run_safety_assessment(
     fallback = False
     output_size = 0
     agent = build_safety_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_safety")
 
-    session = await session_service.create_session(
+    session = await runner.session_service.create_session(
         app_name="spectasync_safety", user_id="system"
     )
 

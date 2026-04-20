@@ -10,7 +10,6 @@ import logging
 import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from google.cloud import storage
 
@@ -116,10 +115,8 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
     fallback = False
     output_size = 0
     agent = build_vision_agent()
-    session_service = InMemorySessionService()
     runner = InMemoryRunner(agent=agent, app_name="spectasync_vision")
-
-    session = await session_service.create_session(
+    session = await runner.session_service.create_session(
         app_name="spectasync_vision", user_id="system"
     )
 

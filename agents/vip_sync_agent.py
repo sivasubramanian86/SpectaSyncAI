@@ -28,7 +28,6 @@ import secrets
 from datetime import datetime, timedelta
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
 from api.services.observability_service import observability_service
@@ -290,10 +289,9 @@ async def run_vip_sync_monitoring(
     fallback = False
     output_size = 0
     agent = build_vip_sync_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
-    session = await session_service.create_session(
-        app_name="spectasync_vipsync", user_id="system"
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_vip_sync")
+    session = await runner.session_service.create_session(
+        app_name="spectasync_vip_sync", user_id="system"
     )
     prompt = (
         f"VIP SYNC MONITORING - Event: {event_id} | Venue: {venue_id}\n"

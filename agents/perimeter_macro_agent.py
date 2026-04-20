@@ -25,7 +25,6 @@ import time
 import secrets
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from .incident_corpus import INCIDENT_CORPUS
 from api.services.observability_service import observability_service
@@ -260,9 +259,8 @@ async def run_perimeter_assessment(
     fallback = False
     output_size = 0
     agent = build_perimeter_macro_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
-    session = await session_service.create_session(
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_perimeter")
+    session = await runner.session_service.create_session(
         app_name="spectasync_perimeter", user_id="system"
     )
     prompt = (

@@ -11,7 +11,6 @@ import logging
 import time
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.adk.sessions import InMemorySessionService
 from google.genai import types as genai_types
 from api.services.observability_service import observability_service
 
@@ -143,10 +142,9 @@ async def run_surge_prediction(location_id: str, current_density: float) -> dict
     fallback = False
     output_size = 0
     agent = build_prediction_agent()
-    session_service = InMemorySessionService()
-    runner = InMemoryRunner(agent=agent, session_service=session_service)
+    runner = InMemoryRunner(agent=agent, app_name="spectasync_prediction")
 
-    session = await session_service.create_session(
+    session = await runner.session_service.create_session(
         app_name="spectasync_prediction", user_id="system"
     )
 

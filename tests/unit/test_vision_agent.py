@@ -25,13 +25,10 @@ async def test_run_vision_analysis_with_mock_runner():
         )
     ]
 
-    with (
-        patch("agents.vision_agent.InMemoryRunner") as MockRunner,
-        patch("agents.vision_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.vision_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-001"
-        MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""
@@ -59,16 +56,10 @@ def test_analyze_cctv_frame_tool():
 async def test_run_vision_analysis_malformed_json_fallback():
     """Test fallback when JSON is malformed."""
     mock_event = MagicMock()
-    mock_event.is_final_response.return_value = True
-    mock_event.content.parts = [MagicMock(text="Not a JSON")]
-
-    with (
-        patch("agents.vision_agent.InMemoryRunner") as MockRunner,
-        patch("agents.vision_agent.InMemorySessionService") as MockSession,
-    ):
+    with patch("agents.vision_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()
         mock_session.id = "test-session-002"
-        MockSession.return_value.create_session = AsyncMock(return_value=mock_session)
+        MockRunner.return_value.session_service.create_session = AsyncMock(return_value=mock_session)
 
         async def fake_run(*args, **kwargs):
             """Test functionality for fake_run."""
