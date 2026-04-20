@@ -55,9 +55,9 @@ def get_zone_queue_snapshot(zone_id: str) -> dict:
     config = VENUE_ZONES.get(
         zone_id, {"capacity": 100, "staff_count": 2, "service_rate_per_min": 10}
     )
-    queue_length = random.randint(
+    queue_length = random.randint(  # nosec B311 # noqa: S311
         5, int(config["capacity"] * 0.9)
-    )  # nosec B311 # noqa: S311
+    )
     return {
         "zone_id": zone_id,
         "queue_length": queue_length,
