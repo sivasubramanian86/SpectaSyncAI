@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode, ReactElement } from 'react';
 import { Clock, Utensils, DoorOpen, Shirt, Users } from 'lucide-react';
 import type { VenueZone } from '../types';
 
@@ -7,7 +7,7 @@ interface QueueBoardProps {
   language: string;
 }
 
-const TYPE_ICONS: Record<VenueZone['type'], React.ReactNode> = {
+const TYPE_ICONS: Record<VenueZone['type'], ReactNode> = {
   gate: <DoorOpen size={13} aria-hidden="true" />,
   food: <Utensils size={13} aria-hidden="true" />,
   restroom: <Users size={13} aria-hidden="true" />,
@@ -25,7 +25,7 @@ function densityToWait(density: number): number {
  */
 import { TRANSLATIONS } from '../translations';
 
-export function QueueBoard({ zones, language }: QueueBoardProps): React.ReactElement {
+export function QueueBoard({ zones, language }: QueueBoardProps): ReactElement {
   const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
   const serviceZones = zones
     .filter(z => ['gate', 'food', 'restroom', 'merch'].includes(z.type))

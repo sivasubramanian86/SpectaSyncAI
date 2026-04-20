@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
 import { TRANSLATIONS } from '../translations';
 

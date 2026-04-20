@@ -146,7 +146,7 @@ export default function App(): React.ReactElement {
                     </div>
                   </div>
                   <div className="space-y-6">
-                    <QueueBoard zones={dashState.zones} />
+                    <QueueBoard zones={dashState.zones} language={language} />
                     <div className="glass p-5">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Flow Velocity</h3>
                       <div className="space-y-4">

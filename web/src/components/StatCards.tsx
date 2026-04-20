@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode, ReactElement } from 'react';
 import { Users, AlertTriangle, Activity, Cpu, TrendingUp } from 'lucide-react';
 
 /**
@@ -22,7 +22,7 @@ interface StatCardsProps {
 function StatCard({
   icon, label, value, unit, color, sublabel,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string;
   unit?: string;
@@ -49,7 +49,7 @@ function StatCard({
  */
 import { TRANSLATIONS } from '../translations';
 
-export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount, language }: StatCardsProps): React.ReactElement {
+export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount, language }: StatCardsProps): ReactElement {
   const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
   return (
     <section aria-label="Venue summary statistics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
