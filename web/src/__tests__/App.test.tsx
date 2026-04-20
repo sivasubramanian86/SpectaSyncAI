@@ -1,19 +1,22 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '../App';
+import { TRANSLATIONS } from '../translations';
 
 describe('App Component', () => {
+  const t = TRANSLATIONS.EN;
+
   it('renders dashboard by default', () => {
     render(<App />);
     expect(screen.getAllByText(/SpectaSync/)[0]).toBeDefined();
-    expect(screen.getByText('Command Hub')).toBeDefined();
+    expect(screen.getByText(t.tabs.dashboard)).toBeDefined();
     // Default tab is dashboard
-    expect(screen.getByText('Mesh Sync Performance')).toBeDefined();
+    expect(screen.getByText(t.headers.performance)).toBeDefined();
   });
 
   it('switches to Tactical View tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('Tactical View');
+    const tabButton = screen.getByText(t.tabs.vision);
     fireEvent.click(tabButton);
     
     expect(screen.getByText('Tactical Asset Grid')).toBeDefined();
@@ -22,7 +25,7 @@ describe('App Component', () => {
 
   it('switches to Crisis Mesh tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('Crisis Mesh');
+    const tabButton = screen.getByText(t.tabs.crisis);
     fireEvent.click(tabButton);
     
     expect(screen.getByText('Kinetic Risk Velocity')).toBeDefined();
@@ -30,7 +33,7 @@ describe('App Component', () => {
 
   it('switches to Incident RAG tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('Incident RAG');
+    const tabButton = screen.getByText(t.tabs.intelligence);
     fireEvent.click(tabButton);
     
     expect(screen.getAllByText('Agent Mesh Activity')[0]).toBeDefined();
@@ -39,7 +42,9 @@ describe('App Component', () => {
 
   it('switches to Settings tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('Settings');
+    // Open More menu for secondary tabs
+    fireEvent.click(screen.getByText('More'));
+    const tabButton = screen.getByText(t.tabs.settings);
     fireEvent.click(tabButton);
     
     expect(screen.getByText('Tactical Mesh')).toBeDefined();
@@ -50,6 +55,6 @@ describe('App Component', () => {
     // Note: MOCK_ZONES has critical zones by default
     render(<App />);
     expect(screen.getByRole('alert')).toBeDefined();
-    expect(screen.getByText(/CRITICAL Breach/)).toBeDefined();
+    expect(screen.getByText(new RegExp(t.alerts.critical, 'i'))).toBeDefined();
   });
 });

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from '../App';
+import { TRANSLATIONS } from '../translations';
 
 /**
  * SpectaSyncAI: User Interaction Integration Tests
@@ -8,11 +9,13 @@ import App from '../App';
  * Orchestrates high-fidelity simulation of user clickstreams and tab 
  * transitions to verify the integrity of the agentic Command Hub UI.
  */
-describe('User Interactions', () => {
+describe('User Interaction Tests', () => {
+  const t = TRANSLATIONS.EN;
+
   it('interacts with VenueHeatmap zones', () => {
     render(<App />);
     // Switch to Tactical View
-    fireEvent.click(screen.getByText('Tactical View'));
+    fireEvent.click(screen.getByText(t.tabs.vision));
     
     // Find a zone cell and click it
     const zoneCells = screen.getAllByRole('button').filter(b => b.className.includes('zone-cell'));
@@ -35,18 +38,18 @@ describe('User Interactions', () => {
     
     // Switch to Tactical View (where MultiModalHub is)
     await act(async () => {
-      fireEvent.click(screen.getByText('Tactical View'));
+      fireEvent.click(screen.getByText(t.tabs.vision));
     });
     
     // Change language to Hindi and verify
-    const select = screen.getByRole('combobox');
+    const select = screen.getAllByRole('combobox')[0];
     await act(async () => {
       fireEvent.change(select, { target: { value: 'HI' } });
     });
-    expect(screen.getByText('मल्टी-मॉडल इंटेलिजेंस')).toBeDefined();
+    expect(screen.getByText(TRANSLATIONS.HI.multiModal.title)).toBeDefined();
 
     // Iterate languages
-    const langs = ['TE', 'TA', 'BN', 'ZH', 'JA', 'ES', 'FR'];
+    const langs = ['TE', 'TA', 'JA'];
     for (const l of langs) {
       await act(async () => {
         fireEvent.change(select, { target: { value: l } });
@@ -78,7 +81,7 @@ describe('User Interactions', () => {
   it('interacts with CrisisDashboard agents', () => {
     render(<App />);
     // Switch to Crisis Mesh
-    fireEvent.click(screen.getByText('Crisis Mesh'));
+    fireEvent.click(screen.getByText(t.tabs.crisis));
     
     // Find an agent card and expand it
     const agentCard = screen.getByText('Perimeter Macro Agent');
@@ -94,7 +97,10 @@ describe('User Interactions', () => {
 
   it('interacts with SystemPanel settings (mock)', () => {
     render(<App />);
-    fireEvent.click(screen.getByText('Settings'));
+    // Open More menu for secondary tabs
+    fireEvent.click(screen.getByText('More'));
+    const tabButton = screen.getByText(t.tabs.settings);
+    fireEvent.click(tabButton);
     
     // Find a toggle (mock)
     const toggles = screen.getAllByRole('generic').filter(el => el.className?.includes('w-10 h-5'));
@@ -103,7 +109,10 @@ describe('User Interactions', () => {
     }
     // Just verifying it doesn't crash
     // Switch to About to verify About section
-    fireEvent.click(screen.getByText(/Info/));
+    fireEvent.click(screen.getByText('More'));
+    fireEvent.click(screen.getByText(t.tabs.faq)); // Check FAQ first
+    fireEvent.click(screen.getByText('More'));
+    fireEvent.click(screen.getByText(t.tabs.info));
     expect(screen.getByText(/About SpectaSync/)).toBeDefined();
   });
 

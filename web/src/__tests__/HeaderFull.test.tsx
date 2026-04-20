@@ -39,9 +39,9 @@ describe('Header Component Coverage', () => {
     const signInMock = vi.mocked(firebase.signInWithGoogle);
     signInMock.mockResolvedValueOnce({ user: { email: 'test@example.com' } } as any);
 
-    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} />);
+    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} language="EN" onLanguageChange={() => {}} />);
     
-    const signInBtn = screen.getByText('Continue with Google');
+    const signInBtn = screen.getByText(/Continue with Google/i);
     fireEvent.click(signInBtn);
     
     expect(screen.getByText('Connecting...')).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('Header Component Coverage', () => {
       return () => {};
     });
 
-    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} />);
+    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} language="EN" onLanguageChange={() => {}} />);
     
     const signOutBtn = screen.getByText('Sign out');
     fireEvent.click(signOutBtn);
@@ -73,9 +73,9 @@ describe('Header Component Coverage', () => {
     
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} />);
+    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} language="EN" onLanguageChange={() => {}} />);
     
-    fireEvent.click(screen.getByText('Continue with Google'));
+    fireEvent.click(screen.getByText(/Continue with Google/i));
     await waitFor(() => expect(spy).toHaveBeenCalledWith('Google sign-in failed:', expect.anything()));
     spy.mockRestore();
   });
@@ -92,7 +92,7 @@ describe('Header Component Coverage', () => {
 
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} />);
+    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} language="EN" onLanguageChange={() => {}} />);
     
     fireEvent.click(screen.getByText('Sign out'));
     await waitFor(() => expect(spy).toHaveBeenCalledWith('Firebase sign-out failed:', expect.anything()));
@@ -101,10 +101,9 @@ describe('Header Component Coverage', () => {
 
   it('handles sign-in when firebase is disabled (Line 43)', async () => {
      mockFirebase.isFirebaseConfigured = false;
-     render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} />);
-     
-     const signInBtn = screen.getByText('Firebase disabled');
-     await fireEvent.click(signInBtn); // This triggers handleGoogleSignIn
-     expect(firebase.signInWithGoogle).not.toHaveBeenCalled();
+      render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} language="EN" onLanguageChange={() => {}} />);
+          const signInBtn = screen.getByText('Firebase disabled');
+      await fireEvent.click(signInBtn); // This triggers handleGoogleSignIn (which does nothing as it returns early)
+      expect(firebase.signInWithGoogle).not.toHaveBeenCalled();
   });
 });

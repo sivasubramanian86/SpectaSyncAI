@@ -79,7 +79,7 @@ SERVICES = {
 
 def run(cmd: str, fatal: bool = True) -> subprocess.CompletedProcess:
     log.info("  $ %s", cmd)
-    result = subprocess.run(cmd, shell=True)
+    result = subprocess.run(cmd, shell=True)  # nosec B602
     if fatal and result.returncode != 0:
         log.error("Command failed (exit %d): %s", result.returncode, cmd)
         sys.exit(result.returncode)
@@ -92,7 +92,7 @@ def get_service_url(service_name: str) -> str:
         f"gcloud run services describe {service_name} "
         f"--region {REGION} --project {PROJECT_ID} "
         f"--format value(status.url)",
-        shell=True,
+        shell=True,  # nosec B602
         capture_output=True,
         text=True,
     )

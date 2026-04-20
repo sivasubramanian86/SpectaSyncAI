@@ -4,6 +4,7 @@ import type { VenueZone } from '../types';
 
 interface QueueBoardProps {
   zones: VenueZone[];
+  language: string;
 }
 
 const TYPE_ICONS: Record<VenueZone['type'], React.ReactNode> = {
@@ -22,7 +23,10 @@ function densityToWait(density: number): number {
  * QueueBoard — Real-time wait time estimates per venue service zone.
  * Sorted by wait time descending (most urgent first).
  */
-export function QueueBoard({ zones }: QueueBoardProps): React.ReactElement {
+import { TRANSLATIONS } from '../translations';
+
+export function QueueBoard({ zones, language }: QueueBoardProps): React.ReactElement {
+  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
   const serviceZones = zones
     .filter(z => ['gate', 'food', 'restroom', 'merch'].includes(z.type))
     .map(z => ({ ...z, waitMins: densityToWait(z.density) }))
@@ -32,7 +36,7 @@ export function QueueBoard({ zones }: QueueBoardProps): React.ReactElement {
     <section className="glass p-5" aria-label="Queue wait time board">
       <div className="flex items-center gap-2 mb-4">
         <Clock size={16} className="text-cyan-400" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-slate-200">Queue Wait Times</h2>
+        <h2 className="text-sm font-semibold text-slate-200">{t.headers.queue}</h2>
       </div>
 
       <ul className="space-y-2" aria-label="Service zone wait times">
@@ -76,7 +80,7 @@ export function QueueBoard({ zones }: QueueBoardProps): React.ReactElement {
         ))}
       </ul>
 
-      <p className="mt-3 text-xs text-slate-600 text-right">Estimated via Queue Agent (ADK)</p>
+      <p className="mt-3 text-xs text-slate-600 text-right">{t.status.attribution}</p>
     </section>
   );
 }

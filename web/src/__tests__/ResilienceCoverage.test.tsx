@@ -63,19 +63,21 @@ describe('Resilience and Coverage Hardening', () => {
         isLive={true} 
         activeTab="dashboard" 
         onTabChange={() => {}} 
+        language="EN"
+        onLanguageChange={() => {}}
       />
     );
 
-    const loginBtn = screen.getByText('Continue with Google');
+    const loginBtn = screen.getByText(/Continue with Google/i);
     await act(async () => {
       fireEvent.click(loginBtn);
     });
 
-    expect(screen.getByText('Continue with Google')).toBeDefined();
+    expect(screen.getByText(/Continue with Google/i)).toBeDefined();
   });
 
   it('AudioVisualizer handles isActive state changes', () => {
-    const { rerender } = render(<MultiModalHub />);
+    const { rerender } = render(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
     
     // Default state check (usually images/video not audio)
     // Find audio tab
@@ -89,7 +91,7 @@ describe('Resilience and Coverage Hardening', () => {
     expect(screen.getAllByRole('img', { hidden: true })).toBeDefined(); // Lucide icons
     
     // Rerender to ensure both paths of isActive are hit in internal components
-    rerender(<MultiModalHub />);
+    rerender(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
   });
 
   it('useDashboardData polling loop handles exceptions', async () => {

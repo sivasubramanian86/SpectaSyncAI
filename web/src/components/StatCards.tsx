@@ -15,6 +15,8 @@ interface StatCardsProps {
   activeInterventions: number;
   /** Total number of active agents in the Google ADK mesh. */
   agentCount: number;
+  /** Current system language. */
+  language: string;
 }
 
 function StatCard({
@@ -45,38 +47,37 @@ function StatCard({
 /**
  * Top-level summary metrics row for the Command Center.
  */
-export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount }: StatCardsProps): React.ReactElement {
+import { TRANSLATIONS } from '../translations';
+
+export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount, language }: StatCardsProps): React.ReactElement {
+  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
   return (
     <section aria-label="Venue summary statistics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       <StatCard
         icon={<Users size={18} className="text-blue-300" aria-hidden="true" />}
-        label="Avg Density"
+        label={t.stats.density}
         value={`${Math.round(avgDensity * 100)}`}
         unit="%"
         color="bg-blue-500/15"
-        sublabel="Across all zones"
       />
       <StatCard
         icon={<AlertTriangle size={18} className="text-red-300" aria-hidden="true" />}
-        label="Critical Zones"
+        label={t.stats.critical}
         value={`${criticalCount}`}
         unit={`/ ${totalZones}`}
         color={criticalCount > 0 ? 'bg-red-500/20' : 'bg-emerald-500/15'}
-        sublabel="Require attention"
       />
       <StatCard
         icon={<Activity size={18} className="text-amber-300" aria-hidden="true" />}
-        label="Interventions"
+        label={t.stats.interventions}
         value={`${activeInterventions}`}
         color="bg-amber-500/15"
-        sublabel="Agent-dispatched"
       />
       <StatCard
         icon={<Cpu size={18} className="text-purple-300" aria-hidden="true" />}
-        label="Active Agents"
+        label={t.stats.agents}
         value={`${agentCount}`}
         color="bg-purple-500/15"
-        sublabel="Google ADK Mesh"
       />
       <StatCard
         icon={<TrendingUp size={18} className="text-emerald-300" aria-hidden="true" />}

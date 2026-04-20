@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
+import { TRANSLATIONS } from '../translations';
 
 type MediaType = 'video' | 'audio' | 'image';
 
@@ -10,6 +11,16 @@ interface MediaSource {
   type: MediaType;
   timestamp: string;
   status: 'SAFE' | 'WARNING' | 'CRITICAL';
+}
+
+/**
+ * Props for MultiModalHub component.
+ */
+interface MultiModalHubProps {
+  /** Current active system language. */
+  language: string;
+  /** Callback to change language. */
+  onLanguageChange: (lang: string) => void;
 }
 
 function AudioVisualizer({ isActive }: { isActive: boolean }) {
@@ -42,9 +53,8 @@ const SAMPLE_MEDIA: MediaSource[] = [
  * 
  * @returns {React.ReactElement} The multi-modal analysis hub.
  */
-export function MultiModalHub() {
+export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps) {
   const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
-  const [language, setLanguage] = useState('EN');
   const [frameIdx, setFrameIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
 
@@ -64,21 +74,8 @@ export function MultiModalHub() {
     ? (activeMedia.url as string[])[frameIdx] 
     : (activeMedia.url as string);
 
-  const translations: Record<string, any> = {
-    EN: { title: 'Multi-Modal Intelligence', capture: 'Live Capture', reco: 'AI Recommendation', lang: 'Select Language', action: 'Close Entry Gate 3 immediately & redirect flow to Sector 4.' },
-    HI: { title: 'मल्टी-मॉडल इंटेलिजेंस', capture: 'लाइव कैप्चर', reco: 'एआई सिफारिश', lang: 'भाषा चुनें', action: 'प्रवेश द्वार 3 को तुरंत बंद करें और भीड़ को सेक्टर 4 की ओर मोड़ें।' },
-    TE: { title: 'మల్టీ-మోడల్ ఇంటెలిజెన్స్', capture: 'లైవ్ క్యాప్చర్', reco: 'ఏఐ సిఫార్సు', lang: 'భాషను ఎంచుకోండి', action: 'గేట్ 3ని వెంటనే మూసివేయండి మరియు ప్రవాహాన్ని సెక్టార్ 4 వైపు మళ్లించండి.' },
-    TA: { title: 'மல்டி-மாடல் இன்டெலிஜென்ஸ்', capture: 'நேரடி பிடிப்பு', reco: 'AI பரிந்துரை', lang: 'மொழியைத் தேர்ந்தெடுக்கவும்', action: 'நுழைவு வாயில் 3-ஐ உடனடியாக மூடி, ஓட்டத்தை பிரிவு 4-க்கு மாற்றவும்.' },
-    BN: { title: 'মাল্টি-মোডাল ইন্টেলিজেন্স', capture: 'লাইভ ক্যাপচার', reco: 'AI সুপারিশ', lang: 'ভাষা নির্বাচন করুন', action: 'গেট ৩ অবিলম্বে বন্ধ করুন এবং ভিড় ১ নং সেক্টরের দিকে ঘুরিয়ে দিন।' },
-    ML: { title: 'മൾട്ടി-മോഡൽ ഇൻ്റലിജൻസ്', capture: 'ലൈവ് ക്യാപ്‌ചർ', reco: 'AI ശുപാർശ', lang: 'ഭാഷ തിരഞ്ഞെടുക്കുക', action: 'ഗേറ്റ് 3 ഉടൻ അടച്ച് ഒഴുക്ക് സെക്ടർ 4 ലേക്ക് തിരിച്ചുവിടുക.' },
-    KN: { title: 'ಮಲ್ಟಿ-ಮೋಡಲ್ ಇಂಟೆಲಿಜೆンス', capture: 'ಲೈವ್ ಕ್ಯಾಪ್ಚರ್', reco: 'AI ಶಿಫಾರಸು', lang: 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ', action: 'ಗೇಟ್ 3 ಅನ್ನು ಕೂಡಲೇ ಮುಚ್ಚಿ ಮತ್ತು ಹರಿವನ್ನು ಸೆಕ್ಟರ್ 4 ಗೆ ತಿರುಗಿಸಿ.' },
-    ZH: { title: '多模态智能', capture: '实况捕获', reco: 'AI 建议', lang: '选择语言', action: '立即关闭3号入口门并将人流重定向至第4区。' },
-    JA: { title: 'マルチモーダル・インテリジェンス', capture: 'ライブキャプチャ', reco: 'AI 推奨', lang: '言語を選択', action: 'ただちに3番ゲートを閉じ、流入をセクター4に誘導してください。' },
-    ES: { title: 'Inteligencia Multimodal', capture: 'Captura en Vivo', reco: 'Recomendación IA', lang: 'Seleccionar Idioma', action: 'Cierre la puerta de entrada 3 de inmediato y redirija el flujo al Sector 4.' },
-    FR: { title: 'Intelligence Multimodale', capture: 'Capture en Direct', reco: 'Recommandation IA', lang: 'Choisir la Langue', action: 'Fermer immédiatement la porte d\'entrée 3 et rediriger le flux vers le secteur 4.' }
-  };
-
-  const t = translations[language] || translations.EN;
+  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
+  const mt = t.multiModal || { title: 'Multi-Modal Intelligence', reco: 'AI Recommendation', action: 'Close Entry Gate 3 immediately & redirect flow to Sector 4.' };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -88,7 +85,7 @@ export function MultiModalHub() {
             <MonitorPlay size={20} className="text-blue-400" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white uppercase tracking-wider">{t.title}</h2>
+            <h2 className="text-lg font-bold text-white uppercase tracking-wider">{mt.title}</h2>
             <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.5 Flash Multi-Modal</p>
           </div>
         </div>
@@ -97,7 +94,7 @@ export function MultiModalHub() {
           <Globe size={14} className="text-slate-500" />
           <select 
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={(e) => onLanguageChange(e.target.value)}
             aria-label="Select Language"
             className="bg-navy-900 border border-white/10 rounded px-3 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
           >
@@ -221,7 +218,7 @@ export function MultiModalHub() {
         <div className="space-y-6">
             <div className="glass p-5 border-l-4 border-l-blue-500">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">{t.reco}</h3>
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">{mt.reco}</h3>
                 <ShieldAlert size={14} className={activeMedia.status === 'CRITICAL' ? 'text-red-500' : 'text-amber-500'} />
               </div>
               
@@ -239,9 +236,9 @@ export function MultiModalHub() {
                 </div>
 
                 <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
-                  <p className="text-[10px] text-blue-400 font-bold uppercase mb-1">Recommendation ({language})</p>
+                  <p className="text-[10px] text-blue-400 font-bold uppercase mb-1">{mt.reco} ({language})</p>
                   <p className="text-sm text-white font-semibold leading-relaxed">
-                    {t.action}
+                    {mt.action}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import App from '../App';
 import { SystemPanel } from '../components/SystemPanel';
 import { AgentFeed } from '../components/AgentFeed';
 import { MultiModalHub } from '../components/MultiModalHub';
+import { TRANSLATIONS } from '../translations';
 
 /**
  * SpectaSyncAI: Frontend Coverage Hardening Suite
@@ -52,7 +53,9 @@ vi.mock('../firebase', async () => {
   };
 });
 
-describe('Frontend Coverage Hardening', () => {
+describe('User Interaction Tests', () => {
+  const t = TRANSLATIONS.EN;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockImplementation((url) => {
@@ -78,14 +81,16 @@ describe('Frontend Coverage Hardening', () => {
     });
 
     render(<App />);
-    const tabButton = screen.getByText('Demographics');
+    // Demographics is now in 'More' menu
+    fireEvent.click(screen.getByText('More'));
+    const tabButton = screen.getByText(t.tabs.demographics);
     fireEvent.click(tabButton);
     expect(screen.getByText('Vision Demographic Intelligence')).toBeDefined();
   });
 
   it('renders Pre-Event Strategic Audit and handles analysis flow', async () => {
     render(<App />);
-    fireEvent.click(screen.getByText('Strategic Audit'));
+    fireEvent.click(screen.getByText(t.tabs.strategic));
     await waitFor(() => expect(screen.getByText('Global Expo 2026')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('Risk: LOW')).toBeInTheDocument());
   });
@@ -273,7 +278,7 @@ describe('Frontend Coverage Hardening', () => {
   });
 
   it('AudioVisualizer handles isActive state changes', () => {
-    render(<MultiModalHub />);
+    render(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
     
     // Switch to audio
     const audioBtn = screen.getByText(/Panic Signature/);
@@ -292,17 +297,24 @@ describe('Frontend Coverage Hardening', () => {
     expect(screen.getByText(/Analysis in Progress/)).toBeDefined();
   });
 
-  it('covers MultiModalHub language branches', () => {
-    render(<MultiModalHub />);
+  it('MultiModalHub renders and switches media', () => {
+    const onLanguageChange = vi.fn();
+    const { rerender } = render(<MultiModalHub language="EN" onLanguageChange={onLanguageChange} />);
     const select = screen.getByLabelText('Select Language');
     
-    // Test Spanish
-    fireEvent.change(select, { target: { value: 'ES' } });
-    expect(screen.getByText('Inteligencia Multimodal')).toBeInTheDocument();
+    // Test Hindi
+    fireEvent.change(select, { target: { value: 'HI' } });
+    expect(onLanguageChange).toHaveBeenCalledWith('HI');
+    
+    // Re-render with new language to verify title change
+    rerender(<MultiModalHub language="HI" onLanguageChange={onLanguageChange} />);
+    expect(screen.getByText(TRANSLATIONS.HI.multiModal.title)).toBeInTheDocument();
 
-    // Test Fallback
-    fireEvent.change(select, { target: { value: 'IT' } }); 
-    expect(screen.getByText('Multi-Modal Intelligence')).toBeInTheDocument();
+    // Test Japanese
+    fireEvent.change(select, { target: { value: 'JA' } });
+    expect(onLanguageChange).toHaveBeenCalledWith('JA');
+    rerender(<MultiModalHub language="JA" onLanguageChange={onLanguageChange} />);
+    expect(screen.getByText(TRANSLATIONS.JA.multiModal.title)).toBeInTheDocument();
   });
 
   it('covers Header branch when Firebase is not configured', async () => {
