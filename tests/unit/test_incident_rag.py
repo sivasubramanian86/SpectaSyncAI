@@ -62,7 +62,7 @@ def test_search_similar_incidents():
 
 
 def test_aggregate_intervention_strategies():
-    """Test functionality for test_aggregate_intervention_strategies."""
+    """Validates the aggregation of help strategies from multiple historical incident records."""
     ids = [INCIDENT_CORPUS[0].incident_id]
     res = aggregate_intervention_strategies(ids)
     assert res["incident_count"] == 1
@@ -71,7 +71,7 @@ def test_aggregate_intervention_strategies():
 
 @pytest.mark.asyncio
 async def test_run_incident_rag_query_success():
-    """Test functionality for test_run_incident_rag_query_success."""
+    """Tests a successful agentic RAG query session with mock JSON response parsing."""
     with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
         mock_runner = MagicMock()
         MockRunner.return_value = mock_runner

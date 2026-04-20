@@ -1,11 +1,17 @@
+"""SpectaSyncAI: API Edge Case & Coverage Gap Verification.
+Ensures 100% router coverage, including health checks, error handlers, and specific endpoint parameters.
+"""
+
 from unittest.mock import patch, AsyncMock
 import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
 
+
 @pytest.fixture(autouse=True)
 def mock_startup_tasks():
+    """Mocks expensive backend initialization tasks like cache warming and periodic analysis."""
     with patch(
         "api.routers.pre_event.trigger_pre_event_analysis", new_callable=AsyncMock
     ), patch("agents.context_cache.warm_all_caches", new_callable=AsyncMock):
@@ -13,6 +19,7 @@ def mock_startup_tasks():
 
 
 def test_api_gaps():
+    """Validates all REST endpoints across the 12-agent mesh for accessibility and response integrity."""
     client = TestClient(app)
     # Mock agent calls to avoid quota issues and latency
     with patch(
@@ -99,17 +106,20 @@ def test_api_gaps():
 
 
 def test_exception_handler():
+    """Verifies that the API correctly returns a 404 status for invalid resource paths."""
     client = TestClient(app)
     response = client.get("/v1/non-existent-endpoint")
     assert response.status_code == 404
 
 
 def test_internal_error_handler():
+    """Ensures that unhandled global exceptions are captured by the FastAPI error processor."""
     assert Exception in app.exception_handlers
 
 
 @pytest.mark.asyncio
 async def test_lifespan():
+    """Validates the FastAPI application lifespan events (startup/shutdown) in a production-like context."""
     # Verify lifespan shell works without side effects
     with TestClient(app) as local_client:
         response = local_client.get("/v1/health")

@@ -7,7 +7,7 @@ from agents.orchestrator import build_orchestrator_agent, run_orchestration_cycl
 
 @pytest.mark.asyncio
 async def test_build_orchestrator():
-    """Test functionality for test_build_orchestrator."""
+    """Verifies that the orchestrator initializes correctly with dynamic MCP tool injection."""
     with patch("agents.orchestrator.MCPToolset") as MockToolset:
         mock_tool = MagicMock()
         MockToolset.return_value.load_tools = AsyncMock(return_value=[mock_tool])
@@ -18,7 +18,7 @@ async def test_build_orchestrator():
 
 @pytest.mark.asyncio
 async def test_run_orchestration_cycle_with_tool_calls():
-    """Test functionality for test_run_orchestration_cycle_with_tool_calls."""
+    """Tests the full orchestration loop including agent reasoning, tool selection, and execution."""
     with (
         patch(
             "agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock
@@ -73,7 +73,7 @@ async def test_run_orchestration_cycle_with_tool_calls():
 
 @pytest.mark.asyncio
 async def test_run_orchestration_cycle_high_risk_broadcast():
-    """Test functionality for test_run_orchestration_cycle_high_risk_broadcast."""
+    """Validates that critical safety thresholds trigger automated high-priority Pub/Sub broadcasts."""
     with (
         patch(
             "agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock
@@ -130,7 +130,7 @@ async def test_run_orchestration_cycle_high_risk_broadcast():
 
 @pytest.mark.asyncio
 async def test_run_orchestration_cycle_failure_exception():
-    """Test functionality for test_run_orchestration_cycle_failure_exception."""
+    """Ensures robust error handling when dependency services (like AlloyDB) are unavailable."""
     with (
         patch("agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock),
         patch(
