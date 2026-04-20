@@ -13,34 +13,35 @@ import logging
 import os
 import sys
 import traceback
-from time import perf_counter
 from contextlib import asynccontextmanager
+from time import perf_counter
 
 try:
     import google.cloud.logging
 except ImportError:  # pragma: no cover
     google.cloud.logging = None
 
+from typing import AsyncIterator, Callable
+
 from dotenv import load_dotenv
-from typing import Any, AsyncIterator, Callable
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from api.services.observability_service import observability_service
 from api.routers import (
+    crisis,
+    experience,
     health,
-    telemetry,
     interventions,
+    observability,
+    pre_event,
     predictions,
     queues,
     safety,
-    experience,
-    crisis,
-    pre_event,
-    observability,
+    telemetry,
 )
+from api.services.observability_service import observability_service
 
 # Force override to ensure .env values take precedence
 load_dotenv(override=True)
@@ -101,9 +102,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async def precompute_pre_event() -> None:
         try:
             from api.routers.pre_event import (
+                PreEventData,
                 get_mock_pre_event,
                 trigger_pre_event_analysis,
-                PreEventData,
             )
 
             mock_data = await get_mock_pre_event()

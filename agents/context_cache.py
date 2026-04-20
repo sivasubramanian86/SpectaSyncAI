@@ -14,10 +14,10 @@ from __future__ import annotations
 
 import logging
 import os
-from google import genai
-from google.genai import types
 
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 
 # Ensure .env is loaded before creating any clients
 load_dotenv(override=True)
@@ -31,7 +31,7 @@ _CACHE_TTL_HOURS = 6
 def get_client() -> genai.Client:
     """Return a GenAI client configured for Vertex AI mode.
 
-    Returns
+    Returns:
     -------
         genai.Client: Configured GenAI client.
 
@@ -171,8 +171,8 @@ async def get_or_create_cache(
                 if c.display_name == cache_id:
                     logger.info(f"[ContextCache] Cache HIT: {cache_id}")
                     return c
-        except Exception:  # pragma: no cover # nosec B110
-            pass
+        except Exception as exc:  # pragma: no cover # nosec B110
+            logger.debug(f"[ContextCache] Failed to list caches: {exc}")
 
         # 2. Create if absent
         logger.info(f"[ContextCache] Creating cache: {cache_id}...")

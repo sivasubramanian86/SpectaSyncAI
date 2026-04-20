@@ -1,6 +1,30 @@
 [tool.ruff]
 line-length = 120
+target-version = "py312"
 
 [tool.ruff.lint]
-select = ["D", "ANN", "E", "F", "W", "C90"]
-ignore = ["ANN101"] # Ignore missing type annotation for self
+select = [
+    "D",   # pydocstyle
+    "ANN", # flake8-annotations
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "C90", # mccabe
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "S",   # flake8-bandit
+]
+ignore = [
+    "ANN101", # Missing type annotation for self (deprecated in fresh ruff)
+    "D203",   # 1 blank line required before class docstring (conflict with D211)
+    "D212",   # Multi-line summary should start at the first line (conflict with D213)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",   # Use of assert detected
+    "ANN",    # Missing type annotations in tests is acceptable
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

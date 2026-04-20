@@ -18,28 +18,17 @@ Infrastructure:
 """
 
 # Tier 1 - Operational Agents
-from .vision_agent import build_vision_agent, run_vision_analysis
-from .orchestrator import build_orchestrator_agent, run_orchestration_cycle
-from .prediction_agent import build_prediction_agent, run_surge_prediction
-from .queue_agent import build_queue_agent, run_queue_analysis
-from .safety_agent import build_safety_agent, run_safety_assessment
-from .experience_agent import build_experience_agent, run_experience_recommendations
-from .memory import AlloyDBMemory
-
 # Infrastructure - Context Cache
 from .context_cache import (
     build_system_prompt,
     get_cached_model,
-    get_cached_model_pro,
     get_cached_model_flash,
+    get_cached_model_pro,
     warm_all_caches,
 )
-
-# Tier 2 - Crisis Prevention Agents
-from .perimeter_macro_agent import build_perimeter_macro_agent, run_perimeter_assessment
-from .vip_sync_agent import build_vip_sync_agent, run_vip_sync_monitoring
-from .rumor_control_agent import build_rumor_control_agent, run_rumor_monitoring
+from .experience_agent import build_experience_agent, run_experience_recommendations
 from .failsafe_mesh_agent import build_failsafe_mesh_agent, run_failsafe_monitoring
+from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
 
 # Tier 2 - Incident RAG (global corpus)
 from .incident_rag_agent import (
@@ -47,7 +36,17 @@ from .incident_rag_agent import (
     run_incident_rag_query,
     search_similar_incidents,
 )
-from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
+from .memory import AlloyDBMemory
+from .orchestrator import build_orchestrator_agent, run_orchestration_cycle
+
+# Tier 2 - Crisis Prevention Agents
+from .perimeter_macro_agent import build_perimeter_macro_agent, run_perimeter_assessment
+from .prediction_agent import build_prediction_agent, run_surge_prediction
+from .queue_agent import build_queue_agent, run_queue_analysis
+from .rumor_control_agent import build_rumor_control_agent, run_rumor_monitoring
+from .safety_agent import build_safety_agent, run_safety_assessment
+from .vip_sync_agent import build_vip_sync_agent, run_vip_sync_monitoring
+from .vision_agent import build_vision_agent, run_vision_analysis
 
 __all__ = [
     # Tier 1

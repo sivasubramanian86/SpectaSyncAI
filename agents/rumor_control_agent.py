@@ -23,19 +23,22 @@ Responsibility:
   counter-narratives within 12 seconds of viral threshold detection.
 """
 
-import os
 import json
 import logging
+import os
 import re
-import time
 import secrets
+import time
 from datetime import datetime, timezone
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
-from .incident_corpus import INCIDENT_CORPUS
-from .context_cache import get_cached_model_flash
+
 from api.services.observability_service import observability_service
+
+from .context_cache import get_cached_model_flash
+from .incident_corpus import INCIDENT_CORPUS
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +268,7 @@ def broadcast_counter_narrative(
 def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
     """Construct the Rumor Control Agent using Gemini Flash for speed.
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured rumor control agent.
 

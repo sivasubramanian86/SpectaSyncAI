@@ -3,17 +3,19 @@
 Address EXOGENOUS_SURGE, TEMPORAL_DISRUPTION, INFO_CASCADE, INFRA_FAILURE.
 """
 
-import os
 import logging
+import os
+from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from typing import Any
-from agents.perimeter_macro_agent import run_perimeter_assessment
-from agents.vip_sync_agent import run_vip_sync_monitoring
-from agents.rumor_control_agent import run_rumor_monitoring
+
 from agents.failsafe_mesh_agent import run_failsafe_monitoring
-from agents.incident_rag_agent import run_incident_rag_query
 from agents.incident_corpus import INCIDENT_CORPUS
+from agents.incident_rag_agent import run_incident_rag_query
+from agents.perimeter_macro_agent import run_perimeter_assessment
+from agents.rumor_control_agent import run_rumor_monitoring
+from agents.vip_sync_agent import run_vip_sync_monitoring
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

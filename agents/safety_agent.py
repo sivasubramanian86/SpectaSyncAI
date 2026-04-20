@@ -8,14 +8,16 @@ Implements responsible AI - all critical decisions require human confirmation
 in production. Prototype uses structured decision output only.
 """
 
-import os
 import json
 import logging
+import os
 import time
 from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+
 from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
@@ -78,7 +80,7 @@ def classify_safety_risk(density_score: float, rate_of_change: float) -> dict[st
 def get_emergency_contact_list() -> dict[str, str]:
     """Return the emergency contacts and escalation chain for the venue.
 
-    Returns
+    Returns:
     -------
         dict: Emergency contacts categorized by type.
 
@@ -96,7 +98,7 @@ def get_emergency_contact_list() -> dict[str, str]:
 def build_safety_agent() -> LlmAgent:
     """Build the ADK Safety Agent using Gemini 2.5 Pro.
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured safety monitoring agent.
 

@@ -8,13 +8,15 @@ Responsibility: Real-time wait time estimation across all venue service points
 Surfaces per-zone wait times for the Command Center dashboard.
 """
 
-import os
 import json
 import logging
+import os
 import time
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+
 from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
@@ -53,7 +55,7 @@ def get_zone_queue_snapshot(zone_id: str) -> dict:
     config = VENUE_ZONES.get(
         zone_id, {"capacity": 100, "staff_count": 2, "service_rate_per_min": 10}
     )
-    queue_length = random.randint(5, int(config["capacity"] * 0.9))  # nosec B311
+    queue_length = random.randint(5, int(config["capacity"] * 0.9))  # noqa: S311
     return {
         "zone_id": zone_id,
         "queue_length": queue_length,
@@ -105,7 +107,7 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
 def build_queue_agent() -> LlmAgent:
     """Construct the ADK Queue Agent using Gemini 2.5 Flash (high-speed).
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured queue monitoring agent.
 

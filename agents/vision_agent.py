@@ -4,15 +4,16 @@ Powered by Google ADK (google-adk) + Gemini 2.5 Flash
 Responsibility: Multimodal CCTV frame analysis for real-time crowd density estimation.
 """
 
-import os
 import json
 import logging
+import os
 import time
 from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from google.genai import types as genai_types
 from google.cloud import storage
+from google.genai import types as genai_types
 
 from api.services.observability_service import observability_service
 

@@ -1,14 +1,15 @@
-"""SpectaSyncAI: Pre-Event Strategic Analyst Agent
+"""SpectaSyncAI: Pre-Event Strategic Analyst Agent.
 
 Powered by Gemini 2.5 Pro
 
 Responsibility: Forecasting crowd risk based on bookings, weather, and scheduling.
 """
 
-import os
 import json
 import logging
+import os
 import time
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types

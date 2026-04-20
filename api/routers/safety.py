@@ -1,9 +1,11 @@
 """Safety router - detection and risk assessment via Safety Agent."""
 
 import logging
+from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from typing import Any
+
 from agents.safety_agent import run_safety_assessment
 
 logger = logging.getLogger(__name__)

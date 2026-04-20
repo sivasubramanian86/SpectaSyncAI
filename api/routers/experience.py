@@ -2,7 +2,9 @@
 
 import logging
 from typing import Any
+
 from fastapi import APIRouter, Query
+
 from agents.experience_agent import run_experience_recommendations
 
 logger = logging.getLogger(__name__)

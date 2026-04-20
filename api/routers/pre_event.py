@@ -4,8 +4,10 @@ Expose strategic forecasting capabilities to the Command Hub.
 """
 
 from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel
+
 from agents.pre_event_agent import run_pre_event_analysis
 
 router = APIRouter()

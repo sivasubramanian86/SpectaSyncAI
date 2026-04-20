@@ -18,18 +18,20 @@ Production: Uses AlloyDB pgvector for embedding search.
 Prototype:  Uses in-memory cosine similarity on float feature vectors.
 """
 
-import os
 import json
 import logging
 import math
+import os
 import time
 from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
 
-from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
 from api.services.observability_service import observability_service
+
+from .incident_corpus import INCIDENT_CORPUS, IncidentRecord
 
 logger = logging.getLogger(__name__)
 

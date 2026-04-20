@@ -52,13 +52,17 @@ class ObservabilityService:
     def _metric_type(self: ObservabilityService, suffix: str) -> str:
         return f"custom.googleapis.com/spectasync/{suffix}"
 
-    def _resource(self: ObservabilityService) -> monitored_resource_pb2.MonitoredResource:
+    def _resource(
+        self: ObservabilityService,
+    ) -> monitored_resource_pb2.MonitoredResource:
         return monitored_resource_pb2.MonitoredResource(
             type="global",
             labels={"project_id": self.project_id or "local"},
         )
 
-    def _client_or_none(self: ObservabilityService) -> monitoring_v3.MetricServiceClient | None:
+    def _client_or_none(
+        self: ObservabilityService,
+    ) -> monitoring_v3.MetricServiceClient | None:
         if not self.enabled or self._client_disabled:
             return None
         if self._client is not None:

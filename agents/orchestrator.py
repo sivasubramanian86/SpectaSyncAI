@@ -5,25 +5,27 @@ Responsibility: Spatial reasoning over venue telemetry, querying historical
 AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventions.
 """
 
-import json
 import asyncio
-import time
-from api.services.pubsub_service import pubsub_service
+import json
 import logging
 import os
+import time
+from typing import Any, TypedDict
 
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
-from typing import TypedDict, Any
 from google.adk.tools.mcp_tool.mcp_toolset import (
     McpToolset as MCPToolset,
+)
+from google.adk.tools.mcp_tool.mcp_toolset import (
     SseConnectionParams,
 )
 from google.genai import types as genai_types
 
-from agents.memory import AlloyDBMemory
 from agents.context_cache import get_cached_model_pro
+from agents.memory import AlloyDBMemory
 from api.services.observability_service import observability_service
+from api.services.pubsub_service import pubsub_service
 
 logger = logging.getLogger(__name__)
 

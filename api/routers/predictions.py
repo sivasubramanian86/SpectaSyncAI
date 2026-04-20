@@ -2,8 +2,10 @@
 
 import logging
 from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
+
 from agents.prediction_agent import run_surge_prediction
 
 logger = logging.getLogger(__name__)

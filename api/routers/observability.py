@@ -1,6 +1,7 @@
 """Observability router for runtime visibility into Google Cloud integration."""
 
 from typing import Any
+
 from fastapi import APIRouter
 
 from api.services.observability_service import observability_service

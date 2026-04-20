@@ -6,12 +6,13 @@ Used to trigger downstream civil defense notifications and HITL workflows.
 
 from __future__ import annotations
 
-import os
 import json
 import logging
+import os
 from typing import Any
-from google.cloud import pubsub_v1
+
 from google.api_core import exceptions
+from google.cloud import pubsub_v1
 
 logger = logging.getLogger("spectasync.pubsub")
 

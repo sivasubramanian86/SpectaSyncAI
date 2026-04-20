@@ -19,17 +19,20 @@ Responsibility:
   crowd accumulation BEFORE it reaches the perimeter.
 """
 
-import os
 import json
 import logging
-import time
+import os
 import secrets
+import time
 from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
-from .incident_corpus import INCIDENT_CORPUS
+
 from api.services.observability_service import observability_service
+
+from .incident_corpus import INCIDENT_CORPUS
 
 logger = logging.getLogger(__name__)
 

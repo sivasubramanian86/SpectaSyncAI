@@ -7,13 +7,15 @@ historical AlloyDB patterns + current telemetry trend analysis.
 Provides confidence scores and specific actionable recommendations.
 """
 
-import os
 import json
 import logging
+import os
 import time
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+
 from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
@@ -100,7 +102,7 @@ def build_prediction_agent() -> LlmAgent:
 
     Specialized for temporal pattern analysis and surge forecasting.
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured prediction agent.
 

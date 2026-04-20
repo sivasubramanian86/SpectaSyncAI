@@ -20,17 +20,20 @@ Responsibility:
   Recalculates arrival surge vector and pre-positions staff accordingly.
 """
 
-import os
 import json
 import logging
-import time
+import os
 import secrets
+import time
 from datetime import datetime, timedelta
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
-from .incident_corpus import INCIDENT_CORPUS
+
 from api.services.observability_service import observability_service
+
+from .incident_corpus import INCIDENT_CORPUS
 
 logger = logging.getLogger(__name__)
 
@@ -248,7 +251,7 @@ def calculate_arrival_surge_vector(
 def build_vip_sync_agent() -> LlmAgent:
     """Construct the VIP Sync Agent for convoy delay monitoring.
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured VIP synchronization agent.
 

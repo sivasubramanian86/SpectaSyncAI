@@ -8,9 +8,10 @@ from __future__ import annotations
 import logging
 import os
 import sys
+
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from mcp.server.sse import TransportSecuritySettings
-from dotenv import load_dotenv
 
 # Force override to ensure .env values take precedence over system environment variables
 load_dotenv(override=True)
@@ -257,7 +258,7 @@ if __name__ == "__main__":  # pragma: no cover
     # Configure FastMCP instance settings for SSE Uvicorn transport
     mcp.settings.port = port
     mcp.settings.host = os.getenv(
-        "MCP_HOST", "0.0.0.0"
-    )  # nosec B104 (Binds to all for Cloud Run)
+        "MCP_HOST", "0.0.0.0"  # noqa: S104
+    )
 
     mcp.run(transport="sse")

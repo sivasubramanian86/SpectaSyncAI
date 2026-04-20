@@ -28,18 +28,21 @@ Graceful Degradation Tiers:
   T4 (Blackout):   Physical signage + staff formation only
 """
 
-import os
 import json
 import logging
-import time
+import os
 import secrets
-from typing import Any
+import time
 from datetime import datetime, timezone
+from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
-from .incident_corpus import INCIDENT_CORPUS
+
 from api.services.observability_service import observability_service
+
+from .incident_corpus import INCIDENT_CORPUS
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +202,9 @@ def dispatch_offline_staff_routing(
     }
 
 
-def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dict[str, Any]:
+def request_emergency_generator(
+    venue_id: str, affected_zones: list[str]
+) -> dict[str, Any]:
     """Dispatch the emergency generator request and activate physical signage.
 
     Ensure glow-in-dark exit signage requires zero power.

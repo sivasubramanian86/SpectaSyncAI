@@ -2,12 +2,13 @@
 
 import base64
 import logging
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from typing import Any
-from agents.vision_agent import run_vision_analysis
 from agents.orchestrator import run_orchestration_cycle
+from agents.vision_agent import run_vision_analysis
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -39,7 +40,7 @@ async def get_telemetry_meta(location_id: str) -> dict[str, Any]:
         logger.error(f"Telemetry meta failure: {exc}")
         raise HTTPException(
             status_code=500, detail="Telemetry pipeline metadata failure."
-        )
+        ) from exc
 
 
 class TelemetryPayload(BaseModel):
@@ -94,7 +95,7 @@ async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
         try:
             image_bytes = base64.b64decode(payload.image_b64)
         except Exception:  # pragma: no cover
-            raise HTTPException(status_code=400, detail="Invalid base64.")
+            raise HTTPException(status_code=400, detail="Invalid base64.") from None
         try:
             density_report = await run_vision_analysis(payload.location_id, image_bytes)
         except Exception as exc:  # pragma: no cover

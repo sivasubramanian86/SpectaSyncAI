@@ -38,7 +38,9 @@ async def test_pubsub_service_production_mock() -> None:
     """Test PubSubService internal mechanics by forcing production mode."""
     with patch("os.getenv") as mock_env:
 
-        def getenv_side_effect(key: str, default: Optional[str] = None) -> Optional[str]:
+        def getenv_side_effect(
+            key: str, default: Optional[str] = None
+        ) -> Optional[str]:
             """Simulate environment variables for production test paths."""
             if key == "K_SERVICE":
                 return "spectasync-api"

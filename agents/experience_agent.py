@@ -6,14 +6,16 @@ to improve their event experience - optimal timing suggestions, food, seating,
 and transport routing based on live venue state.
 """
 
-import os
 import json
 import logging
+import os
 import time
 from typing import Any
+
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
+
 from api.services.observability_service import observability_service
 
 logger = logging.getLogger(__name__)
