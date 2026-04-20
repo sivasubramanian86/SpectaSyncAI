@@ -1,15 +1,15 @@
-"""SpectaSyncAI: Comprehensive Testing for MCP Tools & PubSub Logic
-@14_quality_assurance_engineer: Closing coverage gaps for 100% score.
+"""SpectaSyncAI: Comprehensive Testing for MCP Tools & PubSub Logic.
+
+Closing coverage gaps for 100% score.
 """
 
-import pytest
+from typing import Optional
 from unittest.mock import patch, MagicMock
 from mcp_server.server import search_missing_person, adjust_concession_staffing
 from api.services.pubsub_service import PubSubService
 
 
-@pytest.mark.asyncio
-async def test_search_missing_person_critical():
+async def test_search_missing_person_critical() -> None:
     """Test specialized vulnerability priority in MCP missing person search."""
     # Test child (vulnerable)
     res = await search_missing_person("ref_123", "ZONE_A", "child")
@@ -21,8 +21,7 @@ async def test_search_missing_person_critical():
     assert res["priority_level"] == "HIGH"
 
 
-@pytest.mark.asyncio
-async def test_adjust_concession_staffing_variants():
+async def test_adjust_concession_staffing_variants() -> None:
     """Test all staffing action variants."""
     res = await adjust_concession_staffing("S1", "increase")
     assert res["additional_staff"] == 2
@@ -35,13 +34,12 @@ async def test_adjust_concession_staffing_variants():
     assert res["eta_mins"] == 3
 
 
-@pytest.mark.asyncio
-async def test_pubsub_service_production_mock():
+async def test_pubsub_service_production_mock() -> None:
     """Test PubSubService internal mechanics by forcing production mode."""
     with patch("os.getenv") as mock_env:
 
-        def getenv_side_effect(key, default=None):
-            """Test functionality for getenv_side_effect."""
+        def getenv_side_effect(key: str, default: Optional[str] = None) -> Optional[str]:
+            """Simulate environment variables for production test paths."""
             if key == "K_SERVICE":
                 return "spectasync-api"
             if key == "GOOGLE_CLOUD_PROJECT":
@@ -74,8 +72,7 @@ async def test_pubsub_service_production_mock():
             assert res is False
 
 
-@pytest.mark.asyncio
-async def test_pubsub_init_failure():
+async def test_pubsub_init_failure() -> None:
     """Test PubSub initialization failure path."""
     with (
         patch("os.getenv", return_value="PROD"),

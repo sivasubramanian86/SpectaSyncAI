@@ -1,6 +1,7 @@
 """Experience router - attendee recommendations via Experience Agent."""
 
 import logging
+from typing import Any
 from fastapi import APIRouter, Query
 from agents.experience_agent import run_experience_recommendations
 
@@ -13,8 +14,18 @@ router = APIRouter()
 )
 async def get_recommendations(
     zone: str = Query("SECTION_101", examples=["SECTION_101"]),
-) -> dict:
-    """Invokes Experience Agent for venue navigation
-    and timing recommendations for an attendee in a specific zone.
+) -> dict[str, Any]:
+    """Invoke Experience Agent for venue navigation.
+
+    Provide timing recommendations for an attendee in a specific zone.
+
+    Args:
+    ----
+        zone: Current attendee location zone.
+
+    Returns:
+    -------
+        dict[str, Any]: Personalized recommendations and timing data.
+
     """
     return await run_experience_recommendations(zone)

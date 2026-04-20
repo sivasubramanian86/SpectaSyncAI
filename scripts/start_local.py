@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Venv-aware Local Development Launcher
+"""SpectaSyncAI: Venv-aware Local Development Launcher.
+
 @07_modern_polyglot_standards compliant.
 
 Pre-flight checks:
@@ -77,6 +78,8 @@ def _ver(cmd: list[str]) -> tuple[int, ...]:
 
 
 def check_python() -> None:
+    """Verify that the current Python version meets minimum requirements."""
+    v = sys.version_info[:2]
     v = sys.version_info[:2]
     if v < MIN_PYTHON:
         log.error(
@@ -88,6 +91,8 @@ def check_python() -> None:
 
 
 def check_node() -> None:
+    """Verify that the current Node.js version meets minimum requirements."""
+    v = _ver([NODE_CMD, "--version"])
     v = _ver([NODE_CMD, "--version"])
     if v < MIN_NODE:
         log.error(f"Node.js {MIN_NODE[0]}+ required. Found: {v[0]}.{v[1]}")
@@ -97,6 +102,8 @@ def check_node() -> None:
 
 
 def check_npm() -> None:
+    """Verify that the current npm version meets minimum requirements."""
+    v = _ver([NPM_CMD, "--version"])
     v = _ver([NPM_CMD, "--version"])
     if v < MIN_NPM:
         log.error(f"npm {MIN_NPM[0]}+ required. Found: {v[0]}.{v[1]}")
@@ -149,14 +156,34 @@ def check_env() -> None:
 
 
 def launch(
-    cmd: list[str], cwd: Path, env_extra: dict | None = None
+    cmd: list[str], cwd: Path, env_extra: dict[str, str] | None = None
 ) -> subprocess.Popen:
+    """Launch a subprocess for a specific service.
+
+    Args:
+    ----
+        cmd: Command and arguments list.
+        cwd: Directory context for execution.
+        env_extra: Optional additional environment variables.
+
+    Returns:
+    -------
+        subprocess.Popen: Persistent process handle.
+
+    """
     env = {**os.environ, **(env_extra or {})}
     log.info(f"Starting: {' '.join(str(c) for c in cmd)}")
     return subprocess.Popen(cmd, cwd=str(cwd), env=env)
 
 
 def wait_all(procs: list[subprocess.Popen]) -> None:
+    """Manage lifecycle of all launched processes until termination.
+
+    Args:
+    ----
+        procs: List of active process handles.
+
+    """
     try:
         for p in procs:
             p.wait()
@@ -176,6 +203,8 @@ def wait_all(procs: list[subprocess.Popen]) -> None:
 
 
 def main() -> None:
+    """Coordinate the pre-flight and concurrent launch of the full stack."""
+    parser = argparse.ArgumentParser(description="SpectaSyncAI local dev launcher")
     parser = argparse.ArgumentParser(description="SpectaSyncAI local dev launcher")
     parser.add_argument("--api", action="store_true", help="Start backend only")
     parser.add_argument("--ui", action="store_true", help="Start frontend only")

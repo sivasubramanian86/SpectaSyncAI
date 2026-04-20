@@ -1,5 +1,6 @@
-"""SpectaSyncAI: Agents Package
-Exports the full ADK Agent Mesh - 12 agents across 2 tiers.
+"""SpectaSyncAI: Agent Layer Initialization.
+
+Managed mesh configuration for coordinated crowd-risk mitigation.
 
 Tier 1 - Operational Agents (real-time venue monitoring):
   VisionAgent, CoreOrchestrator, PredictionAgent, QueueAgent, SafetyAgent, ExperienceAgent

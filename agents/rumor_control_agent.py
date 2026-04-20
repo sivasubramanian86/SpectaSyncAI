@@ -1,5 +1,7 @@
-"""SpectaSyncAI: Rumor Control Agent
-Powered by: google-adk + Gemini 2.5 Flash
+"""SpectaSyncAI: Rumor Control & Sentiment Agent.
+
+Monitors social sentiment and counters misinformation during incidents.
+
 Failure Mode Addressed: INFO_CASCADE.
 
 Incident Reference: INC-2025-IND-02
@@ -70,7 +72,8 @@ RUMOR_KEYWORD_PATTERNS = [
 
 
 def scan_social_media_for_rumors(venue_id: str) -> dict:
-    """Scans social media channels for dangerous crowd-related rumors.
+    """Scan social media channels for dangerous crowd-related rumors.
+
     Detects keyword patterns mapped to known incident trigger signatures.
 
     Historical precedent (INC-2025-IND-02): 'free entry' keywords reached
@@ -89,7 +92,6 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
         dict: Detected rumors with severity scores and viral velocity.
 
     """
-
     rumors_detected = []
     sample_posts = [
         "Everyone come, the gates are open for free entry!",
@@ -139,7 +141,8 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
 
 
 def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> dict:
-    """Classifies a detected rumor using Gemini Flash NLP.
+    """Classify a detected rumor using Gemini Flash NLP.
+
     Determines the counter-narrative priority and broadcast channel mix.
 
     Args:
@@ -176,7 +179,8 @@ def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> 
 def broadcast_counter_narrative(
     venue_id: str, channels: list[str], rumor_category: str, languages: list[str]
 ) -> dict:
-    """Broadcasts multilingual counter-narratives across all active channels.
+    """Broadcast multilingual counter-narratives across all active channels.
+
     Target response time: < 12 seconds from viral threshold detection.
 
     Historical precedent: INC-2025-IND-02's 12-minute viral window was enough.
@@ -259,7 +263,13 @@ def broadcast_counter_narrative(
 
 
 def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
-    """Constructs the Rumor Control Agent using Gemini Flash for speed."""
+    """Construct the Rumor Control Agent using Gemini Flash for speed.
+
+    Returns
+    -------
+        LlmAgent: Configured rumor control agent.
+
+    """
     corpus_incidents = [
         r.incident_id
         for r in INCIDENT_CORPUS
@@ -295,7 +305,17 @@ def build_rumor_control_agent(cache_name: str | None = None) -> LlmAgent:
 
 
 async def run_rumor_monitoring(venue_id: str) -> dict:
-    """Runs the Rumor Control Agent for a venue."""
+    """Run the Rumor Control Agent for a venue.
+
+    Args:
+    ----
+        venue_id: Target venue identifier.
+
+    Returns:
+    -------
+        dict: Rumor monitoring report with broadcast status.
+
+    """
     start = time.perf_counter()
     fallback = False
     output_size = 0

@@ -11,14 +11,14 @@ from agents.safety_agent import (
 )
 
 
-def test_build_safety_agent():
+def test_build_safety_agent() -> None:
     """Test functionality for test_build_safety_agent."""
     agent = build_safety_agent()
     assert agent.name == "safety_agent"
     assert "gemini-2.5-pro" in agent.model
 
 
-def test_classify_safety_risk_emergency():
+def test_classify_safety_risk_emergency() -> None:
     # Emergency by density
     """Test functionality for test_classify_safety_risk_emergency."""
     res = classify_safety_risk(0.96, 0.01)
@@ -30,20 +30,20 @@ def test_classify_safety_risk_emergency():
     assert res["risk_level"] == "EMERGENCY"
 
 
-def test_classify_safety_risk_critical():
+def test_classify_safety_risk_critical() -> None:
     """Test functionality for test_classify_safety_risk_critical."""
     res = classify_safety_risk(0.89, 0.01)
     assert res["risk_level"] == "CRITICAL"
     assert res["human_approval_required"] is False
 
 
-def test_classify_safety_risk_elevated():
+def test_classify_safety_risk_elevated() -> None:
     """Test functionality for test_classify_safety_risk_elevated."""
     res = classify_safety_risk(0.5, 0.01)
     assert res["risk_level"] == "ELEVATED"
 
 
-def test_get_emergency_contact_list():
+def test_get_emergency_contact_list() -> None:
     """Test functionality for test_get_emergency_contact_list."""
     res = get_emergency_contact_list()
     assert "local_police" in res
@@ -51,7 +51,7 @@ def test_get_emergency_contact_list():
 
 
 @pytest.mark.asyncio
-async def test_run_safety_assessment_success():
+async def test_run_safety_assessment_success() -> None:
     """Test functionality for test_run_safety_assessment_success."""
     mock_event = MagicMock()
     mock_event.is_final_response.return_value = True
@@ -82,7 +82,7 @@ async def test_run_safety_assessment_success():
 
 
 @pytest.mark.asyncio
-async def test_run_safety_assessment_fallback():
+async def test_run_safety_assessment_fallback() -> None:
     """Test functionality for test_run_safety_assessment_fallback."""
     mock_event = MagicMock()
     mock_event.is_final_response.return_value = True

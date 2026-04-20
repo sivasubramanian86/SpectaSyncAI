@@ -36,7 +36,7 @@ from agents.vision_agent import archive_to_gcs
 
 
 @pytest.mark.asyncio
-async def test_failsafe_agent_tools():
+async def test_failsafe_agent_tools() -> None:
     """Test functionality for test_failsafe_agent_tools."""
     mock_rng = MagicMock()
     mock_rng.uniform.return_value = 1.5
@@ -59,7 +59,7 @@ async def test_failsafe_agent_tools():
 
 
 @pytest.mark.asyncio
-async def test_failsafe_agent_fallback():
+async def test_failsafe_agent_fallback() -> None:
     """Test functionality for test_failsafe_agent_fallback."""
     with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -80,7 +80,7 @@ async def test_failsafe_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_perimeter_agent_tools():
+async def test_perimeter_agent_tools() -> None:
     """Test functionality for test_perimeter_agent_tools."""
     mock_rng = MagicMock()
     mock_rng.uniform.side_effect = [4.0, 3.5, 3.5]  # for cell tower, then 2 stations
@@ -101,7 +101,7 @@ async def test_perimeter_agent_tools():
 
 
 @pytest.mark.asyncio
-async def test_perimeter_agent_fallback():
+async def test_perimeter_agent_fallback() -> None:
     """Test functionality for test_perimeter_agent_fallback."""
     with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -121,7 +121,7 @@ async def test_perimeter_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_rumor_control_agent_tools():
+async def test_rumor_control_agent_tools() -> None:
     # scan_social_media_for_rumors
     """Test functionality for test_rumor_control_agent_tools."""
     res = scan_social_media_for_rumors("V1")
@@ -137,7 +137,7 @@ async def test_rumor_control_agent_tools():
 
 
 @pytest.mark.asyncio
-async def test_rumor_control_agent_fallback():
+async def test_rumor_control_agent_fallback() -> None:
     """Test functionality for test_rumor_control_agent_fallback."""
     with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -157,7 +157,7 @@ async def test_rumor_control_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_vip_sync_agent_tools():
+async def test_vip_sync_agent_tools() -> None:
     # get_convoy_gps_position
     """Test functionality for test_vip_sync_agent_tools."""
     res = get_convoy_gps_position("E1")
@@ -177,7 +177,7 @@ async def test_vip_sync_agent_tools():
 
 
 @pytest.mark.asyncio
-async def test_vip_sync_agent_fallback():
+async def test_vip_sync_agent_fallback() -> None:
     """Test functionality for test_vip_sync_agent_fallback."""
     with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -197,7 +197,7 @@ async def test_vip_sync_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_queue_agent_tools():
+async def test_queue_agent_tools() -> None:
     """Test functionality for test_queue_agent_tools."""
     from agents.queue_agent import get_zone_queue_snapshot, calculate_wait_time
 
@@ -213,7 +213,7 @@ async def test_queue_agent_tools():
 
 
 @pytest.mark.asyncio
-async def test_queue_agent_fallback():
+async def test_queue_agent_fallback() -> None:
     """Test functionality for test_queue_agent_fallback."""
     with patch("agents.queue_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -233,7 +233,7 @@ async def test_queue_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_experience_agent_fallback():
+async def test_experience_agent_fallback() -> None:
     """Test functionality for test_experience_agent_fallback."""
     with patch("agents.experience_agent.InMemoryRunner") as MockRunner:
         mock_event = MagicMock()
@@ -257,7 +257,7 @@ async def test_experience_agent_fallback():
 
 
 @pytest.mark.asyncio
-async def test_rumor_control_agent_cache_failure():
+async def test_rumor_control_agent_cache_failure() -> None:
     # Covers lines 265-266 where get_cached_model_flash fails
     """Test functionality for test_rumor_control_agent_cache_failure."""
     with (
@@ -284,7 +284,7 @@ async def test_rumor_control_agent_cache_failure():
         assert res is not None
 
 
-def test_vision_agent_archive_gcs_failure():
+def test_vision_agent_archive_gcs_failure() -> None:
     # Covers lines 65-67 where storage.Client() or upload fails
     """Test functionality for test_vision_agent_archive_gcs_failure."""
     with (

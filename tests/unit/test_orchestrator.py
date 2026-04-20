@@ -1,13 +1,13 @@
 """SpectaSyncAI: Unit Tests for Core Orchestrator."""
 
 import pytest
+from typing import Any, AsyncIterator
 from unittest.mock import AsyncMock, patch, MagicMock
 from agents.orchestrator import build_orchestrator_agent, run_orchestration_cycle
 
 
-@pytest.mark.asyncio
-async def test_build_orchestrator():
-    """Verifies that the orchestrator initializes correctly with dynamic MCP tool injection."""
+async def test_build_orchestrator() -> None:
+    """Verify that the orchestrator initializes correctly with dynamic MCP tool injection."""
     with patch("agents.orchestrator.MCPToolset") as MockToolset:
         mock_tool = MagicMock()
         MockToolset.return_value.load_tools = AsyncMock(return_value=[mock_tool])
@@ -16,9 +16,8 @@ async def test_build_orchestrator():
         assert len(agent.tools) == 1
 
 
-@pytest.mark.asyncio
-async def test_run_orchestration_cycle_with_tool_calls():
-    """Tests the full orchestration loop including agent reasoning, tool selection, and execution."""
+async def test_run_orchestration_cycle_with_tool_calls() -> None:
+    """Test the full orchestration loop including agent reasoning, tool selection, and execution."""
     with (
         patch(
             "agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock
@@ -36,14 +35,16 @@ async def test_run_orchestration_cycle_with_tool_calls():
         class MockEvent:
             """Test functionality for MockEvent."""
 
-            def __init__(self, tool_call=None, final_text=None):
-                """Test functionality for __init__."""
+            def __init__(
+                self, tool_call: MagicMock = None, final_text: str = None
+            ) -> None:
+                """Initialize MockEvent."""
                 self.tool_call = tool_call
                 self.content = MagicMock()
                 self.content.parts = [MagicMock(text=final_text)] if final_text else []
 
-            def is_final_response(self):
-                """Test functionality for is_final_response."""
+            def is_final_response(self) -> bool:
+                """Return True if final response."""
                 return bool(self.content.parts)
 
         tool_call = MagicMock()
@@ -55,8 +56,8 @@ async def test_run_orchestration_cycle_with_tool_calls():
             MockEvent(final_text="Decision made."),
         ]
 
-        async def fake_run(*args, **kwargs):
-            """Test functionality for fake_run."""
+        async def fake_run(*args: Any, **kwargs: Any) -> AsyncIterator[MockEvent]:
+            """Simulate agent run yielding MockEvents."""
             for e in events:
                 yield e
 
@@ -72,7 +73,7 @@ async def test_run_orchestration_cycle_with_tool_calls():
 
 
 @pytest.mark.asyncio
-async def test_run_orchestration_cycle_high_risk_broadcast():
+async def test_run_orchestration_cycle_high_risk_broadcast() -> None:
     """Validates that critical safety thresholds trigger automated high-priority Pub/Sub broadcasts."""
     with (
         patch(
@@ -100,18 +101,18 @@ async def test_run_orchestration_cycle_high_risk_broadcast():
         class MockEvent:
             """Test functionality for MockEvent."""
 
-            def __init__(self, final_text):
-                """Test functionality for __init__."""
+            def __init__(self, final_text: str) -> None:
+                """Initialize MockEvent."""
                 self.tool_call = None
                 self.content = MagicMock()
                 self.content.parts = [MagicMock(text=final_text)]
 
-            def is_final_response(self):
-                """Test functionality for is_final_response."""
+            def is_final_response(self) -> bool:
+                """Check if final response."""
                 return True
 
-        async def fake_run(*args, **kwargs):
-            """Test functionality for fake_run."""
+        async def fake_run(*args: Any, **kwargs: Any) -> AsyncIterator[MockEvent]:
+            """Simulate agent run yielding MockEvent."""
             yield MockEvent("High risk alert triggered.")
 
         MockRunner.return_value.run_async = fake_run
@@ -129,7 +130,7 @@ async def test_run_orchestration_cycle_high_risk_broadcast():
 
 
 @pytest.mark.asyncio
-async def test_run_orchestration_cycle_failure_exception():
+async def test_run_orchestration_cycle_failure_exception() -> None:
     """Ensures robust error handling when dependency services (like AlloyDB) are unavailable."""
     with (
         patch("agents.orchestrator.build_orchestrator_agent", new_callable=AsyncMock),

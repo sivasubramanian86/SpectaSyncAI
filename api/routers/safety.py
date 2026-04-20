@@ -3,6 +3,7 @@
 import logging
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
+from typing import Any
 from agents.safety_agent import run_safety_assessment
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ class SafetyAssessmentRequest(BaseModel):
 
 
 @router.post("/safety/assess", summary="Run safety risk assessment for a venue zone")
-async def assess_safety(payload: SafetyAssessmentRequest) -> dict:
+async def assess_safety(payload: SafetyAssessmentRequest) -> dict[str, Any]:
     """Invoke Safety Agent (Pro) for emergency risk classification."""
     return await run_safety_assessment(
         payload.location_id, payload.density_score, payload.rate_of_change

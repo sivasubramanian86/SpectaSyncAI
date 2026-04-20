@@ -1,5 +1,7 @@
 """SpectaSyncAI: Pre-Event Strategic Analyst Agent
+
 Powered by Gemini 2.5 Pro
+
 Responsibility: Forecasting crowd risk based on bookings, weather, and scheduling.
 """
 
@@ -17,7 +19,17 @@ logger = logging.getLogger(__name__)
 
 
 def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
-    """Constructs the Strategic Pre-Event Analyst."""
+    """Construct the Strategic Pre-Event Analyst using Gemini Pro.
+
+    Args:
+    ----
+        cache_name: Optional name of preexisting Gemini context cache.
+
+    Returns:
+    -------
+        LlmAgent: Configured strategic analyst agent.
+
+    """
     instruction = (
         "You are the SpectaSyncAI Pre-Event Strategic Analyst. "
         "Your task is to analyze reservation bookings, weather forecasts, "
@@ -48,7 +60,17 @@ def build_pre_event_agent(cache_name: str | None = None) -> LlmAgent:
 
 
 async def run_pre_event_analysis(pre_event_data: dict) -> dict:
-    """Runs a strategic analysis of the upcoming event with resilient fallback."""
+    """Run a strategic analysis of the upcoming event with resilient fallback.
+
+    Args:
+    ----
+        pre_event_data: Dictionary containing bookings, weather, and schedule info.
+
+    Returns:
+    -------
+        dict: Comprehensive risk audit report with strategic recommendations.
+
+    """
     start = time.perf_counter()
     fallback = False
     status = "success"

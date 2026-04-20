@@ -1,4 +1,7 @@
-"""SpectaSyncAI: Queue Agent
+"""SpectaSyncAI: Queue Management Agent.
+
+Analyzes wait-times and throughput across venue check-points.
+
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Real-time wait time estimation across all venue service points
 (entry gates, food concessions, restrooms, merchandise stands).
@@ -32,7 +35,8 @@ VENUE_ZONES = {
 
 
 def get_zone_queue_snapshot(zone_id: str) -> dict:
-    """Retrieves current queue length and density snapshot for a venue zone.
+    """Retrieve current queue length and density snapshot for a venue zone.
+
     Production: queries IoT sensor API or POS transaction rate.
 
     Args:
@@ -61,7 +65,7 @@ def get_zone_queue_snapshot(zone_id: str) -> dict:
 
 
 def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
-    """Calculates estimated wait time using M/D/1 queuing model.
+    """Calculate estimated wait time using M/D/1 queuing model.
 
     Args:
     ----
@@ -99,7 +103,7 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
 
 
 def build_queue_agent() -> LlmAgent:
-    """Constructs the ADK Queue Agent using Gemini 2.5 Flash (high-speed).
+    """Construct the ADK Queue Agent using Gemini 2.5 Flash (high-speed).
 
     Returns
     -------
@@ -126,7 +130,7 @@ def build_queue_agent() -> LlmAgent:
 
 
 async def run_queue_analysis(zone_ids: list[str] | None = None) -> list[dict]:
-    """Runs the Queue Agent across all venue zones or a subset.
+    """Run the Queue Agent across all venue zones or a subset.
 
     Args:
     ----

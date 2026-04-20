@@ -1,7 +1,8 @@
-"""SpectaSyncAI: Main Command Center API
+"""SpectaSyncAI: Main Command Center API.
+
 Startup sequence:
   1. Context cache warm-up   (Vertex AI CachedContent, 6-hour TTL)
-  2. Router registration     (Tier 1 + Tier 2)
+  2. Router registration     (Tier 1 + Tier 2).
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ except ImportError:  # pragma: no cover
     google.cloud.logging = None
 
 from dotenv import load_dotenv
+from typing import Any, AsyncIterator, Callable
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,10 +70,15 @@ if (
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Warm Vertex AI context caches for all 5 Tier-2 agents during startup.
 
     Cache warm-up runs as a background task.
+
+    Args:
+    ----
+        app: The FastAPI instance.
+
     """
     logger.info(
         "SpectaSyncAI v3.1.0 - 12-Agent Mesh starting "
@@ -91,7 +98,7 @@ async def lifespan(app: FastAPI):
         logger.info("Vertex AI not configured - context caching disabled.")
 
     # ── 2. Pre-Event Analysis Pre-Computation ─────────────────────────────
-    async def precompute_pre_event():
+    async def precompute_pre_event() -> None:
         try:
             from api.routers.pre_event import (
                 get_mock_pre_event,
@@ -153,10 +160,20 @@ app.add_middleware(
 )
 
 
-# ── Tier 1 - Operational Agents ──────────────────────────────────────────────
 @app.middleware("http")
-async def add_auth_popup_headers(request: Request, call_next):
-    """Middleware for security headers and observability tracing."""
+async def add_auth_popup_headers(request: Request, call_next: Callable) -> Response:
+    """Implement middleware for security headers and observability tracing.
+
+    Args:
+    ----
+        request: The incoming HTTP request.
+        call_next: Next middleware/handler in the chain.
+
+    Returns:
+    -------
+        Response: The modified HTTP response with standard security headers.
+
+    """
     start = perf_counter()
     response = await call_next(request)
     response.headers.setdefault(
@@ -220,8 +237,14 @@ def _runtime_firebase_config() -> dict[str, str | None]:
 
 
 @app.get("/v1/runtime-config.js", include_in_schema=False)
-async def runtime_config_js():
-    """Serve the dynamic Firebase and Environment config to the frontend."""
+async def runtime_config_js() -> Response:
+    """Serve the dynamic Firebase and Environment config to the frontend.
+
+    Returns:
+    -------
+        Response: JavaScript payload for frontend runtime configuration.
+
+    """
     firebase_config = _runtime_firebase_config()
     payload = {
         "firebase": firebase_config,
@@ -244,14 +267,31 @@ async def runtime_config_js():
 
 
 @app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    """Serve a blank favicon if not present in static."""
+async def favicon() -> HTMLResponse:
+    """Serve a blank favicon if not present in static.
+
+    Returns:
+    -------
+        HTMLResponse: Empty response to satisfy browser favicon requests.
+
+    """
     return HTMLResponse(content="")
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Global catch-all for unhandled exceptions."""
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Implement global catch-all for unhandled exceptions.
+
+    Args:
+    ----
+        request: The request that triggered the error.
+        exc: The exception instance.
+
+    Returns:
+    -------
+        JSONResponse: Standardized error response with detail and traceback in debug.
+
+    """
     tb = traceback.format_exc()
     logger.error(f"GLOBAL ERROR: {exc}\n{tb}")
     payload = {"detail": "Internal Server Error", "error": str(exc)}
@@ -272,8 +312,14 @@ if os.path.exists("static"):
 else:
 
     @app.get("/", include_in_schema=False)
-    async def fallback_root():  # pragma: no cover
-        """Deliver a fallback message when static assets are missing."""
+    async def fallback_root() -> HTMLResponse:  # pragma: no cover
+        """Deliver a fallback message when static assets are missing.
+
+        Returns:
+        -------
+            HTMLResponse: Emergency fallback page content.
+
+        """
         return HTMLResponse(
             content="<h1>SpectaSyncAI API</h1><p>Frontend not found.</p>"
         )

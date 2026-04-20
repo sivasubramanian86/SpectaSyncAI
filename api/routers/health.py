@@ -10,13 +10,12 @@ router = APIRouter()
     summary="Service health check",
     response_description="Basic health payload",
 )
-async def health_check() -> dict:
-    """Executes a high-fidelity system health check for load balancers and orchestrated environments.
+async def health_check() -> dict[str, str]:
+    """Execute a system health check.
 
-    Returns
+    Returns:
     -------
-        dict: A structured dictionary indicating the current operational status,
-              the service identity mask, and the semantic version.
+        dict[str, str]: Structured status, service identity mask, and semantic version.
 
     """
     return {"status": "healthy", "service": "SpectaSyncAI", "version": "1.0.0"}

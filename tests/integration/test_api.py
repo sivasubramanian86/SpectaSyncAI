@@ -7,7 +7,7 @@ from api.main import app
 client = TestClient(app, raise_server_exceptions=False)
 
 
-def test_api_root():
+def test_api_root() -> None:
     """Test functionality for test_api_root."""
     response = client.get("/")
     # With SPA mounting, root returns 200 if index.html exists, else 404 from StaticFiles
@@ -15,14 +15,14 @@ def test_api_root():
     assert response.status_code in (200, 404)
 
 
-def test_health_check():
+def test_health_check() -> None:
     """Test functionality for test_health_check."""
     response = client.get("/v1/health")
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"
 
 
-def test_telemetry_endpoints():
+def test_telemetry_endpoints() -> None:
     """Test standard telemetry ingestion."""
     p_vision = "api.routers.telemetry.run_vision_analysis"
     p_orch = "api.routers.telemetry.run_orchestration_cycle"
@@ -40,7 +40,7 @@ def test_telemetry_endpoints():
             assert response.json()["location_id"] == "L1"
 
 
-def test_predictions_surge():
+def test_predictions_surge() -> None:
     """Test functionality for test_predictions_surge."""
     p_surge = "api.routers.predictions.run_surge_prediction"
     with patch(p_surge, new_callable=AsyncMock) as mock_run:
@@ -50,7 +50,7 @@ def test_predictions_surge():
         assert response.status_code == 200
 
 
-def test_queues_wait_time():
+def test_queues_wait_time() -> None:
     """Test functionality for test_queues_wait_time."""
     p_queue = "api.routers.queues.run_queue_analysis"
     with patch(p_queue, new_callable=AsyncMock) as mock_run:
@@ -59,7 +59,7 @@ def test_queues_wait_time():
         assert response.status_code == 200
 
 
-def test_safety_audit():
+def test_safety_audit() -> None:
     """Test functionality for test_safety_audit."""
     p_safety = "api.routers.safety.run_safety_assessment"
     with patch(p_safety, new_callable=AsyncMock) as mock_run:
@@ -69,7 +69,7 @@ def test_safety_audit():
         assert response.status_code == 200
 
 
-def test_experience_engagement():
+def test_experience_engagement() -> None:
     """Test functionality for test_experience_engagement."""
     p_exp = "api.routers.experience.run_experience_recommendations"
     with patch(p_exp, new_callable=AsyncMock) as mock_run:
@@ -79,7 +79,7 @@ def test_experience_engagement():
         assert response.status_code == 200
 
 
-def test_crisis_endpoints():
+def test_crisis_endpoints() -> None:
     """Test crisis mesh status and perimeter."""
     response = client.get("/v1/crisis/status")
     assert response.status_code == 200
@@ -92,7 +92,7 @@ def test_crisis_endpoints():
         assert response.status_code == 200
 
 
-def test_incident_rag_endpoints():
+def test_incident_rag_endpoints() -> None:
     """Test incident RAG search and corpus."""
     p_rag = "api.routers.crisis.run_incident_rag_query"
     with patch(p_rag, new_callable=AsyncMock) as mock_rag:
@@ -114,20 +114,20 @@ def test_incident_rag_endpoints():
     assert len(response.json()["incidents"]) > 0
 
 
-def test_lifespan_events():
+def test_lifespan_events() -> None:
     """Test functionality for test_lifespan_events."""
     with patch("agents.context_cache.warm_all_caches", new_callable=AsyncMock):
         with TestClient(app):
             pass
 
 
-def test_lifespan_events_disabled():
+def test_lifespan_events_disabled() -> None:
     """Test functionality for test_lifespan_events_disabled."""
     with patch("os.getenv", return_value=None), TestClient(app):
         pass
 
 
-def test_lifespan_exception():
+def test_lifespan_exception() -> None:
     """Test functionality for test_lifespan_exception."""
     p_warm = "agents.context_cache.warm_all_caches"
     with patch(p_warm, side_effect=Exception("Cache error")):
@@ -136,20 +136,20 @@ def test_lifespan_exception():
                 pass
 
 
-def test_static_file_serving():
+def test_static_file_serving() -> None:
     """Test functionality for test_static_file_serving."""
     response = client.get("/")
     assert response.status_code in (200, 404)
 
 
-def test_interventions_execute_deprecated():
+def test_interventions_execute_deprecated() -> None:
     """DEPRECATED: Verifies that execute endpoint now returns 405/404."""
     payload = {"intervention_id": "invalid", "params": {}}
     response = client.post("/v1/interventions/execute", json=payload)
     assert response.status_code in (404, 405)
 
 
-def test_interventions_execute_failure():
+def test_interventions_execute_failure() -> None:
     """Test functionality for test_interventions_execute_failure."""
     p_mem = "api.routers.interventions.AlloyDBMemory.get_historical_context"
     with patch(p_mem, new_callable=AsyncMock) as mock_get:
@@ -159,7 +159,7 @@ def test_interventions_execute_failure():
         assert response.json()["location_id"] == "L1"
 
 
-def test_telemetry_failures():
+def test_telemetry_failures() -> None:
     """Test failure branches in telemetry."""
     p_orch = "api.routers.telemetry.run_orchestration_cycle"
     with patch(p_orch, side_effect=Exception("Orch Error")):
@@ -176,7 +176,7 @@ def test_telemetry_failures():
         assert response.json()["density_report"]["is_fallback"] is True
 
 
-def test_predictions_failure():
+def test_predictions_failure() -> None:
     """Test functionality for test_predictions_failure."""
     p_surge = "api.routers.predictions.run_surge_prediction"
     with patch(p_surge, side_effect=Exception("Pred Error")):
@@ -186,7 +186,7 @@ def test_predictions_failure():
         assert response.json()["is_fallback"] is True
 
 
-def test_queues_invalid():
+def test_queues_invalid() -> None:
     """Test queue failure paths."""
     p_queue = "api.routers.queues.run_queue_analysis"
     with patch(p_queue, side_effect=Exception("Queue Error")):
@@ -206,7 +206,7 @@ def test_queues_invalid():
         assert "error" in response.json()
 
 
-def test_predictions_surge_get():
+def test_predictions_surge_get() -> None:
     """Test functionality for test_predictions_surge_get."""
     p_surge = "api.routers.predictions.run_surge_prediction"
     with patch(p_surge, new_callable=AsyncMock) as mock_run:
@@ -216,14 +216,14 @@ def test_predictions_surge_get():
         assert response.json()["prediction"] == "Surge confirmed"
 
 
-def test_telemetry_get_single_success():
+def test_telemetry_get_single_success() -> None:
     """Test functionality for test_telemetry_get_single_success."""
     response = client.get("/v1/telemetry/ZONE_A")
     assert response.status_code == 200
     assert response.json()["location_id"] == "ZONE_A"
 
 
-def test_pre_event_flow():
+def test_pre_event_flow() -> None:
     # Clear the global cache to test initial state if possible
     # But since it's a module global, we might just check if it's there
     """Test functionality for test_pre_event_flow."""
@@ -259,7 +259,7 @@ def test_pre_event_flow():
         assert "fallback" in response.json()["risk_level"].lower()
 
 
-def test_runtime_config_js():
+def test_runtime_config_js() -> None:
     """Test functionality for test_runtime_config_js."""
     response = client.get("/v1/runtime-config.js")
     assert response.status_code == 200
@@ -267,7 +267,7 @@ def test_runtime_config_js():
     assert "application/javascript" in response.headers["content-type"]
 
 
-def test_global_exception_handler():
+def test_global_exception_handler() -> None:
     # Force a 500 by mocking memory in interventions to throw
     """Test functionality for test_global_exception_handler."""
     p_mem = "api.routers.interventions.AlloyDBMemory.get_historical_context"
@@ -277,7 +277,7 @@ def test_global_exception_handler():
         assert "detail" in response.json()
 
 
-def test_pre_event_mock_data():
+def test_pre_event_mock_data() -> None:
     """Test functionality for test_pre_event_mock_data."""
     response = client.get("/v1/pre-event/mock-data")
     assert response.status_code == 200

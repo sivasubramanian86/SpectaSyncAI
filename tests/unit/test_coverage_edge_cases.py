@@ -1,10 +1,11 @@
-"""Edge case tests to achieve 100% code coverage.
+"""SpectaSyncAI: Edge Case Tests for 100% Coverage.
+
 Targets: Fallback blocks in crisis, telemetry, and main.
 @14_quality_assurance_engineer.
 """
 
-import pytest
 import os
+from typing import Any, AsyncIterator
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from api.main import app
@@ -14,9 +15,8 @@ client = TestClient(app, raise_server_exceptions=False)
 # ── Crisis Router Fallbacks ──────────────────────────────────────────────────
 
 
-@pytest.mark.asyncio
-async def test_assess_perimeter_fallback():
-    """Validates perimeter safety fallback when the macro agent encounters a network or reasoning timeout."""
+async def test_assess_perimeter_fallback() -> None:
+    """Validate perimeter safety fallback when the macro agent encounters a network or reasoning timeout."""
     with patch(
         "api.routers.crisis.run_perimeter_assessment",
         side_effect=Exception("Simulated error"),
@@ -30,9 +30,8 @@ async def test_assess_perimeter_fallback():
         assert data["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_monitor_vip_delay_fallback():
-    """Test functionality for test_monitor_vip_delay_fallback."""
+async def test_monitor_vip_delay_fallback() -> None:
+    """Validate VIP sync monitoring fallback upon dependency service interruption."""
     with patch(
         "api.routers.crisis.run_vip_sync_monitoring",
         side_effect=Exception("Simulated error"),
@@ -51,9 +50,8 @@ async def test_monitor_vip_delay_fallback():
         assert data["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_monitor_rumors_fallback():
-    """Test functionality for test_monitor_rumors_fallback."""
+async def test_monitor_rumors_fallback() -> None:
+    """Validate rumor monitoring fail-safe behavior when social scan agents are unavailable."""
     with patch(
         "api.routers.crisis.run_rumor_monitoring",
         side_effect=Exception("Simulated error"),
@@ -64,9 +62,8 @@ async def test_monitor_rumors_fallback():
         assert data["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_check_infrastructure_fallback():
-    """Test functionality for test_check_infrastructure_fallback."""
+async def test_check_infrastructure_fallback() -> None:
+    """Validate infrastructure failsafe logic when telemetry processing fails."""
     with patch(
         "api.routers.crisis.run_failsafe_monitoring",
         side_effect=Exception("Simulated error"),
@@ -79,9 +76,8 @@ async def test_check_infrastructure_fallback():
         assert data["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_query_incident_rag_fallback():
-    """Test functionality for test_query_incident_rag_fallback."""
+async def test_query_incident_rag_fallback() -> None:
+    """Validate incident RAG query fallback during vector database timeouts."""
     with patch(
         "api.routers.crisis.run_incident_rag_query",
         side_effect=Exception("Simulated error"),
@@ -102,9 +98,8 @@ async def test_query_incident_rag_fallback():
 # ── Telemetry Router Fallbacks ───────────────────────────────────────────────
 
 
-@pytest.mark.asyncio
-async def test_ingest_telemetry_fallback():
-    """Verifies telemetry ingestion resilience, ensuring base64 validation and vision fallback logic are both hit."""
+async def test_ingest_telemetry_fallback() -> None:
+    """Verify telemetry ingestion resilience, ensuring base64 validation and vision fallback logic are both hit."""
     with patch(
         "api.routers.telemetry.run_vision_analysis",
         side_effect=Exception("Vision error"),
@@ -125,10 +120,8 @@ async def test_ingest_telemetry_fallback():
         assert data["density_report"]["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_orchestration_fallback():
-    # Covers Lines 107-117 in telemetry.py (Orchestration failure)
-    """Test functionality for test_orchestration_fallback."""
+async def test_orchestration_fallback() -> None:
+    """Validate orchestration loop fallback during core reasoning exceptions."""
     with patch(
         "api.routers.telemetry.run_orchestration_cycle",
         side_effect=Exception("Orchestration Down"),
@@ -144,14 +137,14 @@ async def test_orchestration_fallback():
 # ── API Main Edge Cases ──────────────────────────────────────────────────────
 
 
-def test_favicon():
-    """Ensures that even minor static assets like placeholders are served without breaking the dashboard router."""
+def test_favicon() -> None:
+    """Ensure that even minor static assets like placeholders are served without breaking the dashboard router."""
     response = client.get("/favicon.ico")
     assert response.status_code == 200
 
 
-def test_serve_dashboard_static_logic():
-    """Verifies static serve branches without the need for complex route re-injection."""
+def test_serve_dashboard_static_logic() -> None:
+    """Verify static serve branches without the need for complex route re-injection."""
     # Check favicon as a representative static-like call
     response = client.get("/favicon.ico")
     assert response.status_code == 200
@@ -160,9 +153,8 @@ def test_serve_dashboard_static_logic():
 # ── Agent Edge Cases ─────────────────────────────────────────────────────────
 
 
-@pytest.mark.asyncio
-async def test_vision_agent_gcs_failure():
-    """Simulates GCS bucket permission issues to verify the vision agent's 'Local Sandbox' archiving failover."""
+async def test_vision_agent_gcs_failure() -> None:
+    """Simulate GCS bucket permission issues to verify the vision agent's 'Local Sandbox' archiving failover."""
     from agents.vision_agent import archive_to_gcs
 
     with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "p", "GCS_ENABLED": "1"}):
@@ -171,9 +163,8 @@ async def test_vision_agent_gcs_failure():
             assert "Local Sandbox" in res
 
 
-@pytest.mark.asyncio
-async def test_vision_agent_json_error():
-    """Test functionality for test_vision_agent_json_error."""
+async def test_vision_agent_json_error() -> None:
+    """Validate vision agent behavior when encountering malformed model JSON responses."""
     from agents.vision_agent import run_vision_analysis
 
     # We need to mock runner.run_async to yield a non-JSON response
@@ -181,8 +172,8 @@ async def test_vision_agent_json_error():
     mock_event.is_final_response.return_value = True
     mock_event.content.parts = [MagicMock(text="Not a JSON string")]
 
-    async def mock_run_async(*args, **kwargs):
-        """Test functionality for mock_run_async."""
+    async def mock_run_async(*args: Any, **kwargs: Any) -> AsyncIterator[MagicMock]:
+        """Simulate async yield session."""
         yield mock_event
 
     with patch(
@@ -192,9 +183,8 @@ async def test_vision_agent_json_error():
         assert res["density_score"] == 0.5  # Fallback value
 
 
-@pytest.mark.asyncio
-async def test_pre_event_agent_error():
-    """Test functionality for test_pre_event_agent_error."""
+async def test_pre_event_agent_error() -> None:
+    """Validate pre-event agent resilience during fatal GenAI reasoning failures."""
     from agents.pre_event_agent import run_pre_event_analysis
 
     with patch(
@@ -205,9 +195,8 @@ async def test_pre_event_agent_error():
         assert res["is_fallback"] is True
 
 
-@pytest.mark.asyncio
-async def test_context_cache_warmer_failure():
-    """Test functionality for test_context_cache_warmer_failure."""
+async def test_context_cache_warmer_failure() -> None:
+    """Validate context cache warmer resilience during Google Cloud cache creation failures."""
     from agents.context_cache import warm_all_caches
 
     # Patch the get_or_create_cache inside warm_all_caches to trigger except block

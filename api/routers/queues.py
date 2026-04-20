@@ -1,6 +1,7 @@
 """Queues router - surfaces real-time wait times via Queue Agent."""
 
 import logging
+from typing import Any
 from fastapi import APIRouter
 from agents.queue_agent import run_queue_analysis
 
@@ -9,8 +10,14 @@ router = APIRouter()
 
 
 @router.get("/queues", summary="Get wait times for all venue service zones")
-async def get_all_queues() -> list[dict]:
-    """Run Queue Agent across all venue zones."""
+async def get_all_queues() -> list[dict[str, Any]]:
+    """Run Queue Agent across all venue zones.
+
+    Returns:
+    -------
+        list[dict[str, Any]]: List of queue status objects for all zones.
+
+    """
     try:
         data = await run_queue_analysis()
         return data
@@ -36,8 +43,18 @@ async def get_all_queues() -> list[dict]:
 
 
 @router.get("/queues/{zone_id}", summary="Get wait time for a specific zone")
-async def get_zone_queue(zone_id: str) -> dict:
-    """Run Queue Agent for a single venue zone."""
+async def get_zone_queue(zone_id: str) -> dict[str, Any]:
+    """Run Queue Agent for a single venue zone.
+
+    Args:
+    ----
+        zone_id: Identifier for the venue zone.
+
+    Returns:
+    -------
+        dict[str, Any]: Detailed queue status for the specified zone.
+
+    """
     try:
         data = await run_queue_analysis()
         zone_data = [d for d in data if d.get("zone_id") == zone_id]

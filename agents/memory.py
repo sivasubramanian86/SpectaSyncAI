@@ -1,5 +1,6 @@
-"""SpectaSyncAI: AlloyDB Memory Module
-# Hardened for AlloyDB with pgvector and asyncpg connection pooling.
+"""SpectaSyncAI: AlloyDB Memory Module.
+
+Hardened for AlloyDB with pgvector and asyncpg connection pooling.
 
 Provides:
   - Connection pool (asyncpg Pool - NOT per-call connect)
@@ -14,6 +15,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +28,16 @@ EMBEDDING_MODEL = "text-embedding-004"  # 768 dimensions, Vertex AI
 # ── Connection Pool ──────────────────────────────────────────────────────────
 
 
-async def _get_pool():
-    """Returns the asyncpg connection pool singleton.
-    Creates it on first call. Pool size tuned for Cloud Run concurrency.
-    Implements pool_pre_ping equivalent via asyncpg keepalives.
+async def _get_pool() -> Any:  # noqa: ANN401
+    """Return the asyncpg connection pool singleton.
+
+    Create it on first call. Pool size tuned for Cloud Run concurrency.
+    Implement pool_pre_ping equivalent via asyncpg keepalives.
+
+    Returns:
+    -------
+        Any: The asyncpg connection pool.
+
     """
     global _POOL
     if _POOL is not None:
@@ -59,8 +67,18 @@ async def _get_pool():
 
 
 async def _embed(text: str) -> list[float]:
-    """Generates a 768-dimension embedding via Vertex AI text-embedding-004.
+    """Generate a 768-dimension embedding via Vertex AI text-embedding-004.
+
     Used to vectorize the live event query before ANN search.
+
+    Args:
+    ----
+        text: Input string to embed.
+
+    Returns:
+    -------
+        list[float]: Numerical embedding vector.
+
     """
     import vertexai
     from vertexai.language_models import TextEmbeddingModel
@@ -79,14 +97,16 @@ async def _embed(text: str) -> list[float]:
 
 class AlloyDBMemory:
     """Async memory interface for ADK agents.
-    Wraps AlloyDB + pgvector operations. Falls back to in-memory mock
+
+    Wrap AlloyDB + pgvector operations. Falls back to in-memory mock
     when DATABASE_URL is not set (prototype / CI mode).
     """
 
     async def get_historical_context(
-        self, location_id: str, event_context: str = ""
-    ) -> list[dict]:
-        """Retrieves top-3 most similar historical incidents via pgvector ANN search.
+        self: AlloyDBMemory, location_id: str, event_context: str = ""
+    ) -> list[dict[str, Any]]:
+        """Retrieve top-3 most similar historical incidents via pgvector ANN search.
+
         Query vector is generated from location_id + event_context using text-embedding-004.
 
         Args:
@@ -96,7 +116,7 @@ class AlloyDBMemory:
 
         Returns:
         -------
-            list[dict]: Ranked historical incident records with resolution strategies.
+            list[dict[str, Any]]: Ranked historical incident records with resolution strategies.
 
         """
         if _USE_MOCK:
@@ -143,7 +163,7 @@ class AlloyDBMemory:
             return []
 
     async def store_intervention(
-        self,
+        self: AlloyDBMemory,
         location_id: str,
         action: str,
         reasoning: str,
@@ -153,8 +173,21 @@ class AlloyDBMemory:
         duration_ms: int = 0,
         event_id: str | None = None,
     ) -> None:
-        """Persists a completed agent intervention to the AlloyDB interventions table.
-        Records HITL flag for Responsible AI audit trail.
+        """Persist a completed agent intervention to the AlloyDB interventions table.
+
+        Record HITL flag for Responsible AI audit trail.
+
+        Args:
+        ----
+            location_id: Zone identifier.
+            action: Intervention action taken.
+            reasoning: Rationale behind the action.
+            agent_name: Name of the agent performing the action.
+            failure_mode: Failure mode detected.
+            hitl_required: Whether human-in-the-loop was required.
+            duration_ms: Duration of the intervention.
+            event_id: Optional event identifier.
+
         """
         if _USE_MOCK:
             logger.info(
@@ -190,7 +223,7 @@ class AlloyDBMemory:
             logger.error(f"[Memory] Failed to store intervention: {exc}")
 
     async def log_agent_run(
-        self,
+        self: AlloyDBMemory,
         agent_name: str,
         model_version: str,
         input_tokens: int,
@@ -201,8 +234,22 @@ class AlloyDBMemory:
         failure_mode: str = "",
         event_id: str | None = None,
     ) -> None:
-        """Writes an agent run record to agent_run_logs.
-        Tracks cached_tokens for context caching ROI measurement.
+        """Write an agent run record to agent_run_logs.
+
+        Track cached_tokens for context caching ROI measurement.
+
+        Args:
+        ----
+            agent_name: Name of the agent.
+            model_version: Version of the model used.
+            input_tokens: Input token count.
+            output_tokens: Output token count.
+            cached_tokens: Cached token count.
+            duration_ms: Execution duration.
+            status: Status of the run.
+            failure_mode: Detected failure mode.
+            event_id: Optional event identifier.
+
         """
         if _USE_MOCK:
             logger.debug(
@@ -238,9 +285,19 @@ class AlloyDBMemory:
 # ── Mock fallback (prototype mode) ───────────────────────────────────────────
 
 
-def _mock_context(location_id: str) -> list[dict]:
-    """Generates synthetic historical context for prototype/CI mode.
+def _mock_context(location_id: str) -> list[dict[str, Any]]:
+    """Generate synthetic historical context for prototype/CI mode.
+
     Used when AlloyDB is not reachable.
+
+    Args:
+    ----
+        location_id: Venue zone identifier.
+
+    Returns:
+    -------
+        list[dict[str, Any]]: Mock incident context.
+
     """
     return [
         {

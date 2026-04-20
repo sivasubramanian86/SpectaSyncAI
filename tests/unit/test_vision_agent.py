@@ -1,22 +1,21 @@
-"""SpectaSyncAI: Unit Tests for Vision Agent
+"""SpectaSyncAI: Unit Tests for Vision Agent.
+
 Tests use mock runner to avoid actual Vertex AI calls in CI.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from agents.vision_agent import build_vision_agent, run_vision_analysis
 
 
-def test_build_vision_agent_returns_agent():
-    """Agents should be constructable without I/O."""
+def test_build_vision_agent_returns_agent() -> None:
+    """Verify that agents are constructable without I/O."""
     agent = build_vision_agent()
     assert agent.name == "vision_agent"
     assert "gemini-2.5-flash" in agent.model
 
 
-@pytest.mark.asyncio
-async def test_run_vision_analysis_with_mock_runner():
-    """Vision agent pipeline should parse density JSON from the model response."""
+async def test_run_vision_analysis_with_mock_runner() -> None:
+    """Validate that vision agent pipeline parses density JSON from the model response."""
     mock_event = MagicMock()
     mock_event.is_final_response.return_value = True
     mock_event.content.parts = [
@@ -45,7 +44,7 @@ async def test_run_vision_analysis_with_mock_runner():
     assert result["location_id"] == "GATE_3"
 
 
-def test_analyze_cctv_frame_tool():
+def test_analyze_cctv_frame_tool() -> None:
     """Test the tool function directly."""
     from agents.vision_agent import analyze_cctv_frame
 
@@ -54,9 +53,8 @@ def test_analyze_cctv_frame_tool():
     assert "density_score" in res
 
 
-@pytest.mark.asyncio
-async def test_run_vision_analysis_malformed_json_fallback():
-    """Test fallback when JSON is malformed."""
+async def test_run_vision_analysis_malformed_json_fallback() -> None:
+    """Test fallback logic when agent returns malformed JSON."""
     mock_event = MagicMock()
     with patch("agents.vision_agent.InMemoryRunner") as MockRunner:
         mock_session = AsyncMock()

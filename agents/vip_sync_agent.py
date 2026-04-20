@@ -57,7 +57,6 @@ def get_convoy_gps_position(event_id: str) -> dict:
         dict: Current ETA, delay_mins, delay_category.
 
     """
-
     rng = secrets.SystemRandom()
     scheduled_arrival = datetime.now() + timedelta(minutes=-30)
     estimated_actual = datetime.now() + timedelta(minutes=rng.randint(45, 180))
@@ -90,7 +89,7 @@ def calculate_crowd_kinetic_energy(
 ) -> dict:
     """Model the accumulated kinetic energy of a waiting crowd.
 
-    Quantifies how violently the crowd will surge upon headline act arrival,
+    Quantify how violently the crowd will surge upon headline act arrival,
     as a function of wait time and current density.
 
     Academic basis: Fruin's Level of Service model + crowd pressure kinetics.
@@ -194,9 +193,9 @@ def activate_crowd_engagement_program(
 def calculate_arrival_surge_vector(
     venue_id: str, arrival_time_mins: int, surge_coefficient: float
 ) -> dict:
-    """Compute WHERE the crowd surge will be most intense at headline act arrival.
+    """Compute where the crowd surge will be most intense at headline act arrival.
 
-    Enables pre-positioning of staff BEFORE the event - not reactive deployment.
+    Enable pre-positioning of staff before the event - not reactive deployment.
 
     Args:
     ----
@@ -247,7 +246,13 @@ def calculate_arrival_surge_vector(
 
 
 def build_vip_sync_agent() -> LlmAgent:
-    """Constructs the VIP Sync Agent for convoy delay monitoring."""
+    """Construct the VIP Sync Agent for convoy delay monitoring.
+
+    Returns
+    -------
+        LlmAgent: Configured VIP synchronization agent.
+
+    """
     corpus_incidents = [
         r.incident_id for r in INCIDENT_CORPUS if "TEMPORAL_DISRUPT" in r.failure_modes
     ]
@@ -284,7 +289,20 @@ def build_vip_sync_agent() -> LlmAgent:
 async def run_vip_sync_monitoring(
     event_id: str, venue_id: str, crowd_size: int, density_score: float
 ) -> dict:
-    """Run continuous VIP delay monitoring and pre-arrival surge mitigation."""
+    """Run continuous VIP delay monitoring and pre-arrival surge mitigation.
+
+    Args:
+    ----
+        event_id: Unique event identifier.
+        venue_id: Target venue identifier.
+        crowd_size: Current attendance estimate.
+        density_score: Current venue density (0.0-1.0).
+
+    Returns:
+    -------
+        dict: VIP monitoring report with surge predictions and mitigation plans.
+
+    """
     start = time.perf_counter()
     fallback = False
     output_size = 0

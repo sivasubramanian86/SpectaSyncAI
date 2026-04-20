@@ -18,7 +18,7 @@ def mock_startup_tasks():
         yield
 
 
-def test_api_gaps():
+def test_api_gaps() -> None:
     """Validates all REST endpoints across the 12-agent mesh for accessibility and response integrity."""
     client = TestClient(app)
     # Mock agent calls to avoid quota issues and latency
@@ -105,20 +105,20 @@ def test_api_gaps():
         assert response.status_code == 200
 
 
-def test_exception_handler():
+def test_exception_handler() -> None:
     """Verifies that the API correctly returns a 404 status for invalid resource paths."""
     client = TestClient(app)
     response = client.get("/v1/non-existent-endpoint")
     assert response.status_code == 404
 
 
-def test_internal_error_handler():
+def test_internal_error_handler() -> None:
     """Ensures that unhandled global exceptions are captured by the FastAPI error processor."""
     assert Exception in app.exception_handlers
 
 
 @pytest.mark.asyncio
-async def test_lifespan():
+async def test_lifespan() -> None:
     """Validates the FastAPI application lifespan events (startup/shutdown) in a production-like context."""
     # Verify lifespan shell works without side effects
     with TestClient(app) as local_client:

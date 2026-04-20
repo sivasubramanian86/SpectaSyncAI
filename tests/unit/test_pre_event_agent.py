@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.mark.asyncio
-async def test_run_pre_event_analysis_mock():
+async def test_run_pre_event_analysis_mock() -> None:
     """Verify pre-event analysis logic and JSON parsing."""
     mock_response = {
         "risk_level": "High",
@@ -47,7 +47,7 @@ async def test_run_pre_event_analysis_mock():
 
 
 @pytest.mark.asyncio
-async def test_pre_event_data_structure():
+async def test_pre_event_data_structure() -> None:
     """Verify the agent can be built and has correct instruction."""
     # build_pre_event_agent is a sync function
     agent = build_pre_event_agent()

@@ -82,6 +82,8 @@ def banner(title: str) -> None:
 
 
 def enable_apis() -> None:
+    """Enable all required Google Cloud APIs for the project."""
+    banner("Step 1: Enabling GCP APIs")
     banner("Step 1: Enabling GCP APIs")
     apis = [
         "run.googleapis.com",
@@ -103,6 +105,8 @@ def enable_apis() -> None:
 
 
 def create_artifact_registry() -> None:
+    """Create the Artifact Registry repository for Docker images."""
+    banner("Step 2: Artifact Registry")
     banner("Step 2: Artifact Registry")
     result = run(
         [
@@ -146,6 +150,8 @@ def create_artifact_registry() -> None:
 
 
 def create_service_account() -> None:
+    """Create and configure the least-privilege service account for Cloud Run."""
+    banner("Step 3: Service Account & IAM")
     banner("Step 3: Service Account & IAM")
 
     result = run(
@@ -208,6 +214,8 @@ def create_service_account() -> None:
 
 
 def create_alloydb() -> None:
+    """Provision the AlloyDB cluster and primary instance."""
+    banner("Step 4: AlloyDB Cluster + Instance")
     banner("Step 4: AlloyDB Cluster + Instance")
 
     # Check if cluster already exists
@@ -308,6 +316,8 @@ def create_alloydb() -> None:
 
 
 def setup_secrets() -> None:
+    """Initialize Secret Manager placeholders for sensitive configuration."""
+    banner("Step 5: Secret Manager")
     banner("Step 5: Secret Manager")
     log.info("  Creating secret placeholder for DATABASE_URL ...")
 
@@ -336,13 +346,16 @@ def setup_secrets() -> None:
 
 
 def print_compute_sa_reminder() -> None:
+    """Display instructions for configuring Cloud Build service account roles."""
+    banner("Step 6: Compute Default SA (reminder)")
     banner("Step 6: Compute Default SA (reminder)")
     log.info("  If using Cloud Build (--source deploy), also grant roles to the")
     log.info("  Cloud Build SA so it can push to Artifact Registry:")
     log.info("")
     log.info(
         "  gcloud projects add-iam-policy-binding %s \\\n"
-        "    --member=serviceAccount:$(gcloud projects describe %s --format='value(projectNumber)')@cloudbuild.gserviceaccount.com \\\n"
+        "    --member=serviceAccount:$(gcloud projects describe %s "
+        "--format='value(projectNumber)')@cloudbuild.gserviceaccount.com \\\n"
         "    --role=roles/artifactregistry.writer",
         PROJECT_ID,
         PROJECT_ID,
@@ -353,6 +366,8 @@ def print_compute_sa_reminder() -> None:
 
 
 def main() -> None:
+    """Execute the primary infrastructure provisioning pipeline."""
+    log.info("=" * 55)
     log.info("=" * 55)
     log.info("  SpectaSyncAI — GCP Infrastructure Setup")
     log.info(f"  Project : {PROJECT_ID}")

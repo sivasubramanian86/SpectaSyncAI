@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from typing import Any
 import sys
 from pathlib import Path
 
@@ -41,8 +42,18 @@ EMBEDDING_MODEL = "text-embedding-004"
 BATCH_SIZE = 10  # Vertex AI text-embedding-004 supports up to 250 texts/batch
 
 
-async def fetch_unembedded(conn) -> list[dict]:
-    """Returns incident rows that have not yet been embedded."""
+async def fetch_unembedded(conn: Any) -> list[dict[str, Any]]:
+    """Return incident rows that have not yet been embedded.
+
+    Args:
+    ----
+        conn: asyncpg connection object.
+
+    Returns:
+    -------
+        list[dict[str, Any]]: Unembedded incident records.
+
+    """
     rows = await conn.fetch(
         "SELECT incident_id, description_text FROM incident_registry WHERE embedding IS NULL"
     )
@@ -50,7 +61,17 @@ async def fetch_unembedded(conn) -> list[dict]:
 
 
 async def embed_batch(texts: list[str]) -> list[list[float]]:
-    """Calls Vertex AI text-embedding-004 for a batch of texts."""
+    """Call Vertex AI text-embedding-004 for a batch of texts.
+
+    Args:
+    ----
+        texts: List of strings to be embedded.
+
+    Returns:
+    -------
+        list[list[float]]: Computed embeddings for the batch.
+
+    """
     import vertexai
     from vertexai.language_models import TextEmbeddingModel
 
@@ -63,8 +84,18 @@ async def embed_batch(texts: list[str]) -> list[list[float]]:
     return [r.values for r in results]
 
 
-async def write_embeddings(conn, rows: list[dict], vectors: list[list[float]]) -> None:
-    """Updates the embedding column for each incident."""
+async def write_embeddings(
+    conn: Any, rows: list[dict[str, Any]], vectors: list[list[float]]
+) -> None:
+    """Update the embedding column for each incident.
+
+    Args:
+    ----
+        conn: asyncpg connection object.
+        rows: Incident records corresponding to the vectors.
+        vectors: Vector embeddings to persist.
+
+    """
     from pgvector.asyncpg import register_vector
 
     await register_vector(conn)

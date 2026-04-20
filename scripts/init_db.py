@@ -1,9 +1,19 @@
+"""SpectaSyncAI: Database Initialization Script.
+
+Creates the database, enables pgvector, and applies schema/seed scripts.
+"""
+
 import asyncio
 import asyncpg
 import contextlib
 
 
-async def init_db():
+async def init_db() -> None:
+    """Initialize the SpectaSyncAI database.
+
+    Connect to the default postgres database to create 'spectasync',
+    then apply schema.sql and seed_corpus.sql.
+    """
     conn = await asyncpg.connect(
         "postgresql://postgres:SpectaSyncAI2026!Secure@127.0.0.1:5432/postgres"
     )

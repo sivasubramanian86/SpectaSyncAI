@@ -1,5 +1,7 @@
-"""SpectaSyncAI: Prediction Agent
-Powered by: google-adk + Gemini 2.5 Pro
+"""SpectaSyncAI: Crowd Flow Prediction Agent.
+
+Generates next-60min occupancy forecasts using historical patterns and live trajectories.
+
 Responsibility: AI-driven surge forecasting 15-30 minutes ahead using
 historical AlloyDB patterns + current telemetry trend analysis.
 Provides confidence scores and specific actionable recommendations.
@@ -18,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_historical_surge_data(location_id: str, window_minutes: int = 60) -> dict:
-    """Retrieves historical surge data for a venue zone over a time window.
+    """Retrieve historical surge data for a venue zone over a time window.
+
     Production: queries AlloyDB time-series crowd_densities table.
 
     Args:
@@ -54,7 +57,7 @@ def get_historical_surge_data(location_id: str, window_minutes: int = 60) -> dic
 
 
 def calculate_surge_trajectory(current_density: float, buildup_rate: float) -> dict:
-    """Projects crowd density forward for 10, 20 and 30 minute windows.
+    """Project crowd density forward for 10, 20 and 30 minute windows.
 
     Args:
     ----
@@ -93,7 +96,8 @@ def calculate_surge_trajectory(current_density: float, buildup_rate: float) -> d
 
 
 def build_prediction_agent() -> LlmAgent:
-    """Constructs the ADK Prediction Agent using Gemini 2.5 Pro.
+    """Construct the ADK Prediction Agent using Gemini 2.5 Pro.
+
     Specialized for temporal pattern analysis and surge forecasting.
 
     Returns
@@ -126,7 +130,7 @@ def build_prediction_agent() -> LlmAgent:
 
 
 async def run_surge_prediction(location_id: str, current_density: float) -> dict:
-    """Executes the Prediction Agent for a given venue zone.
+    """Execute the Prediction Agent for a given venue zone.
 
     Args:
     ----

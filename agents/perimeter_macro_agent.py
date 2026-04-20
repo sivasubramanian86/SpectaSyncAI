@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Perimeter Macro Agent
+"""SpectaSyncAI: Perimeter Macro Agent.
+
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: EXOGENOUS_SURGE.
 
@@ -23,6 +24,7 @@ import json
 import logging
 import time
 import secrets
+from typing import Any
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
@@ -45,9 +47,10 @@ VENUE_CAPACITY_REGISTER: dict[str, int] = {
 }
 
 
-def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
-    """Queries mobile network congestion metrics for cell towers within `radius_km`
-    of the venue perimeter as a real-time crowd density proxy.
+def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict[str, Any]:
+    """Query mobile network congestion metrics for cell towers near the venue.
+
+    Act as a real-time crowd density proxy for the venue perimeter.
 
     Historical precedent (INC-2025-IND-02): Cell towers in the vicinity showed
     4x+ normal load 90 minutes before a fatal crowd crush - a fully detectable
@@ -63,7 +66,7 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
 
     Returns:
     -------
-        dict: Network load ratio (1.0 = normal), estimated external crowd.
+        dict[str, Any]: Network load ratio (1.0 = normal), estimated external crowd.
 
     """
     rng = secrets.SystemRandom()
@@ -81,8 +84,9 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
     }
 
 
-def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
-    """Checks metro/bus station ridership against historical baseline for event day.
+def query_transit_ridership_anomalies(station_ids: list[str]) -> dict[str, Any]:
+    """Check metro and bus station ridership against historical baseline.
+
     Anomalous ridership at adjacent stations signals incoming crowd volume.
 
     Historical precedent (INC-2025-IND-02): Transit stations adjacent to the
@@ -96,7 +100,7 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
 
     Returns:
     -------
-        dict: Per-station ridership ratios and aggregate crowd estimate.
+        dict[str, Any]: Per-station ridership ratios and aggregate crowd estimate.
 
     """
     rng = secrets.SystemRandom()
@@ -124,9 +128,12 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
     }
 
 
-def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) -> dict:
-    """Computes capacity overage ratio and breach probability.
-    Draws comparison against known incident signatures from the corpus.
+def calculate_capacity_breach_risk(
+    venue_id: str, external_crowd_estimate: int
+) -> dict[str, Any]:
+    """Compute capacity overage ratio and breach probability.
+
+    Draw comparison against known incident signatures from the corpus.
 
     Historical precedent:
       INC-2025-IND-02: 6.25x capacity -> certain crush.
@@ -141,7 +148,7 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
 
     Returns:
     -------
-        dict: Capacity ratio, crush probability, time-to-critical estimate.
+        dict[str, Any]: Capacity ratio, crush probability, time-to-critical estimate.
 
     """
     capacity = VENUE_CAPACITY_REGISTER.get(venue_id, VENUE_CAPACITY_REGISTER["default"])
@@ -184,10 +191,11 @@ def calculate_capacity_breach_risk(venue_id: str, external_crowd_estimate: int) 
 
 def activate_street_diversion_protocol(
     venue_id: str, approach_corridors: list[str], diversion_routes: list[str]
-) -> dict:
-    """Triggers street-level crowd diversion BEFORE gate breach.
+) -> dict[str, Any]:
+    """Trigger street-level crowd diversion before gate breach.
+
     The critical intervention absent in INC-2025-IND-02, INC-2022-KOR-01,
-    and INC-2010-DEU-01. Coordinates with traffic authority and city transit.
+    and INC-2010-DEU-01. Coordinate with traffic authority and city transit.
 
     Args:
     ----
@@ -197,7 +205,7 @@ def activate_street_diversion_protocol(
 
     Returns:
     -------
-        dict: Diversion activation confirmation.
+        dict[str, Any]: Diversion activation confirmation.
 
     """
     logger.critical(
@@ -217,7 +225,13 @@ def activate_street_diversion_protocol(
 
 
 def build_perimeter_macro_agent() -> LlmAgent:
-    """Constructs the Perimeter Macro Agent for external crowd monitoring."""
+    """Build the Perimeter Macro Agent for external crowd monitoring.
+
+    Returns:
+    -------
+        LlmAgent: Configured external crowd monitoring agent.
+
+    """
     corpus_incidents = [
         r.incident_id for r in INCIDENT_CORPUS if "EXOGENOUS_SURGE" in r.failure_modes
     ]
@@ -253,8 +267,20 @@ def build_perimeter_macro_agent() -> LlmAgent:
 
 async def run_perimeter_assessment(
     venue_id: str, area_code: str, station_ids: list[str]
-) -> dict:
-    """Runs the Perimeter Macro Agent for a venue ahead of an event."""
+) -> dict[str, Any]:
+    """Run the Perimeter Macro Agent for a venue ahead of an event.
+
+    Args:
+    ----
+        venue_id: Target venue.
+        area_code: Area/postal code.
+        station_ids: List of station IDs.
+
+    Returns:
+    -------
+        dict[str, Any]: Assessment results with potential diversion status.
+
+    """
     start = time.perf_counter()
     fallback = False
     output_size = 0

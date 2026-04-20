@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ObservabilityService:
     """Write lightweight custom metrics to Google Cloud Monitoring."""
 
-    def __init__(self) -> None:
+    def __init__(self: ObservabilityService) -> None:
         """Initialize the observability service with Google Cloud credentials."""
         self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
         self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-south1")
@@ -38,7 +38,7 @@ class ObservabilityService:
         self._client: monitoring_v3.MetricServiceClient | None = None
         self._client_disabled = False
 
-    def status(self) -> dict[str, Any]:
+    def status(self: ObservabilityService) -> dict[str, Any]:
         """Return a small status payload for diagnostics/UI visibility."""
         return {
             "enabled": self.enabled and not self._client_disabled,
@@ -49,16 +49,16 @@ class ObservabilityService:
             "metric_prefix": "custom.googleapis.com/spectasync",
         }
 
-    def _metric_type(self, suffix: str) -> str:
+    def _metric_type(self: ObservabilityService, suffix: str) -> str:
         return f"custom.googleapis.com/spectasync/{suffix}"
 
-    def _resource(self) -> monitored_resource_pb2.MonitoredResource:
+    def _resource(self: ObservabilityService) -> monitored_resource_pb2.MonitoredResource:
         return monitored_resource_pb2.MonitoredResource(
             type="global",
             labels={"project_id": self.project_id or "local"},
         )
 
-    def _client_or_none(self) -> monitoring_v3.MetricServiceClient | None:
+    def _client_or_none(self: ObservabilityService) -> monitoring_v3.MetricServiceClient | None:
         if not self.enabled or self._client_disabled:
             return None
         if self._client is not None:
@@ -74,7 +74,7 @@ class ObservabilityService:
         return self._client
 
     def _build_series(
-        self,
+        self: ObservabilityService,
         suffix: str,
         value: float,
         labels: dict[str, str] | None = None,
@@ -95,7 +95,7 @@ class ObservabilityService:
         return series
 
     def _write_metric(
-        self,
+        self: ObservabilityService,
         suffix: str,
         value: float,
         labels: dict[str, str] | None = None,
@@ -114,7 +114,7 @@ class ObservabilityService:
             logger.debug("Cloud Monitoring write skipped for %s: %s", suffix, exc)
 
     async def record_metric(
-        self,
+        self: ObservabilityService,
         suffix: str,
         value: float,
         labels: dict[str, str] | None = None,
@@ -123,7 +123,7 @@ class ObservabilityService:
         await asyncio.to_thread(self._write_metric, suffix, value, labels)
 
     def schedule_metric(
-        self,
+        self: ObservabilityService,
         suffix: str,
         value: float,
         labels: dict[str, str] | None = None,
@@ -137,7 +137,7 @@ class ObservabilityService:
         loop.create_task(self.record_metric(suffix, value, labels))
 
     def schedule_http_request(
-        self,
+        self: ObservabilityService,
         method: str,
         route: str,
         status_code: int,
@@ -155,7 +155,7 @@ class ObservabilityService:
             self.schedule_metric("http_server_error_count", 1.0, labels)
 
     def schedule_agent_run(
-        self,
+        self: ObservabilityService,
         agent_name: str,
         duration_ms: float,
         *,

@@ -6,7 +6,7 @@ from api.services.pubsub_service import PubSubService
 
 
 @pytest.mark.asyncio
-async def test_pubsub_service_initialization():
+async def test_pubsub_service_initialization() -> None:
     # Test initialization when K_SERVICE is not set (Local/Dev)
     """Test functionality for test_pubsub_service_initialization."""
     with patch.dict("os.environ", {}, clear=True):
@@ -16,7 +16,7 @@ async def test_pubsub_service_initialization():
 
 
 @pytest.mark.asyncio
-async def test_pubsub_service_broadcast_mock():
+async def test_pubsub_service_broadcast_mock() -> None:
     # Test broadcast in mock mode (enabled=False)
     """Test functionality for test_pubsub_service_broadcast_mock."""
     service = PubSubService()
@@ -28,7 +28,7 @@ async def test_pubsub_service_broadcast_mock():
 
 
 @pytest.mark.asyncio
-async def test_pubsub_service_broadcast_enabled():
+async def test_pubsub_service_broadcast_enabled() -> None:
     # Test broadcast when enabled
     """Test functionality for test_pubsub_service_broadcast_enabled."""
     with patch("google.cloud.pubsub_v1.PublisherClient") as mock_client_class:
@@ -56,7 +56,7 @@ async def test_pubsub_service_broadcast_enabled():
 
 
 @pytest.mark.asyncio
-async def test_pubsub_service_broadcast_not_found():
+async def test_pubsub_service_broadcast_not_found() -> None:
     # Test broadcast when topic is missing
     """Test functionality for test_pubsub_service_broadcast_not_found."""
     from google.api_core import exceptions
@@ -76,7 +76,7 @@ async def test_pubsub_service_broadcast_not_found():
 
 
 @pytest.mark.asyncio
-async def test_pubsub_service_initialization_error():
+async def test_pubsub_service_initialization_error() -> None:
     # Test initialization failure
     """Test functionality for test_pubsub_service_initialization_error."""
     with (

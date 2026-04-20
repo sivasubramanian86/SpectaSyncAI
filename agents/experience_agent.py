@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Experience Agent
+"""SpectaSyncAI: Experience Agent.
+
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Generates real-time personalized recommendations for attendees
 to improve their event experience - optimal timing suggestions, food, seating,
@@ -9,6 +10,7 @@ import os
 import json
 import logging
 import time
+from typing import Any
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
@@ -17,13 +19,14 @@ from api.services.observability_service import observability_service
 logger = logging.getLogger(__name__)
 
 
-def get_low_density_zones() -> dict:
-    """Returns the current list of low-density zones suitable for routing attendees.
+def get_low_density_zones() -> dict[str, Any]:
+    """Return the current list of low-density zones suitable for routing attendees.
+
     Production: queries the live crowd_densities table in AlloyDB.
 
-    Returns
+    Returns:
     -------
-        dict: Low-density zones with current density scores.
+        dict[str, Any]: Low-density zones with current density scores.
 
     """
     return {
@@ -37,7 +40,8 @@ def get_low_density_zones() -> dict:
 
 
 def get_venue_event_schedule(next_n_events: int = 3) -> dict:
-    """Returns upcoming venue schedule events to help attendees time their movements.
+    """Return upcoming venue schedule events to help attendees time their movements.
+
     Production: integrates with venue ticketing / event management system.
 
     Args:
@@ -67,9 +71,9 @@ def get_venue_event_schedule(next_n_events: int = 3) -> dict:
 
 
 def build_experience_agent() -> LlmAgent:
-    """Constructs the ADK Experience Agent using Gemini 2.5 Flash.
+    """Construct the ADK Experience Agent using Gemini 2.5 Flash.
 
-    Returns
+    Returns:
     -------
         LlmAgent: Configured attendee experience agent.
 
@@ -97,8 +101,8 @@ def build_experience_agent() -> LlmAgent:
     )
 
 
-async def run_experience_recommendations(attendee_zone: str) -> dict:
-    """Generates personalized recommendations for an attendee in a specific zone.
+async def run_experience_recommendations(attendee_zone: str) -> dict[str, Any]:
+    """Generate personalized recommendations for an attendee in a specific zone.
 
     Args:
     ----
@@ -106,7 +110,7 @@ async def run_experience_recommendations(attendee_zone: str) -> dict:
 
     Returns:
     -------
-        dict: Personalized recommendations with timing advice.
+        dict[str, Any]: Personalized recommendations with timing advice.
 
     """
     start = time.perf_counter()

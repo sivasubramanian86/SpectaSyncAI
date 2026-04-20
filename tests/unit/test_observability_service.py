@@ -6,7 +6,7 @@ from unittest.mock import patch
 from api.services.observability_service import ObservabilityService
 
 
-def test_observability_status():
+def test_observability_status() -> None:
     """Test functionality for test_observability_status."""
     obs = ObservabilityService()
     status = obs.status()
@@ -14,7 +14,7 @@ def test_observability_status():
     assert status["metric_prefix"] == "custom.googleapis.com/spectasync"
 
 
-def test_observability_disabled_behavior():
+def test_observability_disabled_behavior() -> None:
     """Test functionality for test_observability_disabled_behavior."""
     with patch.dict(os.environ, {"OBSERVABILITY_ENABLED": "0"}):
         obs = ObservabilityService()
@@ -25,7 +25,7 @@ def test_observability_disabled_behavior():
         obs._write_metric("test", 1.0)  # Should return None immediately
 
 
-def test_observability_client_caching():
+def test_observability_client_caching() -> None:
     """Test functionality for test_observability_client_caching."""
     with (
         patch.dict(
@@ -41,14 +41,14 @@ def test_observability_client_caching():
         assert MockClient.call_count == 1
 
 
-def test_observability_schedule_no_loop():
+def test_observability_schedule_no_loop() -> None:
     # Covers lines 132-133
     """Test functionality for test_observability_schedule_no_loop."""
     obs = ObservabilityService()
     # If we run this in a thread with no loop, it should return
     import threading
 
-    def target():
+    def target() -> None:
         """Test functionality for target."""
         obs.schedule_metric("test", 1.0)
 
@@ -58,7 +58,7 @@ def test_observability_schedule_no_loop():
 
 
 @pytest.mark.asyncio
-async def test_observability_error_metric():
+async def test_observability_error_metric() -> None:
     # Covers line 153 (status_code >= 500)
     """Test functionality for test_observability_error_metric."""
     obs = ObservabilityService()
@@ -69,7 +69,7 @@ async def test_observability_error_metric():
         assert "http_server_error_count" in calls
 
 
-def test_observability_agent_run():
+def test_observability_agent_run() -> None:
     """Test functionality for test_observability_agent_run."""
     obs = ObservabilityService()
     with patch.object(obs, "schedule_metric") as mock_sched:

@@ -10,7 +10,7 @@ from agents.context_cache import (
 )
 
 
-def test_build_system_prompt():
+def test_build_system_prompt() -> None:
     """Test functionality for test_build_system_prompt."""
     prompt = build_system_prompt("core_orchestrator")
     assert "Core Orchestrator" in prompt
@@ -18,7 +18,7 @@ def test_build_system_prompt():
 
 
 @pytest.mark.asyncio
-async def test_get_or_create_cache_hit():
+async def test_get_or_create_cache_hit() -> None:
     """Test that existing cache is returned if found in list()."""
     mock_client = MagicMock()
     mock_cache = MagicMock()
@@ -33,7 +33,7 @@ async def test_get_or_create_cache_hit():
 
 
 @pytest.mark.asyncio
-async def test_get_or_create_cache_miss_create():
+async def test_get_or_create_cache_miss_create() -> None:
     """Test that new cache is created if not found in list()."""
     mock_client = MagicMock()
     mock_client.caches.list.return_value = []  # Empty list = Miss
@@ -46,7 +46,7 @@ async def test_get_or_create_cache_miss_create():
 
 
 @pytest.mark.asyncio
-async def test_get_cached_model_success():
+async def test_get_cached_model_success() -> None:
     """Test that get_cached_model returns the string name of the cache."""
     mock_cache = MagicMock()
     mock_cache.name = "projects/p/locations/l/cachedContents/c1"
@@ -60,7 +60,7 @@ async def test_get_cached_model_success():
 
 
 @pytest.mark.asyncio
-async def test_warm_all_caches():
+async def test_warm_all_caches() -> None:
     """Test that warm_all_caches triggers cache creation for all agents."""
     with patch(
         "agents.context_cache.get_or_create_cache", new_callable=AsyncMock
@@ -71,7 +71,7 @@ async def test_warm_all_caches():
 
 
 @pytest.mark.asyncio
-async def test_context_cache_failures():
+async def test_context_cache_failures() -> None:
     """Test resilience when client or cache creation fails."""
     mock_client = MagicMock()
     mock_client.caches.list.side_effect = Exception("API Error")

@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from typing import Any
 from agents.vision_agent import run_vision_analysis
 from agents.orchestrator import run_orchestration_cycle
 
@@ -15,8 +16,18 @@ router = APIRouter()
 @router.get(
     "/telemetry/{location_id}", summary="Get latest telemetry metadata for a zone"
 )
-async def get_telemetry_meta(location_id: str) -> dict:
-    """Surface telemetry ingestion capabilities for the zone."""
+async def get_telemetry_meta(location_id: str) -> dict[str, Any]:
+    """Surface telemetry ingestion capabilities for the zone.
+
+    Args:
+    ----
+        location_id: Zone identifier.
+
+    Returns:
+    -------
+        dict[str, Any]: Metadata about zone telemetry state.
+
+    """
     try:
         # Integrated check for active sensors / vision capabilities
         return {
@@ -53,8 +64,8 @@ class OrchestratorResponse(BaseModel):
     """Response from the full agent pipeline."""
 
     location_id: str
-    density_report: dict
-    action_taken: list[dict]
+    density_report: dict[str, Any]
+    action_taken: list[dict[str, Any]]
     agent_reasoning: str
 
 
@@ -64,8 +75,19 @@ class OrchestratorResponse(BaseModel):
     summary="Submit CCTV telemetry to trigger the Agent Mesh",
 )
 async def ingest_telemetry(payload: TelemetryPayload) -> OrchestratorResponse:
-    """Accepts CCTV frame or manual score, runs Vision Agent (Flash),
-    then triggers Core Orchestrator (Pro) for intervention decision.
+    """Accept CCTV frame or manual score and trigger Agent Mesh.
+
+    Runs Vision Agent (Flash) for analysis, then triggers Core
+    Orchestrator (Pro) for intervention decision.
+
+    Args:
+    ----
+        payload: Telemetry data containing optional image or density score.
+
+    Returns:
+    -------
+        OrchestratorResponse: Combined analysis and intervention results.
+
     """
     # Step 1: Vision Agent - analyse frame or use override
     if payload.image_b64:

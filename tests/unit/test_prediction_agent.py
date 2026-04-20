@@ -11,14 +11,14 @@ from agents.prediction_agent import (
 )
 
 
-def test_build_prediction_agent():
+def test_build_prediction_agent() -> None:
     """Test functionality for test_build_prediction_agent."""
     agent = build_prediction_agent()
     assert agent.name == "prediction_agent"
     assert "gemini-2.5-pro" in agent.model
 
 
-def test_get_historical_surge_data():
+def test_get_historical_surge_data() -> None:
     """Test functionality for test_get_historical_surge_data."""
     res = get_historical_surge_data("GATE_1", 30)
     assert res["location_id"] == "GATE_1"
@@ -26,7 +26,7 @@ def test_get_historical_surge_data():
     assert len(res["historical_surges"]) > 0
 
 
-def test_calculate_surge_trajectory():
+def test_calculate_surge_trajectory() -> None:
     # Test normal
     """Test functionality for test_calculate_surge_trajectory."""
     res = calculate_surge_trajectory(0.3, 0.01)
@@ -48,7 +48,7 @@ def test_calculate_surge_trajectory():
 
 
 @pytest.mark.asyncio
-async def test_run_surge_prediction_success():
+async def test_run_surge_prediction_success() -> None:
     """Test functionality for test_run_surge_prediction_success."""
     mock_event = MagicMock()
     mock_event.is_final_response.return_value = True
@@ -85,7 +85,7 @@ async def test_run_surge_prediction_success():
 
 
 @pytest.mark.asyncio
-async def test_run_surge_prediction_fallback():
+async def test_run_surge_prediction_fallback() -> None:
     """Test functionality for test_run_surge_prediction_fallback."""
     mock_event = MagicMock()
     mock_event.is_final_response.return_value = True

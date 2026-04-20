@@ -1,0 +1,6 @@
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["D", "ANN", "E", "F", "W", "C90"]
+ignore = ["ANN101"] # Ignore missing type annotation for self

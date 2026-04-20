@@ -1,12 +1,15 @@
-"""SpectaSyncAI: Google Cloud Pub/Sub Service
+"""SpectaSyncAI: Google Cloud Pub/Sub Service.
 
 High-fidelity broadcast service for agentic incident escalation.
 Used to trigger downstream civil defense notifications and HITL workflows.
 """
 
+from __future__ import annotations
+
 import os
 import json
 import logging
+from typing import Any
 from google.cloud import pubsub_v1
 from google.api_core import exceptions
 
@@ -16,7 +19,7 @@ logger = logging.getLogger("spectasync.pubsub")
 class PubSubService:
     """Manages publishing high-priority risk alerts to Google Cloud Pub/Sub."""
 
-    def __init__(self):
+    def __init__(self: PubSubService) -> None:
         """Initialize the PubSub service and topic paths for critical alerts."""
         self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "spectasyncai")
         self.publisher = None
@@ -34,8 +37,8 @@ class PubSubService:
             except Exception as e:  # pragma: no cover
                 logger.error(f"Failed to initialize Pub/Sub: {e}")
 
-    async def broadcast_risk(self, risk_data: dict):
-        """Publishes a high-priority risk alert to Cloud Pub/Sub."""
+    async def broadcast_risk(self: PubSubService, risk_data: dict[str, Any]) -> bool:
+        """Publish a high-priority risk alert to Cloud Pub/Sub."""
         if not self.enabled:
             logger.debug("Pub/Sub disabled (Local/Dev). Mocking broadcast.")
             return True

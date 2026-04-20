@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Core Orchestrator Agent
+"""SpectaSyncAI: Core Orchestrator Agent.
+
 Powered by Google ADK (google-adk) + Gemini 2.5 Pro
 Responsibility: Spatial reasoning over venue telemetry, querying historical
 AlloyDB memory, and invoking MCP tools via MCPToolset for real-world interventions.
@@ -41,10 +42,16 @@ class DensityReport(TypedDict):
 
 
 async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
-    """Constructs the Core Orchestrator ADK Agent using Gemini 2.5 Pro.
-    Connects to the FastMCP server via MCPToolset (SSE transport).
+    """Build the Core Orchestrator ADK Agent using Gemini 2.5 Pro.
 
-    Returns
+    Connects to the FastMCP server via MCPToolset (SSE transport) to discover
+    and load available intervention tools.
+
+    Args:
+    ----
+        cache_name: Optional identifier for cached context.
+
+    Returns:
     -------
         LlmAgent: Fully configured orchestrator with MCP tools loaded.
 
@@ -78,8 +85,10 @@ async def build_orchestrator_agent(cache_name: str | None = None) -> LlmAgent:
 
 
 async def run_orchestration_cycle(density_report: DensityReport) -> dict[str, Any]:
-    """Single orchestration cycle: takes a density report, retrieves historical
-    context, and runs the ADK orchestrator agent to decide and act.
+    """Execute a single orchestration cycle based on live density telemetry.
+
+    Processes the density report, retrieves historical context from AlloyDB,
+    and runs the ADK orchestrator agent to decide on and execute interventions.
 
     Args:
     ----
@@ -88,7 +97,7 @@ async def run_orchestration_cycle(density_report: DensityReport) -> dict[str, An
 
     Returns:
     -------
-        dict: Agent response with action taken and reasoning.
+        dict[str, Any]: Agent response with action taken and reasoning.
 
     """
     start = time.perf_counter()

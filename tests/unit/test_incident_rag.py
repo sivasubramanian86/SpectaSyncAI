@@ -13,8 +13,8 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 
 @pytest.fixture
-def sample_record():
-    """Generates a standardized IncidentRecord for RAG vectorization testing."""
+def sample_record() -> IncidentRecord:
+    """Generate a standardized IncidentRecord for RAG vectorization testing."""
     return IncidentRecord(
         incident_id="TEST-001",
         year=2025,
@@ -37,15 +37,15 @@ def sample_record():
     )
 
 
-def test_vectorize_incident(sample_record):
-    """Validates that incident records are correctly transformed into numeric semantic vectors."""
+def test_vectorize_incident(sample_record: IncidentRecord) -> None:
+    """Validate that incident records are correctly transformed into numeric semantic vectors."""
     vec = _vectorize_incident(sample_record)
     assert len(vec) > 20
     assert vec[0] == 1.0  # EXOGENOUS_SURGE
 
 
-def test_cosine_similarity():
-    """Verifies the mathematical correctness of the internal cosine similarity implementation."""
+def test_cosine_similarity() -> None:
+    """Verify the mathematical correctness of the internal cosine similarity implementation."""
     v1 = [1.0, 0.0, 0.0]
     v2 = [1.0, 0.0, 0.0]
     v3 = [0.0, 1.0, 0.0]
@@ -54,24 +54,23 @@ def test_cosine_similarity():
     assert _cosine_similarity([0, 0], [1, 1]) == 0.0
 
 
-def test_search_similar_incidents():
-    """Validates the forensic search capability against the historical incident corpus."""
+def test_search_similar_incidents() -> None:
+    """Validate the forensic search capability against the historical incident corpus."""
     res = search_similar_incidents(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
     assert "similar_incidents" in res
     assert len(res["similar_incidents"]) == 3
 
 
-def test_aggregate_intervention_strategies():
-    """Validates the aggregation of help strategies from multiple historical incident records."""
+def test_aggregate_intervention_strategies() -> None:
+    """Validate the aggregation of help strategies from multiple historical incident records."""
     ids = [INCIDENT_CORPUS[0].incident_id]
     res = aggregate_intervention_strategies(ids)
     assert res["incident_count"] == 1
     assert len(res["unified_interventions"]) > 0
 
 
-@pytest.mark.asyncio
-async def test_run_incident_rag_query_success():
-    """Tests a successful agentic RAG query session with mock JSON response parsing."""
+async def test_run_incident_rag_query_success() -> None:
+    """Test a successful agentic RAG query session with mock JSON response parsing."""
     with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
         mock_runner = MagicMock()
         MockRunner.return_value = mock_runner
@@ -99,9 +98,8 @@ async def test_run_incident_rag_query_success():
         assert res["matched_incidents"] == ["INC-001"]
 
 
-@pytest.mark.asyncio
-async def test_run_incident_rag_query_fallback():
-    """Validates the local search fallback mechanism when agentic model parsing fails."""
+async def test_run_incident_rag_query_fallback() -> None:
+    """Validate the local search fallback mechanism when agentic model parsing fails."""
     with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
         mock_runner = MagicMock()
         MockRunner.return_value = mock_runner

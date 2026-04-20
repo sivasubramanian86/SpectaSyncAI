@@ -8,6 +8,7 @@ import os
 import json
 import logging
 import time
+from typing import Any
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
@@ -18,7 +19,7 @@ from api.services.observability_service import observability_service
 logger = logging.getLogger(__name__)
 
 
-def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
+def analyze_cctv_frame(location_id: str, density_b64: str) -> dict[str, Any]:
     """Parse a pre-analyzed CCTV image frame result.
 
     In production, this calls a Vision API or local frame processor.
@@ -30,7 +31,7 @@ def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
 
     Returns:
     -------
-        dict: Structured density analysis result.
+        dict[str, Any]: Structured density analysis result.
 
     """
     # Production: replace with actual image analysis call
@@ -43,7 +44,7 @@ def analyze_cctv_frame(location_id: str, density_b64: str) -> dict:
 
 
 def archive_to_gcs(location_id: str, image_bytes: bytes) -> str:
-    """Archives a critical CCTV frame to Google Cloud Storage for forensic audit.
+    """Archive a critical CCTV frame to Google Cloud Storage for forensic audit.
 
     Args:
     ----
@@ -77,7 +78,7 @@ def build_vision_agent() -> LlmAgent:
 
     This agent is optimized for high-speed, low-cost multimodal analysis.
 
-    Returns
+    Returns:
     -------
         LlmAgent: The configured ADK Vision Agent instance.
 
@@ -98,8 +99,8 @@ def build_vision_agent() -> LlmAgent:
     )
 
 
-async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
-    """Executes the Vision Agent for a given CCTV frame.
+async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict[str, Any]:
+    """Execute the Vision Agent for a given CCTV frame.
 
     Args:
     ----
@@ -108,7 +109,7 @@ async def run_vision_analysis(location_id: str, image_bytes: bytes) -> dict:
 
     Returns:
     -------
-        dict: The agent's final density analysis output.
+        dict[str, Any]: The agent's final density analysis output.
 
     """
     start = time.perf_counter()

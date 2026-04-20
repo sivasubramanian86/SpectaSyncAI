@@ -1,4 +1,5 @@
-"""SpectaSyncAI: Failsafe Mesh Agent
+"""SpectaSyncAI: Failsafe Mesh Agent.
+
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: INFRA_FAILURE.
 
@@ -32,6 +33,7 @@ import json
 import logging
 import time
 import secrets
+from typing import Any
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
@@ -42,8 +44,10 @@ from api.services.observability_service import observability_service
 logger = logging.getLogger(__name__)
 
 
-def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
-    """Polls in-venue infrastructure health via IoT sensors:
+def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict[str, Any]:
+    """Poll in-venue infrastructure health via IoT sensors.
+
+    Monitor components including:
       - Mains power draw per zone
       - PA system carrier-sense status
       - LED/screen network ping
@@ -61,10 +65,9 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
 
     Returns:
     -------
-        dict: Per-component health status with failure probability.
+        dict[str, Any]: Per-component health status with failure probability.
 
     """
-
     infra_components = []
     for zone in zones:
         rng = secrets.SystemRandom()
@@ -108,9 +111,10 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
 
 def activate_ble_mesh_broadcast(
     venue_id: str, zones: list[str], message_type: str
-) -> dict:
-    """Activates BLE 5.0 mesh network broadcast for crowd guidance.
-    Operates WITHOUT mains power or network connectivity.
+) -> dict[str, Any]:
+    """Activate BLE 5.0 mesh network broadcast for crowd guidance.
+
+    Operate WITHOUT mains power or network connectivity.
     Each mesh node has 72-hour battery backup.
 
     Historical precedent (INC-2025-IND-01, INC-2010-KHM-01): Both incidents
@@ -131,7 +135,7 @@ def activate_ble_mesh_broadcast(
 
     Returns:
     -------
-        dict: BLE mesh broadcast confirmation.
+        dict[str, Any]: BLE mesh broadcast confirmation.
 
     """
     logger.critical(
@@ -154,10 +158,11 @@ def activate_ble_mesh_broadcast(
 
 def dispatch_offline_staff_routing(
     venue_id: str, zone_density_map: dict[str, float]
-) -> dict:
-    """Distributes pre-cached offline routing instructions to staff tablets.
-    Tablet apps cache crowd routing algorithms locally - no internet required.
-    Uses last-known density state to generate routing recommendations.
+) -> dict[str, Any]:
+    """Distribute pre-cached offline routing instructions to staff tablets.
+
+    Ensure app-based caches maintain crowd routing algorithms locally - no internet required.
+    Use last-known density state to generate routing recommendations.
 
     Args:
     ----
@@ -166,7 +171,7 @@ def dispatch_offline_staff_routing(
 
     Returns:
     -------
-        dict: Staff positioning instructions for offline operation.
+        dict[str, Any]: Staff positioning instructions for offline operation.
 
     """
     high_density = {z: d for z, d in zone_density_map.items() if d > 0.7}
@@ -194,9 +199,10 @@ def dispatch_offline_staff_routing(
     }
 
 
-def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dict:
-    """Dispatches the emergency generator request and activates physical signage.
-    Glow-in-dark exit signage requires zero power.
+def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dict[str, Any]:
+    """Dispatch the emergency generator request and activate physical signage.
+
+    Ensure glow-in-dark exit signage requires zero power.
 
     Args:
     ----
@@ -205,7 +211,7 @@ def request_emergency_generator(venue_id: str, affected_zones: list[str]) -> dic
 
     Returns:
     -------
-        dict: Generator dispatch status and physical signage activation.
+        dict[str, Any]: Generator dispatch status and physical signage activation.
 
     """
     logger.critical(
@@ -233,7 +239,13 @@ FAILSAFE_DEGRADATION_TIERS = {
 
 
 def build_failsafe_mesh_agent() -> LlmAgent:
-    """Constructs the Failsafe Mesh Agent for infrastructure failure monitoring."""
+    """Construct the Failsafe Mesh Agent for infrastructure failure monitoring.
+
+    Returns:
+    -------
+        LlmAgent: Configured infrastructure failsafe agent.
+
+    """
     corpus_incidents = [
         r.incident_id
         for r in INCIDENT_CORPUS
@@ -271,8 +283,19 @@ def build_failsafe_mesh_agent() -> LlmAgent:
     )
 
 
-async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict:
-    """Runs the Failsafe Mesh Agent for continuous infrastructure monitoring."""
+async def run_failsafe_monitoring(venue_id: str, zones: list[str]) -> dict[str, Any]:
+    """Run the Failsafe Mesh Agent for continuous infrastructure monitoring.
+
+    Args:
+    ----
+        venue_id: Target venue.
+        zones: Zones to monitor.
+
+    Returns:
+    -------
+        dict[str, Any]: Detailed infrastructure health report with failsafe status.
+
+    """
     start = time.perf_counter()
     fallback = False
     output_size = 0

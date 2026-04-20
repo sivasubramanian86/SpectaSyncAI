@@ -1,5 +1,7 @@
-"""SpectaSyncAI: Safety Agent
-Powered by: google-adk + Gemini 2.5 Pro
+"""SpectaSyncAI: Occupational Safety & Compliance Agent.
+
+Identifies physical hazards and ensures compliance with venue safety protocols.
+
 Responsibility: Emergency detection from sensor anomalies, triggering
 automated evacuation protocols and emergency service coordination.
 Implements responsible AI - all critical decisions require human confirmation
@@ -10,6 +12,7 @@ import os
 import json
 import logging
 import time
+from typing import Any
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.genai import types as genai_types
@@ -23,8 +26,9 @@ DENSITY_EMERGENCY_THRESHOLD = 0.95
 DENSITY_CRITICAL_THRESHOLD = 0.88
 
 
-def classify_safety_risk(density_score: float, rate_of_change: float) -> dict:
-    """Classifies safety risk level using density + rate-of-change analysis.
+def classify_safety_risk(density_score: float, rate_of_change: float) -> dict[str, Any]:
+    """Classify safety risk level using density and rate-of-change analysis.
+
     High rate-of-change signals stampede-like conditions.
 
     Args:
@@ -71,8 +75,8 @@ def classify_safety_risk(density_score: float, rate_of_change: float) -> dict:
     }
 
 
-def get_emergency_contact_list() -> dict:
-    """Returns the emergency contacts and escalation chain for the venue.
+def get_emergency_contact_list() -> dict[str, str]:
+    """Return the emergency contacts and escalation chain for the venue.
 
     Returns
     -------
@@ -90,7 +94,7 @@ def get_emergency_contact_list() -> dict:
 
 
 def build_safety_agent() -> LlmAgent:
-    """Constructs the ADK Safety Agent using Gemini 2.5 Pro.
+    """Build the ADK Safety Agent using Gemini 2.5 Pro.
 
     Returns
     -------
@@ -122,8 +126,8 @@ def build_safety_agent() -> LlmAgent:
 
 async def run_safety_assessment(
     location_id: str, density_score: float, rate_of_change: float = 0.02
-) -> dict:
-    """Provide the Safety Agent for emergency detection and coordination.
+) -> dict[str, Any]:
+    """Run the Safety Agent for emergency detection and coordination.
 
     Args:
     ----

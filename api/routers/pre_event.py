@@ -1,7 +1,9 @@
-"""SpectaSyncAI: Pre-Event Analysis Router
-Exposes strategic forecasting capabilities to the Command Hub.
+"""SpectaSyncAI: Pre-Event Analysis Router.
+
+Expose strategic forecasting capabilities to the Command Hub.
 """
 
+from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 from agents.pre_event_agent import run_pre_event_analysis
@@ -24,8 +26,14 @@ class PreEventData(BaseModel):
 
 
 @router.get("/analysis")
-async def get_latest_pre_event_analysis():
-    """Retrieve the last computed strategic analysis (or triggers a default if missing)."""
+async def get_latest_pre_event_analysis() -> dict[str, Any]:
+    """Retrieve the last computed strategic analysis (or triggers a default if missing).
+
+    Returns:
+    -------
+        dict[str, Any]: Cached or default strategic analysis results.
+
+    """
     if _LATEST_ANALYSIS["data"]:  # pragma: no cover
         return _LATEST_ANALYSIS["data"]
 
@@ -52,8 +60,18 @@ async def get_latest_pre_event_analysis():
 
 
 @router.post("/analysis")
-async def trigger_pre_event_analysis(data: PreEventData) -> dict:
-    """Trigger the Agent 12: Pre-Event Strategic Analyst loop."""
+async def trigger_pre_event_analysis(data: PreEventData) -> dict[str, Any]:
+    """Trigger the Agent 12: Pre-Event Strategic Analyst loop.
+
+    Args:
+    ----
+        data: Strategic context for analysis.
+
+    Returns:
+    -------
+        dict[str, Any]: Resulting strategic analysis and recommendations.
+
+    """
     try:
         analysis = await run_pre_event_analysis(data.model_dump())
         if not isinstance(analysis, dict):  # pragma: no cover
@@ -95,8 +113,14 @@ async def trigger_pre_event_analysis(data: PreEventData) -> dict:
 
 
 @router.get("/mock-data")
-async def get_mock_pre_event():
-    """Return sample scenario data for the Pre-Event UI."""
+async def get_mock_pre_event() -> dict[str, Any]:
+    """Return sample scenario data for the Pre-Event UI.
+
+    Returns:
+    -------
+        dict[str, Any]: Mock scenario data object.
+
+    """
     return {
         "event_name": "SpectaSync Grand Opening - Tech City Arena",
         "total_reservations": 142000,

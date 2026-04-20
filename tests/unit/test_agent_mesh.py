@@ -41,14 +41,14 @@ from agents import (
         (build_incident_rag_agent, "incident_rag_agent"),
     ],
 )
-def test_agent_builders(build_fn, expected_name):
+def test_agent_builders(build_fn, expected_name) -> None:
     """Verifies that each agent builder correctly initializes the ADK Agent with expected metadata."""
     agent = build_fn()
     assert agent.name == expected_name
 
 
 @pytest.mark.asyncio
-async def test_build_orchestrator_agent():
+async def test_build_orchestrator_agent() -> None:
     """Validates orchestrator initialization including MCP tool integration."""
     with patch("agents.orchestrator.MCPToolset") as MockToolset:
         MockToolset.return_value.load_tools = AsyncMock(return_value=[])
@@ -79,7 +79,7 @@ def setup_mock_runner(MockRunner, response_text):
 
 
 @pytest.mark.asyncio
-async def test_run_queue_analysis():
+async def test_run_queue_analysis() -> None:
     """Tests queue analysis endpoint for correct parsing of multimodal agent feedback."""
     with patch("agents.queue_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '[{"wait_time": 15}]')
@@ -88,7 +88,7 @@ async def test_run_queue_analysis():
 
 
 @pytest.mark.asyncio
-async def test_run_experience_recommendations():
+async def test_run_experience_recommendations() -> None:
     """Validates the generation of hyper-personalized fan engagement metrics."""
     with patch("agents.experience_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"engagement_score": 0.9}')
@@ -97,7 +97,7 @@ async def test_run_experience_recommendations():
 
 
 @pytest.mark.asyncio
-async def test_run_perimeter_assessment():
+async def test_run_perimeter_assessment() -> None:
     """Tests perimeter macro agents for threshold-based breach predictive capabilities."""
     with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"breach_probability": 0.2}')
@@ -106,7 +106,7 @@ async def test_run_perimeter_assessment():
 
 
 @pytest.mark.asyncio
-async def test_run_vip_sync_monitoring():
+async def test_run_vip_sync_monitoring() -> None:
     """Validates VIP safety agent telemetry synchronization logic."""
     with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"kinetic_energy": 0.5}')
@@ -115,7 +115,7 @@ async def test_run_vip_sync_monitoring():
 
 
 @pytest.mark.asyncio
-async def test_run_rumor_monitoring():
+async def test_run_rumor_monitoring() -> None:
     """Tests rumor control agent's ability to isolate local disinformation events."""
     with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"rumor_detected": true}')
@@ -124,7 +124,7 @@ async def test_run_rumor_monitoring():
 
 
 @pytest.mark.asyncio
-async def test_run_failsafe_monitoring():
+async def test_run_failsafe_monitoring() -> None:
     """Validates the hierarchy-aware mesh agent's final consensus logic."""
     with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"failsafe_active": false}')

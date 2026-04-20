@@ -1,6 +1,6 @@
-"""SpectaSyncAI: Global Incident Corpus - RAG Knowledge Base
-# Hardened for RAG (pgvector) and agentic forensic reasoning.
+"""SpectaSyncAI: Global Incident Corpus - RAG Knowledge Base.
 
+Hardened for RAG (pgvector) and agentic forensic reasoning.
 Incident registry covering 18 crowd crush events from 2003-2025.
 All incidents are anonymized by incident code: INC-{YEAR}-{ISO2}-{SEQ}.
 No individual names, political entities, or proprietary venue identifiers are stored.

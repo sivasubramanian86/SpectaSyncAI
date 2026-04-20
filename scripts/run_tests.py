@@ -14,7 +14,6 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def main() -> None:
     """Test functionality for main."""
-
     result = subprocess.run(
         [
             sys.executable,

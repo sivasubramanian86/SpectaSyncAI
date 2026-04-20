@@ -1,5 +1,6 @@
-"""SpectaSyncAI: Gen AI Context Cache Manager
-# Standardized for unified Google Gen AI SDK (google-genai).
+"""SpectaSyncAI: Vertex AI Context Caching Utility.
+
+Optimizes high-volume repeated prompts for long-context windows.
 
 Migrated from deprecated vertexai.preview.caching (Removal date: June 24, 2026).
 Uses the unified Google Gen AI SDK (google-genai) for high-fidelity context caching.
@@ -28,7 +29,13 @@ _CACHE_TTL_HOURS = 6
 
 
 def get_client() -> genai.Client:
-    """Returns a GenAI client configured for Vertex AI mode."""
+    """Return a GenAI client configured for Vertex AI mode.
+
+    Returns
+    -------
+        genai.Client: Configured GenAI client.
+
+    """
     project = os.getenv("GOOGLE_CLOUD_PROJECT")
     location = os.getenv("GOOGLE_CLOUD_LOCATION", "asia-southeast1")
     logger.info(
@@ -102,7 +109,17 @@ INC-2010-DEU-01: Festival tunnel, 21 deaths - NARROW_CORRIDOR + EGRESS_FAILURE
 
 
 def build_system_prompt(agent_key: str) -> str:
-    """Returns the full system prompt for a given agent (corpus + role)."""
+    """Return the full system prompt for a given agent (corpus + role).
+
+    Args:
+    ----
+        agent_key: Unique identifier for the agent role.
+
+    Returns:
+    -------
+        str: Grounded system prompt with corpus and role instructions.
+
+    """
     # Role mapping for Tier-2 and key Tier-1 agents
     roles = {
         "core_orchestrator": "## Role: Core Orchestrator\nSynthesize telemetry and dispatch MCP tools.",
@@ -126,8 +143,18 @@ def build_system_prompt(agent_key: str) -> str:
 async def get_or_create_cache(
     agent_key: str, model_name: str, tools: list | None = None
 ) -> types.CachedContent | None:
-    """Returns a CachedContent for the given agent's system prompt (and optional tools).
-    Migrated to client.caches namespace.
+    """Return a CachedContent for the given agent's system prompt (and optional tools).
+
+    Args:
+    ----
+        agent_key: Unique identifier for the agent.
+        model_name: Target model identifier.
+        tools: Optional list of tools to bake into the cache.
+
+    Returns:
+    -------
+        types.CachedContent | None: The active or new cache object.
+
     """
     try:
         client = get_client()
@@ -173,22 +200,54 @@ async def get_or_create_cache(
 async def get_cached_model(
     agent_key: str, model_name: str, tools: list | None = None
 ) -> str | None:
-    """Wrapper for backward compatibility.
-    Returns the cache name (string) instead of a model object,
-    matching the expected input for newer LlmAgent/Model configurations.
+    """Return the cache name (string) instead of a model object.
+
+    Matches the expected input for newer LlmAgent/Model configurations.
+
+    Args:
+    ----
+        agent_key: Unique identifier for the agent.
+        model_name: Target model identifier.
+        tools: Optional list of tools to bake into the cache.
+
+    Returns:
+    -------
+        str | None: The cache name identifier.
+
     """
     cache = await get_or_create_cache(agent_key, model_name, tools=tools)
     return cache.name if cache else None
 
 
 async def get_cached_model_pro(agent_key: str, tools: list | None = None) -> str | None:
-    """Returns Gemini 2.5 Pro cache name."""
+    """Return Gemini 2.5 Pro cache name.
+
+    Args:
+    ----
+        agent_key: Unique identifier for the agent.
+        tools: Optional list of tools.
+
+    Returns:
+    -------
+        str | None: The cache name for Gemini Pro.
+
+    """
     model_name = os.getenv("MODEL_PRO", "gemini-2.5-pro")
     return await get_cached_model(agent_key, model_name, tools=tools)
 
 
 async def get_cached_model_flash(agent_key: str) -> str | None:
-    """Returns Gemini 2.5 Flash cache name."""
+    """Return Gemini 2.5 Flash cache name.
+
+    Args:
+    ----
+        agent_key: Unique identifier for the agent.
+
+    Returns:
+    -------
+        str | None: The cache name for Gemini Flash.
+
+    """
     model_name = os.getenv("MODEL_FLASH", "gemini-2.5-flash")
     return await get_cached_model(agent_key, model_name)
 
@@ -197,7 +256,10 @@ async def get_cached_model_flash(agent_key: str) -> str | None:
 
 
 async def warm_all_caches() -> None:
-    """Pre-warms caches for the crisis prevention mesh."""
+    """Pre-warm caches for the crisis prevention mesh.
+
+    Initializes caches for all primary agents to reduce latency during live incidents.
+    """
     agents = [
         ("core_orchestrator", os.getenv("MODEL_PRO", "gemini-2.5-pro")),
         ("perimeter_macro", os.getenv("MODEL_PRO", "gemini-2.5-pro")),

@@ -7,7 +7,7 @@ from agents.memory import AlloyDBMemory, _get_pool, _embed
 
 
 @pytest.mark.asyncio
-async def test_alloydb_memory_mock_mode():
+async def test_alloydb_memory_mock_mode() -> None:
     # Ensure DATABASE_URL is not set to trigger mock mode
     """Test functionality for test_alloydb_memory_mock_mode."""
     with patch.dict(os.environ, {}, clear=True):
@@ -25,7 +25,7 @@ async def test_alloydb_memory_mock_mode():
 
 
 @pytest.mark.asyncio
-async def test_get_pool_singleton():
+async def test_get_pool_singleton() -> None:
     """Test functionality for test_get_pool_singleton."""
     with (
         patch("asyncpg.create_pool", new_callable=AsyncMock) as mock_create_pool,
@@ -53,7 +53,7 @@ async def test_get_pool_singleton():
 
 
 @pytest.mark.asyncio
-async def test_embed_mock():
+async def test_embed_mock() -> None:
     """Test functionality for test_embed_mock."""
     with (
         patch("vertexai.init"),
@@ -72,7 +72,7 @@ async def test_embed_mock():
 
 
 @pytest.mark.asyncio
-async def test_alloydb_memory_real_mode_query_failure():
+async def test_alloydb_memory_real_mode_query_failure() -> None:
     """Test functionality for test_alloydb_memory_real_mode_query_failure."""
     with (
         patch.dict(os.environ, {"DATABASE_URL": "postgresql://user:pass@host/db"}),
@@ -91,7 +91,7 @@ async def test_alloydb_memory_real_mode_query_failure():
 
 
 @pytest.mark.asyncio
-async def test_store_intervention_failure():
+async def test_store_intervention_failure() -> None:
     """Test functionality for test_store_intervention_failure."""
     with (
         patch.dict(os.environ, {"DATABASE_URL": "postgresql://user:pass@host/db"}),
@@ -108,7 +108,7 @@ async def test_store_intervention_failure():
 
 
 @pytest.mark.asyncio
-async def test_log_agent_run_failure():
+async def test_log_agent_run_failure() -> None:
     """Test functionality for test_log_agent_run_failure."""
     with (
         patch.dict(os.environ, {"DATABASE_URL": "postgresql://user:pass@host/db"}),
@@ -124,7 +124,7 @@ async def test_log_agent_run_failure():
 
 
 @pytest.mark.asyncio
-async def test_alloydb_memory_real_mode_success():
+async def test_alloydb_memory_real_mode_success() -> None:
     """Test functionality for test_alloydb_memory_real_mode_success."""
     with (
         patch.dict(os.environ, {"DATABASE_URL": "postgresql://user:pass@host/db"}),

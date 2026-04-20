@@ -1,6 +1,7 @@
 """Predictions router - triggers surge forecasting via Prediction Agent."""
 
 import logging
+from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from agents.prediction_agent import run_surge_prediction
@@ -19,8 +20,18 @@ class PredictionRequest(BaseModel):
 
 
 @router.post("/predictions/surge", summary="Run AI surge prediction for a venue zone")
-async def predict_surge(payload: PredictionRequest) -> dict:
-    """Invokes Prediction Agent (Gemini 2.5 Pro) to forecast surge."""
+async def predict_surge(payload: PredictionRequest) -> dict[str, Any]:
+    """Invoke Prediction Agent (Gemini 2.5 Pro) to forecast surge.
+
+    Args:
+    ----
+        payload: Prediction request containing location and current density.
+
+    Returns:
+    -------
+        dict[str, Any]: Forecast results including trajectory and recommendations.
+
+    """
     try:
         return await run_surge_prediction(payload.location_id, payload.current_density)
     except Exception as exc:  # pragma: no cover
@@ -46,8 +57,19 @@ async def predict_surge(payload: PredictionRequest) -> dict:
 
 
 @router.get("/predictions/surge/{location_id}", summary="Quick surge forecast via GET")
-async def predict_surge_get(location_id: str, density: float = 0.70) -> dict:
-    """Convenience GET endpoint for dashboard polling."""
+async def predict_surge_get(location_id: str, density: float = 0.70) -> dict[str, Any]:
+    """Provide a convenience GET endpoint for dashboard polling.
+
+    Args:
+    ----
+        location_id: Zone identifier.
+        density: Current density score (default 0.70).
+
+    Returns:
+    -------
+        dict[str, Any]: Forecast results including surge level and recommendations.
+
+    """
     try:
         return await run_surge_prediction(location_id, density)
     except Exception as exc:  # pragma: no cover

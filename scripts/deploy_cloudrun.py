@@ -87,7 +87,17 @@ def run(cmd: str, fatal: bool = True) -> subprocess.CompletedProcess:
 
 
 def get_service_url(service_name: str) -> str:
-    """Fetches the live Cloud Run URL for a service."""
+    """Fetch the live Cloud Run URL for a service.
+
+    Args:
+    ----
+        service_name: Name of the Cloud Run service.
+
+    Returns:
+    -------
+        str: The service endpoint URL or empty string.
+
+    """
     result = subprocess.run(
         f"gcloud run services describe {service_name} "
         f"--region {REGION} --project {PROJECT_ID} "
@@ -198,8 +208,15 @@ def print_urls() -> None:
 
 
 def update_cors(api_url: str, ui_url: str = "") -> None:
-    """Updates the API service's CORS_ORIGINS env var after both services are deployed.
+    """Update the API service's CORS_ORIGINS env var after both services are deployed.
+
     Call this after the frontend URL is known.
+
+    Args:
+    ----
+        api_url: URL of the API service.
+        ui_url: URL of the frontend UI (optional).
+
     """
     origins = ",".join(filter(None, ["http://localhost:5173", ui_url]))
     log.info("Updating CORS_ORIGINS on spectasync-api → %s", origins)
