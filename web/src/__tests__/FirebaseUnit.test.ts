@@ -69,15 +69,16 @@ describe('Firebase Module Logic', () => {
   });
 
   it('uses existing app if getApps().length > 0 (Line 68)', async () => {
+    vi.resetModules();
+    const { getApps, getApp } = await import('firebase/app');
+    
     vi.stubEnv('VITE_FIREBASE_API_KEY', 'x');
     vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', 'x');
     vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'x');
     vi.stubEnv('VITE_FIREBASE_APP_ID', 'x');
 
-    const { getApps, getApp } = await import('firebase/app');
-    vi.mocked(getApps).mockReturnValueOnce([{} as any]);
+    vi.mocked(getApps).mockReturnValue([{} as any]);
     
-    vi.resetModules();
     await import('../firebase');
     expect(getApp).toHaveBeenCalled();
   });
