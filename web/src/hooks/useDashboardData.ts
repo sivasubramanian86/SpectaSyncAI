@@ -103,8 +103,8 @@ const MOCK_ALERTS: SafetyAlert[] = [
  * 
  * @returns {DashboardState} The current tactical state of the venue.
  */
-export function useDashboardData() {
-  const [state, setState] = useState<DashboardState>({
+export const useDashboardData = (initialOverride?: DashboardState) => {
+  const [state, setState] = useState<DashboardState>(initialOverride || {
     zones: MOCK_ZONES,
     agentFeed: INITIAL_AGENT_FEED,
     forecasts: [MOCK_FORECAST],
@@ -142,52 +142,55 @@ export function useDashboardData() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setState(prev => {
-        // Animate zone densities
-        const updatedZones = prev.zones.map(z => {
-          const newDensity = addNoise(z.density, 0.03);
-          return { ...z, density: newDensity, level: classifyDensity(newDensity) };
-        });
-
-        const northGateDensity = updatedZones.find(z => z.zone_id === 'GATE_NORTH')?.density || 0.9;
-
-        // Mutate forecast based on live density
-        const updatedForecasts: SurgeForecast[] = [{
-          ...prev.forecasts[0],
-          current_density: northGateDensity,
-          confidence_score: Math.floor(82 + Math.random() * 12),
-          predicted_peak_time_mins: Math.max(2, prev.forecasts[0].predicted_peak_time_mins - (Math.random() > 0.85 ? 1 : 0)),
-          forecast: {
-            'T+10_mins': { density: Math.min(0.99, northGateDensity + 0.04), level: classifyDensity(northGateDensity + 0.04) },
-            'T+20_mins': { density: Math.min(0.99, northGateDensity + 0.07), level: classifyDensity(northGateDensity + 0.07) },
-            'T+30_mins': { density: Math.min(0.99, northGateDensity + 0.01), level: classifyDensity(northGateDensity + 0.01) },
-          }
-        }];
-
-        // Dynamic Recommendations: Adjust based on density
-        const updatedRecommendations = northGateDensity > 0.88 
-          ? ACTUALLY_RECOMMENDED 
-          : ACTUALLY_RECOMMENDED.slice(0, 3);
-
-        // Add agent event to feed
+      try {
         const isActual = Math.random() > 0.2; 
         const newEvent = generateAgentEvent();
         const prefix = isActual ? '[MESH_STREAM] (Actual)' : '[MESH_LOG] (Log)';
         newEvent.message = `${prefix} ${newEvent.message}`;
-        
-        const updatedFeed = [newEvent, ...prev.agentFeed].slice(0, 20);
 
-        return {
-          ...prev,
-          zones: updatedZones,
-          agentFeed: updatedFeed,
-          lastUpdated: new Date(),
-          forecasts: updatedForecasts,
-          recommendations: updatedRecommendations,
-          queues: prev.queues,
-          safetyAlerts: prev.safetyAlerts,
-        };
-      });
+        setState(prev => {
+          // Animate zone densities
+          const updatedZones = prev.zones.map(z => {
+            const newDensity = addNoise(z.density, 0.03);
+            return { ...z, density: newDensity, level: classifyDensity(newDensity) };
+          });
+
+          const northGateDensity = updatedZones.find(z => z.zone_id === 'GATE_NORTH')?.density || 0.9;
+
+          // Mutate forecast based on live density
+          const updatedForecasts: SurgeForecast[] = [{
+            ...prev.forecasts[0],
+            current_density: northGateDensity,
+            confidence_score: Math.floor(82 + Math.random() * 12),
+            predicted_peak_time_mins: Math.max(2, prev.forecasts[0].predicted_peak_time_mins - (Math.random() > 0.85 ? 1 : 0)),
+            forecast: {
+              'T+10_mins': { density: Math.min(0.99, northGateDensity + 0.04), level: classifyDensity(northGateDensity + 0.04) },
+              'T+20_mins': { density: Math.min(0.99, northGateDensity + 0.07), level: classifyDensity(northGateDensity + 0.07) },
+              'T+30_mins': { density: Math.min(0.99, northGateDensity + 0.01), level: classifyDensity(northGateDensity + 0.01) },
+            }
+          }];
+
+          // Dynamic Recommendations: Adjust based on density
+          const updatedRecommendations = northGateDensity > 0.88 
+            ? ACTUALLY_RECOMMENDED 
+            : ACTUALLY_RECOMMENDED.slice(0, 3);
+          
+          const updatedFeed = [newEvent, ...prev.agentFeed].slice(0, 20);
+
+          return {
+            ...prev,
+            zones: updatedZones,
+            agentFeed: updatedFeed,
+            lastUpdated: new Date(),
+            forecasts: updatedForecasts,
+            recommendations: updatedRecommendations,
+            queues: prev.queues,
+            safetyAlerts: prev.safetyAlerts,
+          };
+        });
+      } catch (err) {
+        console.error('[Dashboard Poll Failure]:', err);
+      }
     }, 3000);
 
     return () => clearInterval(interval);

@@ -14,7 +14,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 @pytest.fixture
 def sample_record():
-    """Test functionality for sample_record."""
+    """Generates a standardized IncidentRecord for RAG vectorization testing."""
     return IncidentRecord(
         incident_id="TEST-001",
         year=2025,
@@ -38,14 +38,14 @@ def sample_record():
 
 
 def test_vectorize_incident(sample_record):
-    """Test functionality for test_vectorize_incident."""
+    """Validates that incident records are correctly transformed into numeric semantic vectors."""
     vec = _vectorize_incident(sample_record)
     assert len(vec) > 20
     assert vec[0] == 1.0  # EXOGENOUS_SURGE
 
 
 def test_cosine_similarity():
-    """Test functionality for test_cosine_similarity."""
+    """Verifies the mathematical correctness of the internal cosine similarity implementation."""
     v1 = [1.0, 0.0, 0.0]
     v2 = [1.0, 0.0, 0.0]
     v3 = [0.0, 1.0, 0.0]
@@ -55,7 +55,7 @@ def test_cosine_similarity():
 
 
 def test_search_similar_incidents():
-    """Test functionality for test_search_similar_incidents."""
+    """Validates the forensic search capability against the historical incident corpus."""
     res = search_similar_incidents(["EXOGENOUS_SURGE"], "stadium", "sports", 1.0)
     assert "similar_incidents" in res
     assert len(res["similar_incidents"]) == 3
@@ -101,7 +101,7 @@ async def test_run_incident_rag_query_success():
 
 @pytest.mark.asyncio
 async def test_run_incident_rag_query_fallback():
-    """Test functionality for test_run_incident_rag_query_fallback."""
+    """Validates the local search fallback mechanism when agentic model parsing fails."""
     with patch("agents.incident_rag_agent.InMemoryRunner") as MockRunner:
         mock_runner = MagicMock()
         MockRunner.return_value = mock_runner

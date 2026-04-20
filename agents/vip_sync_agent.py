@@ -60,7 +60,9 @@ def get_convoy_gps_position(event_id: str) -> dict:
     import random
 
     scheduled_arrival = datetime.now() + timedelta(minutes=-30)
-    estimated_actual = datetime.now() + timedelta(minutes=random.randint(45, 180))  # nosec B311
+    estimated_actual = datetime.now() + timedelta(
+        minutes=random.randint(45, 180)
+    )  # nosec B311
     delay_mins = int((estimated_actual - scheduled_arrival).total_seconds() / 60)
     return {
         "event_id": event_id,
@@ -133,9 +135,7 @@ def calculate_crowd_kinetic_energy(
                 else (
                     "HIGH"
                     if surge_coefficient >= 3.0
-                    else "MODERATE"
-                    if surge_coefficient >= 1.5
-                    else "LOW"
+                    else "MODERATE" if surge_coefficient >= 1.5 else "LOW"
                 )
             )
         ),

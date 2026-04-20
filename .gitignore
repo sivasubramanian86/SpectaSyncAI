@@ -4,6 +4,7 @@ knowledge/
 brain/
 scratch/
 .system_generated/
+!.gemini/
 
 # Python
 __pycache__/

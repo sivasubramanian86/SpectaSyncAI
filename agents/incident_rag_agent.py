@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Incident RAG Agent - @03 @05 @12
+"""SpectaSyncAI: Incident RAG Agent
 Powered by: google-adk + Gemini 2.5 Pro + pgvector (AlloyDB).
 
 Responsibility:
@@ -361,9 +361,7 @@ async def run_incident_rag_query(
             "combined_risk_level": (
                 "CRITICAL"
                 if capacity_ratio > 2.0
-                else "HIGH"
-                if capacity_ratio > 1.5
-                else "MODERATE"
+                else "HIGH" if capacity_ratio > 1.5 else "MODERATE"
             ),
             "priority_interventions": [
                 s["action"] for s in strategies["unified_interventions"][:5]

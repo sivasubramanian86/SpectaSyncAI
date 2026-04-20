@@ -1,5 +1,5 @@
 """SpectaSyncAI: Gen AI Context Cache Manager
-@19_cost_efficiency_architect - Framework Update (google-genai).
+# Standardized for unified Google Gen AI SDK (google-genai).
 
 Migrated from deprecated vertexai.preview.caching (Removal date: June 24, 2026).
 Uses the unified Google Gen AI SDK (google-genai) for high-fidelity context caching.
@@ -144,7 +144,7 @@ async def get_or_create_cache(
                 if c.display_name == cache_id:
                     logger.info(f"[ContextCache] Cache HIT: {cache_id}")
                     return c
-        except Exception:  # pragma: no cover
+        except Exception:  # pragma: no cover # nosec B110
             pass
 
         # 2. Create if absent

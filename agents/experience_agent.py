@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Experience Agent - @03 @05
+"""SpectaSyncAI: Experience Agent
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Generates real-time personalized recommendations for attendees
 to improve their event experience - optimal timing suggestions, food, seating,

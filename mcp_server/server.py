@@ -1,7 +1,6 @@
 """Provide 7 venue intervention tools for integrated preventative safety.
 
-@07_modern_polyglot_standards: PORT from env, structured logging,
-Cloud Run compatible.
+Standardized port configuration, structured logging, and Cloud Run compatibility.
 """
 
 from __future__ import annotations
@@ -257,6 +256,8 @@ if __name__ == "__main__":  # pragma: no cover
 
     # Configure FastMCP instance settings for SSE Uvicorn transport
     mcp.settings.port = port
-    mcp.settings.host = os.getenv("MCP_HOST", "0.0.0.0")  # nosec B104 (Binds to all for Cloud Run)
+    mcp.settings.host = os.getenv(
+        "MCP_HOST", "0.0.0.0"
+    )  # nosec B104 (Binds to all for Cloud Run)
 
     mcp.run(transport="sse")

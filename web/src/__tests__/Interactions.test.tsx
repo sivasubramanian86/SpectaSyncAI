@@ -2,6 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from '../App';
 
+/**
+ * SpectaSyncAI: User Interaction Integration Tests
+ * 
+ * Orchestrates high-fidelity simulation of user clickstreams and tab 
+ * transitions to verify the integrity of the agentic Command Hub UI.
+ */
 describe('User Interactions', () => {
   it('interacts with VenueHeatmap zones', () => {
     render(<App />);

@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Prediction Agent - @03 @05
+"""SpectaSyncAI: Prediction Agent
 Powered by: google-adk + Gemini 2.5 Pro
 Responsibility: AI-driven surge forecasting 15-30 minutes ahead using
 historical AlloyDB patterns + current telemetry trend analysis.

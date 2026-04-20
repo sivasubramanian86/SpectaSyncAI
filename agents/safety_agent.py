@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Safety Agent - @03 @05 @04
+"""SpectaSyncAI: Safety Agent
 Powered by: google-adk + Gemini 2.5 Pro
 Responsibility: Emergency detection from sensor anomalies, triggering
 automated evacuation protocols and emergency service coordination.
@@ -124,7 +124,7 @@ def build_safety_agent() -> LlmAgent:
 async def run_safety_assessment(
     location_id: str, density_score: float, rate_of_change: float = 0.02
 ) -> dict:
-    """Executes the Safety Agent for a venue zone with anomalous metrics.
+    """Provide the Safety Agent for emergency detection and coordination.
 
     Args:
     ----

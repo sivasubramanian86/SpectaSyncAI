@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Failsafe Mesh Agent - @03 @05
+"""SpectaSyncAI: Failsafe Mesh Agent
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: INFRA_FAILURE.
 
@@ -68,15 +68,17 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
 
     infra_components = []
     for zone in zones:
-        power_load = random.uniform(0.4, 1.6)
+        power_load = random.uniform(0.4, 1.6)  # nosec B311
         infra_components.append(
             {
                 "zone": zone,
                 "mains_power_load_ratio": round(power_load, 2),
-                "pa_system_status": "FAILED" if random.random() < 0.3 else "ONLINE",
-                "led_network_ping_ms": random.randint(10, 9000),
-                "emergency_lighting_battery_pct": random.randint(12, 100),
-                "ble_beacon_heartbeat": random.random() > 0.15,
+                "pa_system_status": (
+                    "FAILED" if random.random() < 0.3 else "ONLINE"
+                ),  # nosec B311
+                "led_network_ping_ms": random.randint(10, 9000),  # nosec B311
+                "emergency_lighting_battery_pct": random.randint(12, 100),  # nosec B311
+                "ble_beacon_heartbeat": random.random() > 0.15,  # nosec B311
                 "failure_probability_pct": (
                     round(min(100, (power_load - 0.8) * 80), 1)
                     if power_load > 0.8

@@ -1,5 +1,4 @@
 """SpectaSyncAI: Google Cloud Pub/Sub Service
-@17 @10 @01.
 
 High-fidelity broadcast service for agentic incident escalation.
 Used to trigger downstream civil defense notifications and HITL workflows.

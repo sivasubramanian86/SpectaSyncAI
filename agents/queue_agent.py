@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Queue Agent - @03 @05
+"""SpectaSyncAI: Queue Agent
 Powered by: google-adk + Gemini 2.5 Flash
 Responsibility: Real-time wait time estimation across all venue service points
 (entry gates, food concessions, restrooms, merchandise stands).
@@ -50,7 +50,7 @@ def get_zone_queue_snapshot(zone_id: str) -> dict:
     config = VENUE_ZONES.get(
         zone_id, {"capacity": 100, "staff_count": 2, "service_rate_per_min": 10}
     )
-    queue_length = random.randint(5, int(config["capacity"] * 0.9))
+    queue_length = random.randint(5, int(config["capacity"] * 0.9))  # nosec B311
     return {
         "zone_id": zone_id,
         "queue_length": queue_length,
@@ -94,9 +94,7 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
         "recommendation": (
             "Immediate additional staff required"
             if priority == "CRITICAL"
-            else "Monitor closely"
-            if priority == "HIGH"
-            else "No action needed"
+            else "Monitor closely" if priority == "HIGH" else "No action needed"
         ),
     }
 

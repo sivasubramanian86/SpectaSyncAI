@@ -1,5 +1,5 @@
 """SpectaSyncAI: AlloyDB Memory Module
-@11_database_architect + @19_cost_efficiency_architect compliant.
+# Hardened for AlloyDB with pgvector and asyncpg connection pooling.
 
 Provides:
   - Connection pool (asyncpg Pool - NOT per-call connect)
@@ -29,7 +29,7 @@ EMBEDDING_MODEL = "text-embedding-004"  # 768 dimensions, Vertex AI
 async def _get_pool():
     """Returns the asyncpg connection pool singleton.
     Creates it on first call. Pool size tuned for Cloud Run concurrency.
-    @11_database_architect: pool_pre_ping equivalent via asyncpg keepalives.
+    Implements pool_pre_ping equivalent via asyncpg keepalives.
     """
     global _POOL
     if _POOL is not None:

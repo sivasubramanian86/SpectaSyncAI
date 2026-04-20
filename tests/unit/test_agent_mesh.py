@@ -42,14 +42,14 @@ from agents import (
     ],
 )
 def test_agent_builders(build_fn, expected_name):
-    """Test functionality for test_agent_builders."""
+    """Verifies that each agent builder correctly initializes the ADK Agent with expected metadata."""
     agent = build_fn()
     assert agent.name == expected_name
 
 
 @pytest.mark.asyncio
 async def test_build_orchestrator_agent():
-    """Test functionality for test_build_orchestrator_agent."""
+    """Validates orchestrator initialization including MCP tool integration."""
     with patch("agents.orchestrator.MCPToolset") as MockToolset:
         MockToolset.return_value.load_tools = AsyncMock(return_value=[])
         agent = await build_orchestrator_agent()
@@ -57,12 +57,12 @@ async def test_build_orchestrator_agent():
 
 
 async def mock_runner_gen(mock_event):
-    """Test functionality for mock_runner_gen."""
+    """Helper generator to simulate async event streams for agentic runners."""
     yield mock_event
 
 
 def setup_mock_runner(MockRunner, response_text):
-    """Test functionality for setup_mock_runner."""
+    """Utility to configure complex InMemoryRunner mocks with predictable final responses."""
     mock_runner = MagicMock()
     MockRunner.return_value = mock_runner
 
@@ -80,7 +80,7 @@ def setup_mock_runner(MockRunner, response_text):
 
 @pytest.mark.asyncio
 async def test_run_queue_analysis():
-    """Test functionality for test_run_queue_analysis."""
+    """Tests queue analysis endpoint for correct parsing of multimodal agent feedback."""
     with patch("agents.queue_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '[{"wait_time": 15}]')
         result = await run_queue_analysis(["STAND_1"])
@@ -89,7 +89,7 @@ async def test_run_queue_analysis():
 
 @pytest.mark.asyncio
 async def test_run_experience_recommendations():
-    """Test functionality for test_run_experience_recommendations."""
+    """Validates the generation of hyper-personalized fan engagement metrics."""
     with patch("agents.experience_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"engagement_score": 0.9}')
         result = await run_experience_recommendations("EVENT_1")
@@ -98,7 +98,7 @@ async def test_run_experience_recommendations():
 
 @pytest.mark.asyncio
 async def test_run_perimeter_assessment():
-    """Test functionality for test_run_perimeter_assessment."""
+    """Tests perimeter macro agents for threshold-based breach predictive capabilities."""
     with patch("agents.perimeter_macro_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"breach_probability": 0.2}')
         result = await run_perimeter_assessment("VENUE_1", "560001", ["STATION_1"])
@@ -107,7 +107,7 @@ async def test_run_perimeter_assessment():
 
 @pytest.mark.asyncio
 async def test_run_vip_sync_monitoring():
-    """Test functionality for test_run_vip_sync_monitoring."""
+    """Validates VIP safety agent telemetry synchronization logic."""
     with patch("agents.vip_sync_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"kinetic_energy": 0.5}')
         result = await run_vip_sync_monitoring("EVT_1", "VENUE_1", 1000, 0.5)
@@ -116,7 +116,7 @@ async def test_run_vip_sync_monitoring():
 
 @pytest.mark.asyncio
 async def test_run_rumor_monitoring():
-    """Test functionality for test_run_rumor_monitoring."""
+    """Tests rumor control agent's ability to isolate local disinformation events."""
     with patch("agents.rumor_control_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"rumor_detected": true}')
         result = await run_rumor_monitoring("VENUE_1")
@@ -125,7 +125,7 @@ async def test_run_rumor_monitoring():
 
 @pytest.mark.asyncio
 async def test_run_failsafe_monitoring():
-    """Test functionality for test_run_failsafe_monitoring."""
+    """Validates the hierarchy-aware mesh agent's final consensus logic."""
     with patch("agents.failsafe_mesh_agent.InMemoryRunner") as MockRunner:
         setup_mock_runner(MockRunner, '{"failsafe_active": false}')
         result = await run_failsafe_monitoring("VENUE_1", ["ZONE_1"])

@@ -46,6 +46,7 @@ export function MultiModalHub() {
   const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
   const [language, setLanguage] = useState('EN');
   const [frameIdx, setFrameIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   // Auto-cycle frames for sequences
   useEffect(() => {
@@ -134,16 +135,22 @@ export function MultiModalHub() {
                  )}
                </div>
              )}
-             {activeMedia.type === 'audio' && (
-               <div className="w-full h-full flex flex-col items-center justify-center bg-black/40 backdrop-blur-3xl rounded-2xl overflow-hidden relative">
-                  <AudioVisualizer isActive={true} />
-                  <Mic size={48} className="text-blue-400 mb-2 animate-pulse" />
-                  <p className="text-xs text-slate-300 uppercase font-black tracking-widest">
-                    Analysis in Progress: Distress Transients Detected
-                  </p>
-                  <audio key={currentUrl} src={currentUrl} autoPlay hidden />
-               </div>
-             )}
+              {activeMedia.type === 'audio' && (
+                <div 
+                  className="w-full h-full flex flex-col items-center justify-center bg-black/40 backdrop-blur-3xl rounded-2xl overflow-hidden relative"
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  style={{ cursor: 'pointer' }}
+                >
+                   <AudioVisualizer isActive={isPlaying} />
+                   <div className="flex items-center gap-3 mb-2">
+                     <Mic size={48} className={`text-blue-400 ${isPlaying ? 'animate-pulse' : 'opacity-40'}`} />
+                   </div>
+                   <p className="text-xs text-slate-300 uppercase font-black tracking-widest">
+                     {isPlaying ? 'Analysis in Progress: Distress Transients Detected' : 'Feed Paused'}
+                   </p>
+                   <audio key={currentUrl} src={currentUrl} autoPlay={isPlaying} hidden />
+                </div>
+              )}
              
              <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                 <div className="flex gap-2 text-left">

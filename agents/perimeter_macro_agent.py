@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Perimeter Macro Agent - @03 @05
+"""SpectaSyncAI: Perimeter Macro Agent
 Powered by: google-adk + Gemini 2.5 Pro
 Failure Mode Addressed: EXOGENOUS_SURGE.
 
@@ -68,7 +68,7 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
     """
     import random
 
-    load_ratio = random.uniform(2.8, 6.5)
+    load_ratio = random.uniform(2.8, 6.5)  # nosec B311
     estimated_people = int(load_ratio * 38_000)
     return {
         "area_code": area_code,
@@ -104,7 +104,7 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
 
     stations = []
     for sid in station_ids:
-        ratio = random.uniform(1.5, 4.2)
+        ratio = random.uniform(1.5, 4.2)  # nosec B311
         stations.append(
             {
                 "station_id": sid,
@@ -121,9 +121,7 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
         "aggregate_alert_level": (
             "CRITICAL"
             if total_incoming > 80_000
-            else "HIGH"
-            if total_incoming > 40_000
-            else "MODERATE"
+            else "HIGH" if total_incoming > 40_000 else "MODERATE"
         ),
     }
 

@@ -16,7 +16,7 @@ client = TestClient(app, raise_server_exceptions=False)
 
 @pytest.mark.asyncio
 async def test_assess_perimeter_fallback():
-    """Test functionality for test_assess_perimeter_fallback."""
+    """Validates perimeter safety fallback when the macro agent encounters a network or reasoning timeout."""
     with patch(
         "api.routers.crisis.run_perimeter_assessment",
         side_effect=Exception("Simulated error"),
@@ -104,7 +104,7 @@ async def test_query_incident_rag_fallback():
 
 @pytest.mark.asyncio
 async def test_ingest_telemetry_fallback():
-    """Test functionality for test_ingest_telemetry_fallback."""
+    """Verifies telemetry ingestion resilience, ensuring base64 validation and vision fallback logic are both hit."""
     with patch(
         "api.routers.telemetry.run_vision_analysis",
         side_effect=Exception("Vision error"),
@@ -145,7 +145,7 @@ async def test_orchestration_fallback():
 
 
 def test_favicon():
-    """Test functionality for test_favicon."""
+    """Ensures that even minor static assets like placeholders are served without breaking the dashboard router."""
     response = client.get("/favicon.ico")
     assert response.status_code == 200
 
@@ -162,7 +162,7 @@ def test_serve_dashboard_static_logic():
 
 @pytest.mark.asyncio
 async def test_vision_agent_gcs_failure():
-    """Test functionality for test_vision_agent_gcs_failure."""
+    """Simulates GCS bucket permission issues to verify the vision agent's 'Local Sandbox' archiving failover."""
     from agents.vision_agent import archive_to_gcs
 
     with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "p", "GCS_ENABLED": "1"}):

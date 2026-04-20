@@ -1,7 +1,4 @@
-"""Provide the FastAPI entry point for the 12-Agent real-time crowd intelligence mesh.
-
-@07_modern_polyglot_standards | @19_cost_efficiency_architect.
-
+"""SpectaSyncAI: Main Command Center API
 Startup sequence:
   1. Context cache warm-up   (Vertex AI CachedContent, 6-hour TTL)
   2. Router registration     (Tier 1 + Tier 2)

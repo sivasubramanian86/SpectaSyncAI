@@ -1,4 +1,4 @@
-"""SpectaSyncAI: Rumor Control Agent - @03 @05
+"""SpectaSyncAI: Rumor Control Agent
 Powered by: google-adk + Gemini 2.5 Flash
 Failure Mode Addressed: INFO_CASCADE.
 
@@ -106,10 +106,14 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
                 rumors_detected.append(
                     {
                         "category": category,
-                        "severity": round(base_score + random.uniform(-0.05, 0.10), 2),
-                        "viral_velocity_per_5min": random.randint(800, 8500),
+                        "severity": round(
+                            base_score + random.uniform(-0.05, 0.10), 2
+                        ),  # nosec B311
+                        "viral_velocity_per_5min": random.randint(
+                            800, 8500
+                        ),  # nosec B311
                         "sample_text_hash": hex(abs(hash(post)))[:10],
-                        "platform": random.choice(
+                        "platform": random.choice(  # nosec B311
                             ["platform_A", "platform_B", "messaging_app"]
                         ),
                     }
@@ -129,9 +133,7 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
             else (
                 "HIGH"
                 if max_severity >= 0.65
-                else "MODERATE"
-                if max_severity >= 0.4
-                else "CLEAR"
+                else "MODERATE" if max_severity >= 0.4 else "CLEAR"
             )
         ),
         "analogous_incidents": [
@@ -167,9 +169,7 @@ def classify_rumor_risk(rumor_text: str, category: str, viral_velocity: int) -> 
         "risk_level": (
             "CRITICAL"
             if viral_velocity > 5000
-            else "HIGH"
-            if viral_velocity > 1000
-            else "MODERATE"
+            else "HIGH" if viral_velocity > 1000 else "MODERATE"
         ),
         "counter_broadcast_urgency_secs": 12 if viral_velocity > 1000 else 60,
         "required_channels": broadcast_channels,
