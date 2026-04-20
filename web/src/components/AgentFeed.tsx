@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Bot, Eye, Brain, ShieldAlert, Clock, Sparkles, 
   Cpu, Globe, Crown, Megaphone, Network, Search 
@@ -41,11 +42,12 @@ const EVENT_TYPE_COLOR: Record<string, string> = {
  * @returns {React.ReactElement} The rendered agent feed section.
  */
 export function AgentFeed({ events }: AgentFeedProps) {
+  const { t } = useTranslation();
   return (
     <section className="glass p-5 flex flex-col h-full overflow-hidden" aria-label="Live agent activity feed">
       <div className="flex items-center gap-2 mb-3">
         <Bot size={16} className="text-purple-400" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-slate-200">Agent Mesh Activity</h2>
+        <h2 className="text-sm font-semibold text-slate-200">{t('headers.agents')}</h2>
         <div className="ml-auto flex items-center gap-2">
            <div className="flex gap-0.5 items-center">
              <div className="w-1 h-3 bg-blue-500/40 animate-pulse" />

@@ -5,7 +5,7 @@
  */
 import React, { useState } from 'react';
 import { useDashboardData } from './hooks/useDashboardData';
-import { TRANSLATIONS } from './translations';
+import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import type { TabId } from './components/Header';
 import { StatCards } from './components/StatCards';
@@ -29,15 +29,15 @@ import { Bot } from 'lucide-react';
 import './index.css';
 
 export default function App(): React.ReactElement {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const dashState = useDashboardData();
-  const [language, setLanguage] = useState('EN');
+  const [language, setLanguage] = useState(i18n.language.toUpperCase());
 
   const criticalZones = dashState.zones.filter(z => z.level === 'CRITICAL' || z.level === 'EMERGENCY');
   const avgDensity = dashState.zones.reduce((s, z) => s + z.density, 0) / dashState.zones.length;
   const activeInterventions = dashState.agentFeed.filter(e => e.event_type === 'intervention').length;
 
-  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
 
   return (
     <div className="h-screen font-sans bg-navy-950 text-slate-100 flex flex-col overflow-hidden">
@@ -52,7 +52,7 @@ export default function App(): React.ReactElement {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
           </span>
           <p className="text-red-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-            {t.alerts.critical}: {criticalZones.map(z => z.label).join(', ')} — {t.alerts.failsafe}.
+            {t('alerts.critical')}: {criticalZones.map(z => z.label).join(', ')} — {t('alerts.failsafe')}.
           </p>
         </div>
       )}
@@ -78,7 +78,6 @@ export default function App(): React.ReactElement {
                   totalZones={dashState.zones.length}
                   activeInterventions={activeInterventions}
                   agentCount={12}
-                  language={language}
                 />
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                    <div className="xl:col-span-2 space-y-6">
@@ -87,22 +86,22 @@ export default function App(): React.ReactElement {
                    </div>
                    <div className="space-y-6">
                       <div className="glass p-5">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t.headers.performance}</h3>
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t('headers.performance')}</h3>
                         <MeshPerformanceRadar />
                       </div>
-                      <QueueBoard zones={dashState.zones} language={language} />
+                      <QueueBoard zones={dashState.zones} />
                    </div>
                    <div className="space-y-6">
-                     <div className="glass p-5">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t.headers.sentiment}</h3>
+                      <div className="glass p-5">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t('headers.sentiment')}</h3>
                         <SentimentPie />
                         <div className="mt-4 space-y-2">
                           <div className="flex justify-between text-[10px] uppercase"><span className="text-slate-500">Stability Index</span><span className="text-emerald-400">92%</span></div>
                           <div className="flex justify-between text-[10px] uppercase"><span className="text-slate-500">Cohesion Rate</span><span className="text-blue-400">High</span></div>
                         </div>
                      </div>
-                     <div className="glass p-5">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t.headers.health}</h3>
+                      <div className="glass p-5">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">{t('headers.health')}</h3>
                         <div className="space-y-4">
                          <div className="flex justify-between text-xs"><span className="text-slate-500 text-[10px] uppercase">API Latency</span><span className="text-emerald-400">12ms</span></div>
                          <div className="flex justify-between text-xs"><span className="text-slate-500 text-[10px] uppercase">RAG Memory</span><span className="text-blue-400">4.2GB</span></div>
@@ -116,7 +115,7 @@ export default function App(): React.ReactElement {
 
             {activeTab === 'vision' && (
               <div className="space-y-6 animate-fade-in">
-                <MultiModalHub language={language} onLanguageChange={setLanguage} />
+                <MultiModalHub />
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   <div className="lg:col-span-3 space-y-6">
                     <VenueMap className="rounded-2xl border border-white/5 shadow-2xl" />

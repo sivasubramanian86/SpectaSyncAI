@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
-import { TRANSLATIONS } from '../translations';
 
 type MediaType = 'video' | 'audio' | 'image';
 
@@ -17,10 +16,6 @@ interface MediaSource {
  * Props for MultiModalHub component.
  */
 interface MultiModalHubProps {
-  /** Current active system language. */
-  language: string;
-  /** Callback to change language. */
-  onLanguageChange: (lang: string) => void;
 }
 
 function AudioVisualizer({ isActive }: { isActive: boolean }) {
@@ -53,7 +48,8 @@ const SAMPLE_MEDIA: MediaSource[] = [
  * 
  * @returns {React.ReactElement} The multi-modal analysis hub.
  */
-export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps) {
+export function MultiModalHub() {
+  const { t, i18n } = useTranslation();
   const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -74,9 +70,6 @@ export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps
     ? (activeMedia.url as string[])[frameIdx] 
     : (activeMedia.url as string);
 
-  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
-  const mt = t.multiModal || { title: 'Multi-Modal Intelligence', reco: 'AI Recommendation', action: 'Close Entry Gate 3 immediately & redirect flow to Sector 4.' };
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
@@ -85,7 +78,7 @@ export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps
             <MonitorPlay size={20} className="text-blue-400" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white uppercase tracking-wider">{mt.title}</h2>
+            <h2 className="text-sm font-black text-white tracking-widest uppercase mb-1">{t('multiModal.title')}</h2>
             <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.5 Flash Multi-Modal</p>
           </div>
         </div>
@@ -93,8 +86,8 @@ export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps
         <div className="flex items-center gap-2">
           <Globe size={14} className="text-slate-500" />
           <select 
-            value={language}
-            onChange={(e) => onLanguageChange(e.target.value)}
+            value={i18n.language}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
             aria-label="Select Language"
             className="bg-navy-900 border border-white/10 rounded px-3 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
           >
@@ -218,7 +211,7 @@ export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps
         <div className="space-y-6">
             <div className="glass p-5 border-l-4 border-l-blue-500">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">{mt.reco}</h3>
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('multiModal.reco')}</h3>
                 <ShieldAlert size={14} className={activeMedia.status === 'CRITICAL' ? 'text-red-500' : 'text-amber-500'} />
               </div>
               
@@ -236,10 +229,10 @@ export function MultiModalHub({ language, onLanguageChange }: MultiModalHubProps
                 </div>
 
                 <div className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
-                  <p className="text-[10px] text-blue-400 font-bold uppercase mb-1">{mt.reco} ({language})</p>
-                  <p className="text-sm text-white font-semibold leading-relaxed">
-                    {mt.action}
-                  </p>
+                  <span className="text-blue-500 font-bold">{t('multiModal.reco')}</span>
+                <p className="text-[10px] leading-relaxed text-slate-100 font-medium">
+                  {t('multiModal.action')}
+                </p>
                 </div>
               </div>
            </div>

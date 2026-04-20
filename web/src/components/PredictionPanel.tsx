@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, AlertTriangle, Clock } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -33,6 +34,7 @@ export const densityFormatter = (v: number) => [`${v.toFixed(1)}%`, 'Density'];
  * PredictionPanel — AI surge forecast chart with recharts + actionable recommendations.
  */
 export function PredictionPanel({ forecast }: PredictionPanelProps): React.ReactElement {
+  const { t } = useTranslation();
   const chartData = buildChartData(forecast);
   const peakColor = LEVEL_COLOR[forecast.surge_level];
 
@@ -41,7 +43,7 @@ export function PredictionPanel({ forecast }: PredictionPanelProps): React.React
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <TrendingUp size={16} className="text-purple-400" aria-hidden="true" />
-          <h2 className="text-sm font-semibold text-slate-200">AI Surge Forecast — {forecast.location_id}</h2>
+          <h2 className="text-sm font-semibold text-slate-200">{t('headers.forecast')} — {forecast.location_id}</h2>
         </div>
         <div className="flex items-center gap-3">
           <span className="badge-critical text-xs flex items-center gap-1">

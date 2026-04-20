@@ -47,35 +47,35 @@ function StatCard({
 /**
  * Top-level summary metrics row for the Command Center.
  */
-import { TRANSLATIONS } from '../translations';
+import { useTranslation } from 'react-i18next';
 
-export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount, language }: StatCardsProps): ReactElement {
-  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
+export function StatCards({ avgDensity, criticalCount, totalZones, activeInterventions, agentCount }: StatCardsProps): ReactElement {
+  const { t } = useTranslation();
   return (
     <section aria-label="Venue summary statistics" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       <StatCard
         icon={<Users size={18} className="text-blue-300" aria-hidden="true" />}
-        label={t.stats.density}
+        label={t('stats.density')}
         value={`${Math.round(avgDensity * 100)}`}
         unit="%"
         color="bg-blue-500/15"
       />
       <StatCard
         icon={<AlertTriangle size={18} className="text-red-300" aria-hidden="true" />}
-        label={t.stats.critical}
+        label={t('stats.critical')}
         value={`${criticalCount}`}
         unit={`/ ${totalZones}`}
         color={criticalCount > 0 ? 'bg-red-500/20' : 'bg-emerald-500/15'}
       />
       <StatCard
         icon={<Activity size={18} className="text-amber-300" aria-hidden="true" />}
-        label={t.stats.interventions}
+        label={t('stats.interventions')}
         value={`${activeInterventions}`}
         color="bg-amber-500/15"
       />
       <StatCard
         icon={<Cpu size={18} className="text-purple-300" aria-hidden="true" />}
-        label={t.stats.agents}
+        label={t('stats.agents')}
         value={`${agentCount}`}
         color="bg-purple-500/15"
       />

@@ -17,10 +17,12 @@ export const TRANSLATIONS: Record<string, any> = {
        faq: 'FAQ'
     },
     headers: {
-       performance: 'Mesh Sync Performance',
+       queue: 'Queue Wait Times',
+       forecast: 'AI Surge Forecast',
+       agents: 'Agent Mesh Activity',
        sentiment: 'Crowd Sentiment',
-       health: 'System Health',
-       queue: 'Queue Wait Times'
+       performance: 'Mesh Sync Performance',
+       health: 'System Health'
     },
     status: {
        active: 'Active',

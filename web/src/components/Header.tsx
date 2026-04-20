@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, ShieldAlert, Database, Command, Users, Settings, HelpCircle, Info, Compass, Globe, ChevronDown, MoreHorizontal } from 'lucide-react';
-import { TRANSLATIONS } from '../translations';
+import { useTranslation } from 'react-i18next';
 import * as firebase from '../firebase';
 import type { User } from 'firebase/auth';
 
@@ -29,10 +29,10 @@ interface HeaderProps {
  * Provides global navigation and system status overlays.
  */
 export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, onTabChange, language, onLanguageChange }) => {
+  const { t, i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const t = TRANSLATIONS[language] || TRANSLATIONS.EN;
 
   const handleGoogleSignIn = async () => {
     try {
@@ -65,15 +65,15 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
   }, []);
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: 'dashboard', label: t.tabs.dashboard, icon: <Activity size={18} /> },
-    { id: 'vision', label: t.tabs.vision, icon: <Database size={18} /> },
-    { id: 'pre-event', label: t.tabs.strategic, icon: <Compass size={18} /> },
-    { id: 'crisis', label: t.tabs.crisis, icon: <ShieldAlert size={18} /> },
-    { id: 'intelligence', label: t.tabs.intelligence, icon: <Command size={18} /> },
-    { id: 'demographics', label: t.tabs.demographics, icon: <Users size={18} /> },
-    { id: 'system', label: t.tabs.settings, icon: <Settings size={18} /> },
-    { id: 'about', label: t.tabs.info, icon: <Info size={18} /> },
-    { id: 'faq', label: t.tabs.faq, icon: <HelpCircle size={18} /> },
+    { id: 'dashboard', label: t('tabs.dashboard'), icon: <Activity size={18} /> },
+    { id: 'vision', label: t('tabs.vision'), icon: <Database size={18} /> },
+    { id: 'pre-event', label: t('tabs.strategic'), icon: <Compass size={18} /> },
+    { id: 'crisis', label: t('tabs.crisis'), icon: <ShieldAlert size={18} /> },
+    { id: 'intelligence', label: t('tabs.intelligence'), icon: <Command size={18} /> },
+    { id: 'demographics', label: t('tabs.demographics'), icon: <Users size={18} /> },
+    { id: 'system', label: t('tabs.settings'), icon: <Settings size={18} /> },
+    { id: 'about', label: t('tabs.info'), icon: <Info size={18} /> },
+    { id: 'faq', label: t('tabs.faq'), icon: <HelpCircle size={18} /> },
   ];
 
   return (
@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
               <div className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
-                  {isLive ? t.status.active : t.status.offline} • {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  {isLive ? t('status.active') : t('status.offline')} • {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
               </div>
             </div>
@@ -154,8 +154,12 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
           <div className="flex items-center gap-1.5 glass px-2 2xl:px-3 py-1.5 border-white/5 group bg-white/5">
             <Globe size={14} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
             <select 
-              value={language}
-              onChange={(e) => onLanguageChange(e.target.value)}
+              value={i18n.language.slice(0, 2).toUpperCase()}
+              onChange={(e) => {
+                const lang = e.target.value.toLowerCase();
+                i18n.changeLanguage(lang);
+                onLanguageChange(e.target.value);
+              }}
               className="bg-transparent border-none text-[10px] font-bold text-slate-400 focus:ring-0 cursor-pointer hover:text-white uppercase tracking-widest outline-none"
               aria-label="Select Language"
             >
