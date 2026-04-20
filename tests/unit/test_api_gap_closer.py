@@ -1,12 +1,19 @@
 from unittest.mock import patch, AsyncMock
 import pytest
 from fastapi.testclient import TestClient
+
 from api.main import app
 
-client = TestClient(app)
+@pytest.fixture(autouse=True)
+def mock_startup_tasks():
+    with patch(
+        "api.routers.pre_event.trigger_pre_event_analysis", new_callable=AsyncMock
+    ), patch("agents.context_cache.warm_all_caches", new_callable=AsyncMock):
+        yield
 
 
 def test_api_gaps():
+    client = TestClient(app)
     # Mock agent calls to avoid quota issues and latency
     with patch(
         "api.routers.pre_event.run_pre_event_analysis", new_callable=AsyncMock
@@ -92,6 +99,7 @@ def test_api_gaps():
 
 
 def test_exception_handler():
+    client = TestClient(app)
     response = client.get("/v1/non-existent-endpoint")
     assert response.status_code == 404
 
@@ -102,6 +110,7 @@ def test_internal_error_handler():
 
 @pytest.mark.asyncio
 async def test_lifespan():
+    # Verify lifespan shell works without side effects
     with TestClient(app) as local_client:
         response = local_client.get("/v1/health")
         assert response.status_code == 200
