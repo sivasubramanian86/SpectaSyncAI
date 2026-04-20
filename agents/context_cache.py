@@ -171,7 +171,7 @@ async def get_or_create_cache(
                 if c.display_name == cache_id:
                     logger.info(f"[ContextCache] Cache HIT: {cache_id}")
                     return c
-        except Exception as exc:  # pragma: no cover # nosec B110
+        except Exception as exc:  # pragma: no cover
             logger.debug(f"[ContextCache] Failed to list caches: {exc}")
 
         # 2. Create if absent

@@ -257,8 +257,6 @@ if __name__ == "__main__":  # pragma: no cover
 
     # Configure FastMCP instance settings for SSE Uvicorn transport
     mcp.settings.port = port
-    mcp.settings.host = os.getenv(
-        "MCP_HOST", "0.0.0.0"  # noqa: S104
-    )
+    mcp.settings.host = os.getenv("MCP_HOST", "0.0.0.0")  # nosec B104 # noqa: S104
 
     mcp.run(transport="sse")
