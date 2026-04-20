@@ -24,7 +24,7 @@ vi.mock('recharts', async () => {
 
 describe('Coverage Hardening Tests', () => {
   it('covers the video branch and language fallback in MultiModalHub', async () => {
-    render(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
+    render(<MultiModalHub />);
     
     // Switch to Video
     const videoBtn = screen.getByText(/Drone Patrol/i); 

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
 
@@ -12,11 +13,6 @@ interface MediaSource {
   status: 'SAFE' | 'WARNING' | 'CRITICAL';
 }
 
-/**
- * Props for MultiModalHub component.
- */
-interface MultiModalHubProps {
-}
 
 function AudioVisualizer({ isActive }: { isActive: boolean }) {
   return (

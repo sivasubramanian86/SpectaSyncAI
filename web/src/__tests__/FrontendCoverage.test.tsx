@@ -278,7 +278,7 @@ describe('User Interaction Tests', () => {
   });
 
   it('AudioVisualizer handles isActive state changes', () => {
-    render(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
+    render(<MultiModalHub />);
     
     // Switch to audio
     const audioBtn = screen.getByText(/Panic Signature/);
@@ -298,22 +298,19 @@ describe('User Interaction Tests', () => {
   });
 
   it('MultiModalHub renders and switches media', () => {
-    const onLanguageChange = vi.fn();
-    const { rerender } = render(<MultiModalHub language="EN" onLanguageChange={onLanguageChange} />);
+    const { rerender } = render(<MultiModalHub />);
     const select = screen.getByLabelText('Select Language');
     
     // Test Hindi
     fireEvent.change(select, { target: { value: 'HI' } });
-    expect(onLanguageChange).toHaveBeenCalledWith('HI');
     
-    // Re-render with new language to verify title change
-    rerender(<MultiModalHub language="HI" onLanguageChange={onLanguageChange} />);
+    // Re-render to verify title change (i18next handles this now, but rerender is safe)
+    rerender(<MultiModalHub />);
     expect(screen.getByText(TRANSLATIONS.HI.multiModal.title)).toBeInTheDocument();
 
     // Test Japanese
     fireEvent.change(select, { target: { value: 'JA' } });
-    expect(onLanguageChange).toHaveBeenCalledWith('JA');
-    rerender(<MultiModalHub language="JA" onLanguageChange={onLanguageChange} />);
+    rerender(<MultiModalHub />);
     expect(screen.getByText(TRANSLATIONS.JA.multiModal.title)).toBeInTheDocument();
   });
 

@@ -15,8 +15,6 @@ interface StatCardsProps {
   activeInterventions: number;
   /** Total number of active agents in the Google ADK mesh. */
   agentCount: number;
-  /** Current system language. */
-  language: string;
 }
 
 function StatCard({

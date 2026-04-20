@@ -32,7 +32,7 @@ export default function App(): React.ReactElement {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const dashState = useDashboardData();
-  const [language, setLanguage] = useState(i18n.language.toUpperCase());
+  const [, setLanguage] = useState(i18n.language.toUpperCase());
 
   const criticalZones = dashState.zones.filter(z => z.level === 'CRITICAL' || z.level === 'EMERGENCY');
   const avgDensity = dashState.zones.reduce((s, z) => s + z.density, 0) / dashState.zones.length;
@@ -62,7 +62,6 @@ export default function App(): React.ReactElement {
         isLive={dashState.isLive} 
         activeTab={activeTab} 
         onTabChange={setActiveTab} 
-        language={language}
         onLanguageChange={setLanguage}
       />
 
@@ -145,7 +144,7 @@ export default function App(): React.ReactElement {
                     </div>
                   </div>
                   <div className="space-y-6">
-                    <QueueBoard zones={dashState.zones} language={language} />
+                    <QueueBoard zones={dashState.zones} />
                     <div className="glass p-5">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Flow Velocity</h3>
                       <div className="space-y-4">

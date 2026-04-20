@@ -63,7 +63,6 @@ describe('Resilience and Coverage Hardening', () => {
         isLive={true} 
         activeTab="dashboard" 
         onTabChange={() => {}} 
-        language="EN"
         onLanguageChange={() => {}}
       />
     );
@@ -77,7 +76,7 @@ describe('Resilience and Coverage Hardening', () => {
   });
 
   it('AudioVisualizer handles isActive state changes', () => {
-    const { rerender } = render(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
+    const { rerender } = render(<MultiModalHub />);
     
     // Default state check (usually images/video not audio)
     // Find audio tab
@@ -91,7 +90,7 @@ describe('Resilience and Coverage Hardening', () => {
     expect(screen.getAllByRole('img', { hidden: true })).toBeDefined(); // Lucide icons
     
     // Rerender to ensure both paths of isActive are hit in internal components
-    rerender(<MultiModalHub language="EN" onLanguageChange={() => {}} />);
+    rerender(<MultiModalHub />);
   });
 
   it('useDashboardData polling loop handles exceptions', async () => {

@@ -18,8 +18,6 @@ interface HeaderProps {
   activeTab: TabId;
   /** Callback triggered when the user switches tabs. */
   onTabChange: (tab: TabId) => void;
-  /** Current active language code. */
-  language: string;
   /** Callback to change system language. */
   onLanguageChange: (lang: string) => void;
 }
@@ -28,7 +26,7 @@ interface HeaderProps {
  * Header Component
  * Provides global navigation and system status overlays.
  */
-export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, onTabChange, language, onLanguageChange }) => {
+export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, onTabChange, onLanguageChange }) => {
   const { t, i18n } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
