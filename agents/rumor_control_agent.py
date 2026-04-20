@@ -26,6 +26,7 @@ import json
 import logging
 import re
 import time
+import secrets
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
@@ -89,7 +90,6 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
         dict: Detected rumors with severity scores and viral velocity.
 
     """
-    import random
 
     rumors_detected = []
     sample_posts = [
@@ -103,17 +103,14 @@ def scan_social_media_for_rumors(venue_id: str) -> dict:
         lower = post.lower()
         for pattern, category, base_score in RUMOR_KEYWORD_PATTERNS:
             if re.search(pattern, lower, re.IGNORECASE):
+                rng = secrets.SystemRandom()
                 rumors_detected.append(
                     {
                         "category": category,
-                        "severity": round(
-                            base_score + random.uniform(-0.05, 0.10), 2
-                        ),  # nosec B311
-                        "viral_velocity_per_5min": random.randint(
-                            800, 8500
-                        ),  # nosec B311
+                        "severity": round(base_score + rng.uniform(-0.05, 0.10), 2),
+                        "viral_velocity_per_5min": rng.randint(800, 8500),
                         "sample_text_hash": hex(abs(hash(post)))[:10],
-                        "platform": random.choice(  # nosec B311
+                        "platform": rng.choice(
                             ["platform_A", "platform_B", "messaging_app"]
                         ),
                     }

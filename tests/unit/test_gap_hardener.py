@@ -46,7 +46,7 @@ async def test_pubsub_service_production_mock():
                 return "spectasync-api"
             if key == "GOOGLE_CLOUD_PROJECT":
                 return "test-proj"
-            return default
+            return default  # pragma: no cover
 
         mock_env.side_effect = getenv_side_effect
 

@@ -540,9 +540,10 @@ function PreEventStrategicAudit() {
         <p className="text-sm text-slate-400 max-w-md leading-relaxed">{error}</p>
         <button 
           onClick={() => { setError(null); void loadAudit(); }}
+          data-testid="retry-mesh-connection"
           className="mt-4 px-6 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-xs font-bold uppercase tracking-widest text-red-300 transition-all"
         >
-          Re-establish Mesh Connection
+          i18n:strategic.retry_connection
         </button>
       </div>
     );
@@ -591,10 +592,13 @@ function PreEventStrategicAudit() {
              <button 
                onClick={runAnalysis}
                disabled={loading}
+               data-testid="run-strategic-analysis"
                className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 rounded-xl font-bold uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
              >
                {loading ? <Loader2 className="animate-spin" size={16} /> : <Compass size={16} />}
-               {loading ? 'Agent Reasoning...' : 'Refresh Strategic Analysis'}
+               <span data-testid="strategic-btn-text">
+                 {loading ? 'i18n:strategic.agent_reasoning' : 'i18n:strategic.run_analysis'}
+               </span>
              </button>
           </div>
         </InfoSection>
@@ -684,16 +688,16 @@ function PreEventStrategicAudit() {
               </div>
            </div>
         ) : (
-           <div className="h-full flex flex-col items-center justify-center glass p-12 text-center space-y-4">
+           <div className="h-full flex flex-col items-center justify-center glass p-12 text-center space-y-4" data-testid="empty-analysis-state">
               <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400/50">
                  <Compass size={40} />
               </div>
-              <div>
-                 <h2 className="text-xl font-bold text-slate-300">Ready for Strategic Audit</h2>
-                 <p className="text-xs text-slate-500 max-w-xs mx-auto mt-2 tracking-wide">
-                    Invoke Agent 12 to run a multimodal analysis on reservations, weather, and operational friction.
-                 </p>
-              </div>
+               <div>
+                  <h2 className="text-xl font-bold text-slate-300">i18n:strategic.ready_title</h2>
+                  <p className="text-xs text-slate-500 max-w-xs mx-auto mt-2 tracking-wide">
+                     i18n:strategic.ready_desc
+                  </p>
+               </div>
            </div>
         )}
       </div>

@@ -31,6 +31,7 @@ import os
 import json
 import logging
 import time
+import secrets
 from datetime import datetime, timezone
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
@@ -64,21 +65,19 @@ def monitor_infrastructure_health(venue_id: str, zones: list[str]) -> dict:
         dict: Per-component health status with failure probability.
 
     """
-    import random
 
     infra_components = []
     for zone in zones:
-        power_load = random.uniform(0.4, 1.6)  # nosec B311
+        rng = secrets.SystemRandom()
+        power_load = rng.uniform(0.4, 1.6)
         infra_components.append(
             {
                 "zone": zone,
                 "mains_power_load_ratio": round(power_load, 2),
-                "pa_system_status": (
-                    "FAILED" if random.random() < 0.3 else "ONLINE"
-                ),  # nosec B311
-                "led_network_ping_ms": random.randint(10, 9000),  # nosec B311
-                "emergency_lighting_battery_pct": random.randint(12, 100),  # nosec B311
-                "ble_beacon_heartbeat": random.random() > 0.15,  # nosec B311
+                "pa_system_status": ("FAILED" if rng.random() < 0.3 else "ONLINE"),
+                "led_network_ping_ms": rng.randint(10, 9000),
+                "emergency_lighting_battery_pct": rng.randint(12, 100),
+                "ble_beacon_heartbeat": rng.random() > 0.15,
                 "failure_probability_pct": (
                     round(min(100, (power_load - 0.8) * 80), 1)
                     if power_load > 0.8

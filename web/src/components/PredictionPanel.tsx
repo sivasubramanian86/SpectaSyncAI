@@ -9,6 +9,7 @@ import type { SurgeForecast, DensityLevel } from '../types';
 
 interface PredictionPanelProps {
   forecast: SurgeForecast;
+  zoneId?: string;
 }
 
 const LEVEL_COLOR: Record<DensityLevel, string> = {

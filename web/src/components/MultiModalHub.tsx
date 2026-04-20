@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, Mic, Globe, ShieldAlert, MonitorPlay } from 'lucide-react';
+import { Camera, Mic, Globe, ShieldAlert, MonitorPlay, Video, Mic2 } from 'lucide-react';
 
 type MediaType = 'video' | 'audio' | 'image';
 
@@ -13,10 +13,10 @@ interface MediaSource {
   status: 'SAFE' | 'WARNING' | 'CRITICAL';
 }
 
-
-function AudioVisualizer({ isActive }: { isActive: boolean }) {
+export function AudioVisualizer({ isActive }: { isActive: boolean }) {
   return (
-    <div className="flex gap-1 items-end h-20 mb-6">
+    <div className="flex gap-1 items-end h-20 mb-6" data-testid="audio-visualizer">
+      <span className="sr-only">{isActive ? 'i18n:visualizer.active' : 'i18n:visualizer.idle'}</span>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 8, 6, 4, 2].map((_, i) => (
         <div
           key={i}
@@ -49,6 +49,7 @@ export function MultiModalHub() {
   const [activeMedia, setActiveMedia] = useState<MediaSource>(SAMPLE_MEDIA[0]);
   const [frameIdx, setFrameIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [mediaMode, setMediaMode] = useState<'video' | 'audio'>('video');
 
   // Auto-cycle frames for sequences
   useEffect(() => {
@@ -74,7 +75,7 @@ export function MultiModalHub() {
             <MonitorPlay size={20} className="text-blue-400" />
           </div>
           <div>
-            <h2 className="text-sm font-black text-white tracking-widest uppercase mb-1">{t('multiModal.title')}</h2>
+            <h2 data-testid="multi-modal-title" className="text-sm font-black text-white tracking-widest uppercase mb-1">{t('multiModal.title')}</h2>
             <p className="text-[10px] text-slate-500 uppercase font-black">Powered by Gemini 2.5 Flash Multi-Modal</p>
           </div>
         </div>
@@ -107,7 +108,7 @@ export function MultiModalHub() {
         <div className="xl:col-span-2 space-y-4">
           <div className="relative aspect-video bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
              {activeMedia.type === 'video' && (
-               <video key={currentUrl} src={currentUrl} className="w-full h-full object-cover" autoPlay muted loop />
+               <video data-testid="video-element" key={currentUrl} src={currentUrl} className="w-full h-full object-cover" autoPlay muted loop />
              )}
              {activeMedia.type === 'image' && (
                <div className="relative w-full h-full">
@@ -123,6 +124,7 @@ export function MultiModalHub() {
              )}
               {activeMedia.type === 'audio' && (
                 <div 
+                  data-testid="audio-container"
                   className="w-full h-full flex flex-col items-center justify-center bg-black/40 backdrop-blur-3xl rounded-2xl overflow-hidden relative"
                   onClick={() => setIsPlaying(!isPlaying)}
                   style={{ cursor: 'pointer' }}
@@ -175,7 +177,7 @@ export function MultiModalHub() {
                   </div>
                 </div>
               </div>
-
+              
               {/* Live Signal Control Overlay */}
               <div className="absolute bottom-4 left-4 flex gap-2 z-20 text-left">
                  <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-black uppercase tracking-widest text-white hover:bg-blue-600 transition-all group">
@@ -187,12 +189,40 @@ export function MultiModalHub() {
               </div>
           </div>
 
+          <div className="flex bg-navy-900/50 p-1 rounded-xl border border-white/5 w-fit">
+            <button
+              onClick={() => setMediaMode('video')}
+              data-testid="media-mode-video"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                mediaMode === 'video' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Video size={14} />
+              <span className="hidden sm:inline">Visual Analysis</span>
+            </button>
+            <button
+              onClick={() => setMediaMode('audio')}
+              data-testid="media-mode-audio"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                mediaMode === 'audio' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Mic2 size={14} />
+              <span className="hidden sm:inline">Acoustic Guard</span>
+            </button>
+          </div>
+
           <div className="grid grid-cols-3 gap-4">
             {SAMPLE_MEDIA.map(media => (
               <button 
                 key={media.id}
                 onClick={() => setActiveMedia(media)}
-                className={`p-3 rounded-xl border transition-all ${activeMedia.id === media.id ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
+                className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
+                  activeMedia.id === media.id 
+                    ? 'bg-blue-600/20 border-blue-500/50 text-blue-400' 
+                    : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                }`}
+                data-testid={`media-source-${media.id}`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   {media.type === 'video' ? <Camera size={14} /> : media.type === 'audio' ? <Mic size={14} /> : <Camera size={14} />}

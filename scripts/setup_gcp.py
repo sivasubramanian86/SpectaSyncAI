@@ -62,7 +62,9 @@ def run(
     log.info("  $ %s", " ".join(cmd_list))
     # We allow shell=True ONLY for commands with pipes/redirection that are internally controlled.
     # Otherwise, we use the safer list-based approach to prevent shell injection.
-    result = subprocess.run(cmd_list, shell=shell, capture_output=False, text=True)  # nosec B602
+    result = subprocess.run(
+        cmd_list, shell=shell, capture_output=False, text=True
+    )  # nosec B602
     if fatal and result.returncode != 0:
         log.error("Command failed (exit %d): %s", result.returncode, " ".join(cmd_list))
         sys.exit(result.returncode)

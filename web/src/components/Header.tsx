@@ -104,6 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
                     : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
                 title={tab.label}
+                data-testid={`tab-${tab.id}`}
               >
                 {tab.icon}
                 <span className="hidden 2xl:inline whitespace-nowrap">{tab.label}</span>
@@ -137,6 +138,7 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
                       className={`w-full flex items-center gap-3 px-4 py-3 text-left text-[10px] font-bold uppercase tracking-widest transition-colors ${
                         activeTab === tab.id ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:bg-white/5 hover:text-white'
                       }`}
+                      data-testid={`tab-${tab.id}`}
                     >
                       {tab.icon}
                       {tab.label}
@@ -152,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({ lastUpdated, isLive, activeTab, 
           <div className="flex items-center gap-1.5 glass px-2 2xl:px-3 py-1.5 border-white/5 group bg-white/5">
             <Globe size={14} className="text-slate-500 group-hover:text-blue-400 transition-colors" />
             <select 
-              value={i18n.language.slice(0, 2).toUpperCase()}
+              value={(i18n.language || 'en').slice(0, 2).toUpperCase()}
               onChange={(e) => {
                 const lang = e.target.value.toLowerCase();
                 i18n.changeLanguage(lang);

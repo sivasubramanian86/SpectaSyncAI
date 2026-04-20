@@ -24,6 +24,7 @@ import os
 import json
 import logging
 import time
+import secrets
 from datetime import datetime, timedelta
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
@@ -57,16 +58,14 @@ def get_convoy_gps_position(event_id: str) -> dict:
         dict: Current ETA, delay_mins, delay_category.
 
     """
-    import random
 
+    rng = secrets.SystemRandom()
     scheduled_arrival = datetime.now() + timedelta(minutes=-30)
-    estimated_actual = datetime.now() + timedelta(
-        minutes=random.randint(45, 180)
-    )  # nosec B311
+    estimated_actual = datetime.now() + timedelta(minutes=rng.randint(45, 180))
     delay_mins = int((estimated_actual - scheduled_arrival).total_seconds() / 60)
     return {
         "event_id": event_id,
-        "distance_to_venue_km": round(random.uniform(18.5, 42.0), 1),  # nosec B311
+        "distance_to_venue_km": round(rng.uniform(18.5, 42.0), 1),
         "scheduled_arrival_iso": scheduled_arrival.isoformat(),
         "estimated_actual_arrival_iso": estimated_actual.isoformat(),
         "delay_mins": delay_mins,
@@ -83,7 +82,7 @@ def get_convoy_gps_position(event_id: str) -> dict:
                 )
             )
         ),
-        "convoy_speed_kmph": round(random.uniform(35, 65), 1),  # nosec B311
+        "convoy_speed_kmph": round(rng.uniform(35, 65), 1),
     }
 
 

@@ -22,6 +22,7 @@ dist/
 .ruff_cache/
 .pytype/
 .coverage
+.coverage_report.json
 coverage.xml
 htmlcov/
 *.sqlite

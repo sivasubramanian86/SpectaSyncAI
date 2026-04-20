@@ -4,6 +4,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components/Header';
 import * as firebase from '../firebase';
 
@@ -105,5 +106,14 @@ describe('Header Component Coverage', () => {
           const signInBtn = screen.getByText('Firebase disabled');
       await fireEvent.click(signInBtn); // This triggers handleGoogleSignIn (which does nothing as it returns early)
       expect(firebase.signInWithGoogle).not.toHaveBeenCalled();
+  });
+
+  it('handles language fallback (Line 157)', () => {
+    (useTranslation as any).mockReturnValueOnce({
+      t: (k: string) => k,
+      i18n: { changeLanguage: vi.fn(), language: undefined }
+    });
+    render(<Header lastUpdated={lastUpdated} isLive={true} activeTab="dashboard" onTabChange={onTabChange} onLanguageChange={() => {}} />);
+    expect(screen.getByRole('combobox')).toHaveValue('EN');
   });
 });

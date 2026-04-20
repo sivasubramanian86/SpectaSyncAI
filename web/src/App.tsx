@@ -32,7 +32,7 @@ export default function App(): React.ReactElement {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const dashState = useDashboardData();
-  const [, setLanguage] = useState(i18n.language.toUpperCase());
+  const [, setLanguage] = useState((i18n.language || 'en').toUpperCase());
 
   const criticalZones = dashState.zones.filter(z => z.level === 'CRITICAL' || z.level === 'EMERGENCY');
   const avgDensity = dashState.zones.reduce((s, z) => s + z.density, 0) / dashState.zones.length;

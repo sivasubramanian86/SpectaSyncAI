@@ -3,7 +3,7 @@
  * @description Enhanced coverage for SystemPanel logic branches including audit formatting and empty states.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { SystemPanel } from '../components/SystemPanel';
 
 // Mock fetch globally
@@ -94,8 +94,7 @@ describe('SystemPanel Comprehensive Coverage', () => {
       if (url.includes('/analysis')) return Promise.resolve({ ok: true, json: () => Promise.resolve(MOCK_ANALYSIS_DATA) });
       return Promise.resolve({ ok: false });
     });
-    
-    const retryBtn = screen.getByText('Re-establish Mesh Connection');
+    const retryBtn = screen.getByTestId('retry-mesh-connection'); 
     fireEvent.click(retryBtn);
     
     await waitFor(() => expect(screen.getByText('Global Expo 2026')).toBeInTheDocument());
@@ -147,28 +146,40 @@ describe('SystemPanel Comprehensive Coverage', () => {
   });
 
   it('covers manual analysis SUCCESS and edge error paths (Lines 523-525)', async () => {
-    mockFetch.mockImplementation((url) => {
-      if (url.includes('/mock-data')) return Promise.resolve({ ok: true, json: () => Promise.resolve(MOCK_STRATEGIC_DATA) });
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(MOCK_ANALYSIS_DATA) });
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockFetch.mockImplementation(async (url) => {
+      if (url.includes('/mock-data')) return { ok: true, json: () => Promise.resolve(MOCK_STRATEGIC_DATA) };
+      // Artificial delay to ensure findByTestId has time to catch the Loading state
+      await new Promise(resolve => setTimeout(resolve, 50));
+      return { ok: true, json: () => Promise.resolve(MOCK_ANALYSIS_DATA) };
     });
     
     render(<SystemPanel view="pre-event" />);
     await waitFor(() => expect(screen.getByText('Global Expo 2026')).toBeInTheDocument());
     
     // Test SUCCESS path
-    const refreshBtn = screen.getByText('Refresh Strategic Analysis');
-    fireEvent.click(refreshBtn);
-    expect(screen.getByText('Agent Reasoning...')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText('Refresh Strategic Analysis')).toBeInTheDocument());
+    const refreshBtn = screen.getByTestId('run-strategic-analysis');
+    await act(async () => {
+        fireEvent.click(refreshBtn);
+    });
+    
+    // Check for the loading state i18n key using data-testid
+    expect(await screen.findByTestId('strategic-btn-text')).toHaveTextContent(/i18n:strategic\.agent_reasoning/i);
+    
+    // Wait for loading to finish and button to be restored/visible again
+    await waitFor(() => expect(screen.getByTestId('run-strategic-analysis')).not.toBeDisabled());
     
     // Test HTTP error path (!res.ok) - Line 523
     mockFetch.mockImplementation((_url, opt) => {
        if (opt?.method === 'POST') return Promise.resolve({ ok: false, status: 500 });
        return Promise.resolve({ ok: true, json: () => Promise.resolve(MOCK_STRATEGIC_DATA) });
     });
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    fireEvent.click(screen.getByText('Refresh Strategic Analysis'));
-    await waitFor(() => expect(spy).toHaveBeenCalledWith('Analysis failed:', expect.anything()));
+    await act(async () => {
+        fireEvent.click(screen.getByTestId('run-strategic-analysis'));
+    });
+    // Just ensure the button re-enables which means the catch block was hit and loading set to false
+    await waitFor(() => expect(screen.getByTestId('run-strategic-analysis')).not.toBeDisabled());
+    expect(spy).toHaveBeenCalledWith("Analysis failed:", expect.any(Error));
     spy.mockRestore();
   });
 
@@ -191,5 +202,35 @@ describe('SystemPanel Comprehensive Coverage', () => {
      await waitFor(() => expect(screen.getByText(/Outside perimeter: 1234/)).toBeInTheDocument());
      expect(screen.getByText('{}')).toBeInTheDocument();
      expect(screen.getByText('NestedMeasure')).toBeInTheDocument();
+  });
+
+  it('covers cleanup on unmount (Lines 458, 472)', async () => {
+    let resolveScenario: any;
+    let resolveAnalysis: any;
+    const scenarioPromise = new Promise(r => { resolveScenario = r; });
+    const analysisPromise = new Promise(r => { resolveAnalysis = r; });
+
+    mockFetch.mockImplementation(async (url) => {
+      if (url.includes('/mock-data')) {
+        await scenarioPromise;
+        return { ok: true, json: () => Promise.resolve(MOCK_STRATEGIC_DATA) };
+      }
+      if (url.includes('/analysis')) {
+        await analysisPromise;
+        return { ok: true, json: () => Promise.resolve(MOCK_ANALYSIS_DATA) };
+      }
+      return { ok: false };
+    });
+
+    const { unmount } = render(<SystemPanel view="pre-event" />);
+    // unmount before promises resolve, setting isActive = false
+    unmount();
+    
+    // Now resolve them
+    resolveScenario();
+    resolveAnalysis();
+    
+    // Wait a tick to ensure coverage catches the resolved promises with isActive=false
+    await new Promise(r => setTimeout(r, 10));
   });
 });

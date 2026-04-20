@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from '../App';
-import { TRANSLATIONS } from '../translations';
+
 
 /**
  * SpectaSyncAI: User Interaction Integration Tests
@@ -10,12 +10,12 @@ import { TRANSLATIONS } from '../translations';
  * transitions to verify the integrity of the agentic Command Hub UI.
  */
 describe('User Interaction Tests', () => {
-  const t = TRANSLATIONS.EN;
+
 
   it('interacts with VenueHeatmap zones', () => {
     render(<App />);
     // Switch to Tactical View
-    fireEvent.click(screen.getByText(t.tabs.vision));
+    fireEvent.click(screen.getByTestId('tab-vision'));
     
     // Find a zone cell and click it
     const zoneCells = screen.getAllByRole('button').filter(b => b.className.includes('zone-cell'));
@@ -38,7 +38,7 @@ describe('User Interaction Tests', () => {
     
     // Switch to Tactical View (where MultiModalHub is)
     await act(async () => {
-      fireEvent.click(screen.getByText(t.tabs.vision));
+      fireEvent.click(screen.getByTestId('tab-vision'));
     });
     
     // Change language to Hindi and verify
@@ -46,7 +46,7 @@ describe('User Interaction Tests', () => {
     await act(async () => {
       fireEvent.change(select, { target: { value: 'HI' } });
     });
-    expect(screen.getByText(TRANSLATIONS.HI.multiModal.title)).toBeDefined();
+    expect(screen.getByText('i18n:multiModal.title')).toBeDefined();
 
     // Iterate languages
     const langs = ['TE', 'TA', 'JA'];
@@ -81,7 +81,7 @@ describe('User Interaction Tests', () => {
   it('interacts with CrisisDashboard agents', () => {
     render(<App />);
     // Switch to Crisis Mesh
-    fireEvent.click(screen.getByText(t.tabs.crisis));
+    fireEvent.click(screen.getByTestId('tab-crisis'));
     
     // Find an agent card and expand it
     const agentCard = screen.getByText('Perimeter Macro Agent');
@@ -99,7 +99,7 @@ describe('User Interaction Tests', () => {
     render(<App />);
     // Open More menu for secondary tabs
     fireEvent.click(screen.getByText('More'));
-    const tabButton = screen.getByText(t.tabs.settings);
+    const tabButton = screen.getByTestId('tab-system');
     fireEvent.click(tabButton);
     
     // Find a toggle (mock)
@@ -110,9 +110,9 @@ describe('User Interaction Tests', () => {
     // Just verifying it doesn't crash
     // Switch to About to verify About section
     fireEvent.click(screen.getByText('More'));
-    fireEvent.click(screen.getByText(t.tabs.faq)); // Check FAQ first
+    fireEvent.click(screen.getByTestId('tab-faq')); // Check FAQ first
     fireEvent.click(screen.getByText('More'));
-    fireEvent.click(screen.getByText(t.tabs.info));
+    fireEvent.click(screen.getByTestId('tab-about'));
     expect(screen.getByText(/About SpectaSync/)).toBeDefined();
   });
 

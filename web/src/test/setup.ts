@@ -3,7 +3,7 @@
  * Initializes testing library jest-dom extensions and global polyfills.
  */
 import '@testing-library/jest-dom';
-import { expect, afterEach } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
@@ -27,6 +27,21 @@ if (!window.crypto.randomUUID) {
   // @ts-ignore
   window.crypto.randomUUID = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
+
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(() => ({
+    t: (key: string) => `i18n:${key}`,
+    i18n: {
+      changeLanguage: vi.fn(() => Promise.resolve()),
+      language: 'en',
+    },
+  })),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+}));
 
 // runs a cleanup after each test case (e.g. clearing jsdom)
 afterEach(() => {

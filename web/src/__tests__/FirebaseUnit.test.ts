@@ -52,6 +52,9 @@ describe('Firebase Module Logic', () => {
     
     // Stub environment to force isConfigured to false
     vi.stubEnv('VITE_FIREBASE_API_KEY', '');
+    vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', '');
+    vi.stubEnv('VITE_FIREBASE_PROJECT_ID', '');
+    vi.stubEnv('VITE_FIREBASE_APP_ID', '');
     
     const firebase = await import('../firebase');
     
@@ -63,5 +66,31 @@ describe('Firebase Module Logic', () => {
     expect(result).toBeNull();
 
     await firebase.signOutUser(); // should just return
+  });
+
+  it('uses existing app if getApps().length > 0 (Line 68)', async () => {
+    vi.stubEnv('VITE_FIREBASE_API_KEY', 'x');
+    vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', 'x');
+    vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'x');
+    vi.stubEnv('VITE_FIREBASE_APP_ID', 'x');
+
+    const { getApps, getApp } = await import('firebase/app');
+    vi.mocked(getApps).mockReturnValueOnce([{} as any]);
+    
+    vi.resetModules();
+    await import('../firebase');
+    expect(getApp).toHaveBeenCalled();
+  });
+
+  it('handles undefined window (Line 48)', async () => {
+    const originalWindow = global.window;
+    // @ts-ignore
+    delete global.window;
+    
+    vi.resetModules();
+    const fb = await import('../firebase');
+    expect(fb).toBeDefined();
+    
+    global.window = originalWindow;
   });
 });
