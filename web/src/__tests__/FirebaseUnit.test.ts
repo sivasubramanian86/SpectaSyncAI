@@ -72,15 +72,25 @@ describe('Firebase Module Logic', () => {
     vi.resetModules();
     const { getApps, getApp } = await import('firebase/app');
     
-    vi.stubEnv('VITE_FIREBASE_API_KEY', 'x');
-    vi.stubEnv('VITE_FIREBASE_AUTH_DOMAIN', 'x');
-    vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'x');
-    vi.stubEnv('VITE_FIREBASE_APP_ID', 'x');
+    // Inject directly into runtime config to bypass import.meta.env issues in some CI environments
+    // @ts-ignore
+    global.window.__SPECTASYNC_RUNTIME__ = {
+      firebase: {
+        apiKey: 'x',
+        authDomain: 'x',
+        projectId: 'x',
+        appId: 'x'
+      }
+    };
 
     vi.mocked(getApps).mockReturnValue([{} as any]);
     
     await import('../firebase');
     expect(getApp).toHaveBeenCalled();
+    
+    // Cleanup
+    // @ts-ignore
+    delete global.window.__SPECTASYNC_RUNTIME__;
   });
 
   it('handles undefined window (Line 48)', async () => {

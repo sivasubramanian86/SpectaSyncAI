@@ -22,6 +22,7 @@ import os
 import json
 import logging
 import time
+import secrets
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
 from google.adk.sessions import InMemorySessionService
@@ -66,9 +67,8 @@ def query_cell_tower_load(area_code: str, radius_km: float = 2.0) -> dict:
         dict: Network load ratio (1.0 = normal), estimated external crowd.
 
     """
-    import random
-
-    load_ratio = random.uniform(2.8, 6.5)  # nosec B311
+    rng = secrets.SystemRandom()
+    load_ratio = rng.uniform(2.8, 6.5)
     estimated_people = int(load_ratio * 38_000)
     return {
         "area_code": area_code,
@@ -100,11 +100,10 @@ def query_transit_ridership_anomalies(station_ids: list[str]) -> dict:
         dict: Per-station ridership ratios and aggregate crowd estimate.
 
     """
-    import random
-
+    rng = secrets.SystemRandom()
     stations = []
     for sid in station_ids:
-        ratio = random.uniform(1.5, 4.2)  # nosec B311
+        ratio = rng.uniform(1.5, 4.2)
         stations.append(
             {
                 "station_id": sid,

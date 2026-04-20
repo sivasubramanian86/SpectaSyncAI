@@ -2,7 +2,7 @@
 
 import pytest
 import os
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import MagicMock, patch, AsyncMock, PropertyMock
 from agents.failsafe_mesh_agent import (
     monitor_infrastructure_health,
     activate_ble_mesh_broadcast,
@@ -37,13 +37,13 @@ from agents.vision_agent import archive_to_gcs
 
 @pytest.mark.asyncio
 async def test_failsafe_agent_tools():
-    # Test monitor_infrastructure_health with failure possibility
     """Test functionality for test_failsafe_agent_tools."""
-    with (
-        patch("random.uniform", return_value=1.5),
-        patch("random.random", return_value=0.1),
-        patch("random.randint", return_value=50),
-    ):
+    mock_rng = MagicMock()
+    mock_rng.uniform.return_value = 1.5
+    mock_rng.random.return_value = 0.1
+    mock_rng.randint.return_value = 50
+
+    with patch("secrets.SystemRandom", return_value=mock_rng):
         res = monitor_infrastructure_health("V1", ["Z1", "Z2"])
         assert res["overall_status"] == "DEGRADED"
         assert res["immediate_action_required"] is True
@@ -85,11 +85,13 @@ async def test_failsafe_agent_fallback():
 @pytest.mark.asyncio
 async def test_perimeter_agent_tools():
     """Test functionality for test_perimeter_agent_tools."""
-    with patch("random.uniform", return_value=4.0):
+    mock_rng = MagicMock()
+    mock_rng.uniform.side_effect = [4.0, 3.5, 3.5]  # for cell tower, then 2 stations
+
+    with patch("secrets.SystemRandom", return_value=mock_rng):
         res = query_cell_tower_load("12345")
         assert res["avg_network_load_ratio"] == 4.0
 
-    with patch("random.uniform", return_value=3.5):
         res = query_transit_ridership_anomalies(["S1", "S2"])
         # 3.5 * 12000 * 2 = 84000 (> 80000 = CRITICAL)
         assert res["aggregate_alert_level"] == "CRITICAL"
