@@ -94,7 +94,9 @@ def calculate_wait_time(queue_length: int, service_rate_per_min: int) -> dict:
         "recommendation": (
             "Immediate additional staff required"
             if priority == "CRITICAL"
-            else "Monitor closely" if priority == "HIGH" else "No action needed"
+            else "Monitor closely"
+            if priority == "HIGH"
+            else "No action needed"
         ),
     }
 

@@ -97,8 +97,8 @@ describe('User Interactions', () => {
     }
     // Just verifying it doesn't crash
     // Switch to About to verify About section
-    fireEvent.click(screen.getByText('About'));
-    expect(screen.getByText('About SpectaSyncAI')).toBeDefined();
+    fireEvent.click(screen.getByText(/Info/));
+    expect(screen.getByText(/About SpectaSync/)).toBeDefined();
   });
 
   it('triggers chart tooltip in PredictionPanel', () => {

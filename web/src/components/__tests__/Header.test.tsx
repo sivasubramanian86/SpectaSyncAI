@@ -13,7 +13,7 @@ describe('Header Component', () => {
   it('renders correctly with title and tabs', () => {
     render(<Header {...mockProps} />);
     
-    expect(screen.getByText('SpectaSyncAI')).toBeDefined();
+    expect(screen.getAllByText(/SpectaSync/)[0]).toBeDefined();
     expect(screen.getByText('Command Hub')).toBeDefined();
     expect(screen.getByText('Tactical View')).toBeDefined();
     expect(screen.getByText('Crisis Mesh')).toBeDefined();
@@ -21,7 +21,12 @@ describe('Header Component', () => {
 
   it('shows live indicator when isLive is true', () => {
     render(<Header {...mockProps} />);
-    expect(screen.getByText('LIVE')).toBeDefined();
+    expect(screen.getByText(/Link Active/)).toBeDefined();
+  });
+
+  it('shows link severed when isLive is false', () => {
+    render(<Header {...mockProps} isLive={false} />);
+    expect(screen.getByText(/Link Severed/)).toBeDefined();
   });
 
   it('triggers onTabChange when a tab is clicked', () => {

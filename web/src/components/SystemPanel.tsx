@@ -54,7 +54,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <p className="text-sm font-medium text-white">Advanced RAG Augmentation</p>
                 <p className="text-[10px] text-slate-500">Dual-stream Gemini reasoning.</p>
               </div>
-              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+              <button type="button" aria-pressed="true" aria-label="Toggle Advanced RAG Augmentation" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                 <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
               </button>
             </div>
@@ -64,7 +64,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <p className="text-sm font-medium text-white">Agentic Auto-Intervention</p>
                 <p className="text-[10px] text-slate-500">Autonomous PA/Signage updates.</p>
               </div>
-              <button type="button" aria-pressed="false" className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
+              <button type="button" aria-pressed="false" aria-label="Toggle Agentic Auto-Intervention" className="w-10 h-5 bg-slate-700 rounded-full flex items-center justify-start px-1 cursor-pointer">
                 <div className="w-3 h-3 bg-slate-400 rounded-full shadow-sm" />
               </button>
             </div>
@@ -74,7 +74,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <p className="text-sm font-medium text-white">Synthetic Crowd Twin</p>
                 <p className="text-[10px] text-slate-500">Parallel Monte Carlo verify.</p>
               </div>
-              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+              <button type="button" aria-pressed="true" aria-label="Toggle Synthetic Crowd Twin" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                  <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
               </button>
             </div>
@@ -84,7 +84,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                 <p className="text-sm font-medium text-white">Mesh Self-Healing</p>
                 <p className="text-[10px] text-slate-500">Auto-GKE container recovery.</p>
               </div>
-              <button type="button" aria-pressed="true" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
+              <button type="button" aria-pressed="true" aria-label="Toggle Mesh Self-Healing" className="w-10 h-5 bg-blue-600 rounded-full flex items-center justify-end px-1 cursor-pointer">
                  <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
               </button>
             </div>
@@ -110,7 +110,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                <label className="text-[10px] font-bold text-slate-500 uppercase px-1">Privacy Masking</label>
                <div className="flex bg-white/5 p-1 rounded-lg border border-white/5">
                   {['Blur', 'Full Anonymize'].map((label, i) => (
-                    <button key={label} className={`flex-1 text-[10px] py-1.5 rounded transition-all ${i === 1 ? 'bg-blue-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}>
+                    <button key={label} aria-label={`Select ${label} privacy mode`} className={`flex-1 text-[10px] py-1.5 rounded transition-all ${i === 1 ? 'bg-blue-500 text-white font-bold' : 'text-slate-400 hover:text-slate-200'}`}>
                       {label}
                     </button>
                   ))}
@@ -119,8 +119,8 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
 
              <div className="grid grid-cols-1 gap-3">
                <div className="space-y-1">
-                 <label className="text-[10px] font-bold text-slate-500 uppercase px-1 font-mono">Telemetry Rate</label>
-                 <select defaultValue="15s" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none">
+                 <label htmlFor="telemetry-rate" className="text-[10px] font-bold text-slate-500 uppercase px-1 font-mono">Telemetry Rate</label>
+                 <select id="telemetry-rate" defaultValue="15s" className="w-full bg-white/5 border border-white/5 rounded-lg p-2 text-xs text-slate-300 focus:outline-none">
                    <option value="5s">5s (Real-time)</option>
                    <option value="15s">15s (Standard)</option>
                    <option value="60s">60s (Efficiency)</option>
@@ -147,6 +147,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                   const isLight = document.body.classList.toggle('theme-light');
                   localStorage.setItem('spectasync-theme', isLight ? 'light' : 'dark');
                 }}
+                aria-label="Toggle interface visual theme"
                 className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-[10px] font-bold uppercase transition-all"
                >
                  <Sun size={12} className="text-amber-400" /> / <Moon size={12} className="text-blue-400" />
@@ -220,10 +221,10 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
                     Access anonymized incident datasets for GNN training and Crowd Ethics forensics.
                  </p>
                  <div className="flex flex-col gap-2">
-                    <button type="button" className="flex items-center justify-center gap-2 p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
+                    <button type="button" aria-label="Download Sync Dataset Version 3.4" className="flex items-center justify-center gap-2 p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase text-slate-300 transition-all border border-white/5">
                       <Download size={12} /> Sync Dataset V3.4
                     </button>
-                    <button type="button" className="flex items-center justify-center gap-2 p-2.5 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl text-[10px] font-black uppercase text-blue-400 transition-all border border-blue-500/20">
+                    <button type="button" aria-label="Request Access to GNN Computational Node" className="flex items-center justify-center gap-2 p-2.5 bg-blue-500/10 hover:bg-blue-500/20 rounded-xl text-[10px] font-black uppercase text-blue-400 transition-all border border-blue-500/20">
                        Request GNN Node Access
                     </button>
                  </div>
@@ -232,7 +233,7 @@ export function SystemPanel({ view = 'system' }: { view?: TabId }): React.ReactE
 
            <InfoSection title="Developer Support" icon={<ShieldCheck size={24} />}>
               <div className="space-y-4">
-                <a href="https://github.com/sivasubramanian86/SpectaSyncAI" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
+                <a href="https://github.com/sivasubramanian86/SpectaSyncAI" target="_blank" rel="noreferrer" aria-label="View public source code on GitHub (opens in new tab)" className="flex items-center gap-3 p-4 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/5 group">
                   <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-slate-700 group-hover:scale-110 transition-all">
                     <Github className="text-slate-400 group-hover:text-white" size={20} />
                   </div>

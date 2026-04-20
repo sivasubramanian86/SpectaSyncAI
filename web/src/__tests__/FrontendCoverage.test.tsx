@@ -53,7 +53,7 @@ describe('Frontend Coverage Hardening', () => {
 
   it('renders Demographic Insights tab', () => {
     render(<App />);
-    const tabButton = screen.getByText('Demographic Intel');
+    const tabButton = screen.getByText('Demographics');
     fireEvent.click(tabButton);
     expect(screen.getByText('Vision Demographic Intelligence')).toBeDefined();
     expect(screen.getByText('VULNERABLE')).toBeDefined();

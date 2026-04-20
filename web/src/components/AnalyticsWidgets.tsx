@@ -122,28 +122,33 @@ const COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
  * @returns {React.ReactElement} The pie chart visualization.
  */
 export const SentimentPie = () => (
-  <div className="h-[200px] w-full flex items-center justify-center">
+  <div className="h-[250px] w-full flex items-center justify-center relative">
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
           data={sentimentData}
           cx="50%"
           cy="50%"
-          innerRadius={30}
-          outerRadius={50}
-          paddingAngle={5}
+          innerRadius={60}
+          outerRadius={85}
+          paddingAngle={8}
+          cornerRadius={4}
           dataKey="value"
+          stroke="none"
         >
           {sentimentData.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip />
+        <Tooltip 
+          contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+          itemStyle={{ color: '#fff' }}
+        />
       </PieChart>
     </ResponsiveContainer>
-    <div className="absolute flex flex-col items-center">
-      <span className="text-[10px] text-slate-500 uppercase font-black">Sentiment</span>
-      <span className="text-lg font-bold">Stable</span>
+    <div className="absolute flex flex-col items-center justify-center">
+      <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Sentiment</span>
+      <span className="text-xl font-black text-white tracking-tighter">STABLE</span>
     </div>
   </div>
 );

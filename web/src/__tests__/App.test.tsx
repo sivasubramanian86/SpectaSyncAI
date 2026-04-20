@@ -5,7 +5,7 @@ import App from '../App';
 describe('App Component', () => {
   it('renders dashboard by default', () => {
     render(<App />);
-    expect(screen.getByText('SpectaSyncAI')).toBeDefined();
+    expect(screen.getAllByText(/SpectaSync/)[0]).toBeDefined();
     expect(screen.getByText('Command Hub')).toBeDefined();
     // Default tab is dashboard
     expect(screen.getByText('Mesh Sync Performance')).toBeDefined();
