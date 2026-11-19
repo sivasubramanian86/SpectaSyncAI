@@ -1,3 +1,8 @@
+> [!NOTE]
+> **OFFICIAL PORTFOLIO SHOWCASE BY SIVASUBRAMANIAN**  
+> **Original Author:** [Sivasubramanian](https://github.com/sivasubramanian86)  
+> *This repository is an open portfolio showcase. Unauthorized cloning, re-hosting, or submission to hackathons/competitions under another name is strictly prohibited.*
+
 SpectaSyncAI is an enterprise-grade, agentic prevention system designed to preempt large-scale crowd disasters before they manifest. By orchestrating a high-fidelity mesh of **12 autonomous agents**, the system intercepts precursor signals of crowd crush events—ranging from exogenous transit surges to information cascades—using a forensically grounded RAG (Retrieval-Augmented Generation) engine.
 
 Ground-truthed against an anonymized corpus of **18 global crowd incidents (2003–2025)**, SpectaSyncAI transforms reactive security into proactive prevention. It leverages **Gemini 2.5 Pro/Flash** for spatial reasoning and **AlloyDB with pgvector** for real-time historical analogy synthesis, enabling a 45–90 minute intervention window that could have saved 3,500+ lives in the last decade.
